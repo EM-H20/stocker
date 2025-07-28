@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/app_routes.dart';
 
@@ -22,21 +23,30 @@ class ErrorPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            Icon(Icons.error_outline, size: 64.w, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               '페이지를 찾을 수 없습니다',
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall!.copyWith(fontSize: 16.sp),
             ),
             const SizedBox(height: 8),
             Text(
               '경로: ${errorPath ?? "알 수 없음"}',
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium!.copyWith(fontSize: 12.sp),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => context.go(AppRoutes.home),
-              child: const Text('홈으로 돌아가기'),
+              child: Text(
+                '홈으로 돌아가기',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.copyWith(fontSize: 12.sp),
+              ),
             ),
           ],
         ),
