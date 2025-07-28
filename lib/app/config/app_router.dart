@@ -27,27 +27,37 @@ class AppRouter {
           // 교육 탭
           GoRoute(
             path: AppRoutes.education,
-            builder: (context, state) => const EducationScreen(),
+            pageBuilder:
+                (context, state) =>
+                    NoTransitionPage(child: const EducationScreen()),
           ),
           // 출석 탭
           GoRoute(
             path: AppRoutes.attendance,
-            builder: (context, state) => const AttendanceScreen(),
+            pageBuilder:
+                (context, state) =>
+                    NoTransitionPage(child: const AttendanceScreen()),
           ),
           // 성향분석 탭
           GoRoute(
             path: AppRoutes.aptitude,
-            builder: (context, state) => const AptitudeScreen(),
+            pageBuilder:
+                (context, state) =>
+                    NoTransitionPage(child: const AptitudeScreen()),
           ),
           // 오답노트 탭
           GoRoute(
             path: AppRoutes.wrongNote,
-            builder: (context, state) => const WrongNoteScreen(),
+            pageBuilder:
+                (context, state) =>
+                    NoTransitionPage(child: const WrongNoteScreen()),
           ),
           // 마이페이지 탭
           GoRoute(
             path: AppRoutes.mypage,
-            builder: (context, state) => const MypageScreen(),
+            pageBuilder:
+                (context, state) =>
+                    NoTransitionPage(child: const MypageScreen()),
           ),
         ],
       ),
