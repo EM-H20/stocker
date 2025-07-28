@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'tap_item.dart';
 import '../../../app/config/app_routes.dart';
 
@@ -31,12 +31,12 @@ class HomeShell extends StatelessWidget {
       onTap: (index) => _onTabTapped(context, index),
       selectedItemColor: Theme.of(context).primaryColor,
       unselectedItemColor: Colors.grey,
-      selectedLabelStyle: const TextStyle(
-        fontSize: 12,
+      selectedLabelStyle: TextStyle(
+        fontSize: 12.sp,
         fontWeight: FontWeight.w600,
       ),
-      unselectedLabelStyle: const TextStyle(
-        fontSize: 11,
+      unselectedLabelStyle: TextStyle(
+        fontSize: 11.sp,
         fontWeight: FontWeight.w400,
       ),
       // BottomNavigationBarItem을 생성하여 탭 아이콘과 라벨을 설정합니다.
@@ -45,7 +45,7 @@ class HomeShell extends StatelessWidget {
             final isSelected = _isTabSelected(location, tab);
             // isSelected에 따라 아이콘을 변경합니다.
             return BottomNavigationBarItem(
-              icon: Icon(isSelected ? tab.selectedIcon : tab.icon, size: 24),
+              icon: Icon(isSelected ? tab.selectedIcon : tab.icon, size: 24.w),
               label: tab.label,
             );
           }).toList(),
