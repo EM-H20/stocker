@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 // 분리된 위젯들 import
 import 'widgets/search_bar_widget.dart';
-import 'widgets/recommended_content_card.dart';
+import 'widgets/recommended_chapter_card.dart';
 import 'widgets/current_learning_card.dart';
 
 class EducationScreen extends StatefulWidget {
@@ -23,7 +22,7 @@ class _EducationScreenState extends State<EducationScreen> {
     'icon': Icons.trending_up,
   };
 
-  // 추천 학습 컨텐츠를 선택했을 때 현재 진행 학습으로 설정
+  // 추천 학습 챕터를 선택했을 때 현재 진행 학습으로 설정
   void _selectRecommendedContent(Map<String, dynamic> content) {
     setState(() {
       currentLearning = {
@@ -111,11 +110,11 @@ class _EducationScreenState extends State<EducationScreen> {
               ),
               SizedBox(height: 28.h),
 
-              // 추천 학습 컨텐츠 제목
+              // 추천 학습 챕터 제목
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 5.w),
                 child: Text(
-                  '추천 학습 컨텐츠',
+                  '추천 학습 챕터',
                   style: theme.textTheme.titleLarge?.copyWith(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
@@ -124,11 +123,11 @@ class _EducationScreenState extends State<EducationScreen> {
               ),
               SizedBox(height: 16.h),
 
-              // 추천 학습 컨텐츠 리스트
+              // 추천 학습 챕터 리스트
               ...stockEducationData.map((data) {
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 4.2.w), // 좌우 여백
-                  child: RecommendedContentCard(
+                  child: RecommendedChapterCard(
                     title: data['title'] as String,
                     description: data['description'] as String,
                     icon: data['icon'] as IconData,
