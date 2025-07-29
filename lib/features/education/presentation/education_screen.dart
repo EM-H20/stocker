@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 // 분리된 위젯들 import
 import 'widgets/search_bar_widget.dart';
-import 'widgets/recommended_content_card.dart';
+import 'widgets/recommended_chapter_card.dart';
 import 'widgets/current_learning_card.dart';
+import 'package:stocker/app/config/app_routes.dart';
+import 'package:go_router/go_router.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -23,7 +24,7 @@ class _EducationScreenState extends State<EducationScreen> {
     'icon': Icons.trending_up,
   };
 
-  // 추천 학습 컨텐츠를 선택했을 때 현재 진행 학습으로 설정
+  // 추천 학습 챕터를 선택했을 때 현재 진행 학습으로 설정
   void _selectRecommendedContent(Map<String, dynamic> content) {
     setState(() {
       currentLearning = {
@@ -90,7 +91,7 @@ class _EducationScreenState extends State<EducationScreen> {
       backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.w),
+          padding: EdgeInsets.all(18.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -104,30 +105,35 @@ class _EducationScreenState extends State<EducationScreen> {
                 description: currentLearning['description'],
                 progress: currentLearning['progress'],
                 progressText: currentLearning['progressText'],
-                onTheoryPressed:
-                    () => debugPrint('${currentLearning['title']} 이론 학습 클릭'),
+                onTheoryPressed: () => {context.go(AppRoutes.theory)},
                 onQuizPressed:
                     () => debugPrint('${currentLearning['title']} 퀴즈 풀기 클릭'),
               ),
               SizedBox(height: 28.h),
 
-              // 추천 학습 컨텐츠 제목
-              Text(
-                '추천 학습 컨텐츠',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
+              // 추천 학습 챕터 제목
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 5.w),
+                child: Text(
+                  '추천 학습 챕터',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               SizedBox(height: 16.h),
 
-              // 추천 학습 컨텐츠 리스트
+              // 추천 학습 챕터 리스트
               ...stockEducationData.map((data) {
-                return RecommendedContentCard(
-                  title: data['title'] as String,
-                  description: data['description'] as String,
-                  icon: data['icon'] as IconData,
-                  onTap: () => _selectRecommendedContent(data),
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4.2.w), // 좌우 여백
+                  child: RecommendedChapterCard(
+                    title: data['title'] as String,
+                    description: data['description'] as String,
+                    icon: data['icon'] as IconData,
+                    onTap: () => _selectRecommendedContent(data),
+                  ),
                 );
               }),
             ],

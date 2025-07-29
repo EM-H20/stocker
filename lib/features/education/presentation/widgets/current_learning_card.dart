@@ -28,7 +28,7 @@ class CurrentLearningCard extends StatelessWidget {
 
     return Card(
       elevation: 4,
-      shadowColor: colorScheme.shadow.withOpacity(0.3),
+      shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
         padding: EdgeInsets.all(24.w), // 기존 20.w에서 확대
@@ -41,7 +41,7 @@ class CurrentLearningCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(
@@ -124,6 +124,9 @@ class CurrentLearningCard extends StatelessWidget {
                     text: '이론 학습',
                     icon: Icons.book_outlined,
                     color: AppTheme.primaryColor, // app_theme.dart의 색상 사용
+                    // 아래 코드 해석 :
+                    // onTheoryPressed가 null이면 debugPrint('이론 학습 클릭')을 실행
+                    // 그렇지 않으면 onTheoryPressed를 실행
                     onPressed: onTheoryPressed ?? () => debugPrint('이론 학습 클릭'),
                   ),
                 ),

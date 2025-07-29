@@ -17,7 +17,7 @@ dependencies:
   flutter_screenutil: ^5.9.3
 
   # 로컬 푸시 알림 (출석 알림 등)
-  flutter_local_notifications: ^19.3.0
+  # flutter_local_notifications: ^19.3.0
 
   # 네트워크 및 인증
   dio: ^5.8.0+1                    # REST API 통신

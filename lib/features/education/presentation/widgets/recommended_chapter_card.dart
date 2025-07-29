@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// 추천 학습 컨텐츠 카드 위젯
+/// 추천 학습 챕터 카드 위젯
 ///
-/// 추천 학습 컨텐츠를 표시하는 재사용 가능한 리스트 타일 카드입니다.
-class RecommendedContentCard extends StatelessWidget {
-  const RecommendedContentCard({
+/// 추천 학습 챕터를 표시하는 재사용 가능한 리스트 타일 카드입니다.
+class RecommendedChapterCard extends StatelessWidget {
+  const RecommendedChapterCard({
     super.key,
     required this.title,
     required this.description,
@@ -39,12 +39,12 @@ class RecommendedContentCard extends StatelessWidget {
         subtitle: Text(
           description,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
-          color: colorScheme.onSurface.withOpacity(0.5),
+          color: colorScheme.onSurface.withValues(alpha: 0.5),
           size: 16.sp,
         ),
         onTap: onTap,
