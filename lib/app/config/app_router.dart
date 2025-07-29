@@ -7,6 +7,7 @@ import '../../features/attendance/presentation/attendance_screen.dart';
 import '../../features/aptitude/presentation/aptitude_screen.dart';
 import '../../features/wrong_note/presentation/wrong_note_screen.dart';
 import '../../features/mypage/presentation/mypage_screen.dart';
+import '../../features/education/presentation/theory_screen.dart';
 
 /// 앱 전체의 라우팅을 관리하는 GoRouter 설정
 class AppRouter {
@@ -31,6 +32,7 @@ class AppRouter {
                 (context, state) =>
                     NoTransitionPage(child: const EducationScreen()),
           ),
+
           // 출석 탭
           GoRoute(
             path: AppRoutes.attendance,
@@ -62,7 +64,14 @@ class AppRouter {
         ],
       ),
 
-      // TODO: 추후 추가될 라우트들 (ShellRoute 외부)
+      // 독립적인 전체 화면들 (ShellRoute 외부)
+      // 이론 학습 화면
+      GoRoute(
+        path: AppRoutes.theory,
+        builder: (context, state) => const TheoryScreen(),
+      ),
+
+      // TODO: 추후 추가될 라우트들
       // - 로그인/회원가입 화면
       // - 스플래시 화면
       // - 온보딩 화면

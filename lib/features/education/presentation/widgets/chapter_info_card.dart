@@ -67,7 +67,7 @@ class ChapterInfoCard extends StatelessWidget {
             Text(
               description,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurface.withOpacity(0.7),
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
                 height: 1.5,
               ),
             ),

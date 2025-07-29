@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'widgets/search_bar_widget.dart';
 import 'widgets/recommended_chapter_card.dart';
 import 'widgets/current_learning_card.dart';
+import 'package:stocker/app/config/app_routes.dart';
+import 'package:go_router/go_router.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -103,8 +105,7 @@ class _EducationScreenState extends State<EducationScreen> {
                 description: currentLearning['description'],
                 progress: currentLearning['progress'],
                 progressText: currentLearning['progressText'],
-                onTheoryPressed:
-                    () => debugPrint('${currentLearning['title']} 이론 학습 클릭'),
+                onTheoryPressed: () => {context.go(AppRoutes.theory)},
                 onQuizPressed:
                     () => debugPrint('${currentLearning['title']} 퀴즈 풀기 클릭'),
               ),

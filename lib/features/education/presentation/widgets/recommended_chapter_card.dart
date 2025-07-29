@@ -39,12 +39,12 @@ class RecommendedChapterCard extends StatelessWidget {
         subtitle: Text(
           description,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: colorScheme.onSurface.withOpacity(0.7),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
-          color: colorScheme.onSurface.withOpacity(0.5),
+          color: colorScheme.onSurface.withValues(alpha: 0.5),
           size: 16.sp,
         ),
         onTap: onTap,
