@@ -6,7 +6,7 @@ class AppTheme {
   // 브랜드 커러
   static const Color primaryColor = Color(0xFF2196F3); // 파란색
   static const Color secondaryColor = Color(0xFF03DAC6); // 청록색
-  static const Color errorColor = Color(0xFFB00020); // 빨간색
+  static const Color accentColor = Color(0xFFB00020); // 강조색 (빨간색)
   static const Color surfaceColor = Color(0xFFFAFAFA); // 배경색
 
   // 그레이 스케일
@@ -32,7 +32,7 @@ class AppTheme {
         seedColor: primaryColor,
         brightness: Brightness.light,
         surface: surfaceColor,
-        error: errorColor,
+        error: accentColor,
       ),
 
       // 텍스트 테마
@@ -101,7 +101,7 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),
-          borderSide: const BorderSide(color: errorColor),
+          borderSide: const BorderSide(color: accentColor),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       ),
@@ -118,7 +118,7 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         brightness: Brightness.dark,
-        error: errorColor,
+        error: accentColor,
       ),
 
       // 텍스트 테마

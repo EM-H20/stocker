@@ -1,0 +1,146 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/widgets/action_button.dart';
+
+class CurrentLearningCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final double progress;
+  final String progressText;
+  final VoidCallback? onTheoryPressed;
+  final VoidCallback? onQuizPressed;
+
+  const CurrentLearningCard({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.progress,
+    required this.progressText,
+    this.onTheoryPressed,
+    this.onQuizPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Card(
+      elevation: 4,
+      shadowColor: colorScheme.shadow.withOpacity(0.3),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+      child: Padding(
+        padding: EdgeInsets.all(24.w), // 기존 20.w에서 확대
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 챕터 헤더
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8.w),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Icon(
+                    Icons.trending_up,
+                    color: colorScheme.primary,
+                    size: 24.sp,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Text(
+                    '현재 진행 학습',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20.h), // 기존 16.h에서 확대
+            // 챕터 제목
+            Text(
+              title,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 12.h), // 기존 8.h에서 확대
+            // 챕터 설명
+            Text(
+              description,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
+            ),
+            SizedBox(height: 24.h), // 기존 20.h에서 확대
+            // 진행률 바
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '진행률',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      progressText,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.h), // 기존 8.h에서 확대
+                LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    colorScheme.primary,
+                  ),
+                  minHeight: 8.h,
+                ),
+              ],
+            ),
+            SizedBox(height: 24.h), // ActionButton을 위한 공간
+            // ActionButton 추가
+            Row(
+              children: [
+                Expanded(
+                  child: ActionButton(
+                    text: '이론 학습',
+                    icon: Icons.book_outlined,
+                    color: AppTheme.primaryColor, // app_theme.dart의 색상 사용
+                    onPressed: onTheoryPressed ?? () => debugPrint('이론 학습 클릭'),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: ActionButton(
+                    text: '퀴즈 풀기',
+                    icon: Icons.quiz_outlined,
+                    color: AppTheme.grey700, // app_theme.dart의 강조색 사용
+                    onPressed: onQuizPressed ?? () => debugPrint('퀴즈 풀기 클릭'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
