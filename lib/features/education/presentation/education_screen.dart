@@ -90,7 +90,7 @@ class _EducationScreenState extends State<EducationScreen> {
       backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.w),
+          padding: EdgeInsets.all(18.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -112,22 +112,28 @@ class _EducationScreenState extends State<EducationScreen> {
               SizedBox(height: 28.h),
 
               // 추천 학습 컨텐츠 제목
-              Text(
-                '추천 학습 컨텐츠',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.bold,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 5.w),
+                child: Text(
+                  '추천 학습 컨텐츠',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               SizedBox(height: 16.h),
 
               // 추천 학습 컨텐츠 리스트
               ...stockEducationData.map((data) {
-                return RecommendedContentCard(
-                  title: data['title'] as String,
-                  description: data['description'] as String,
-                  icon: data['icon'] as IconData,
-                  onTap: () => _selectRecommendedContent(data),
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4.2.w), // 좌우 여백
+                  child: RecommendedContentCard(
+                    title: data['title'] as String,
+                    description: data['description'] as String,
+                    icon: data['icon'] as IconData,
+                    onTap: () => _selectRecommendedContent(data),
+                  ),
                 );
               }),
             ],
