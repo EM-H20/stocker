@@ -18,22 +18,22 @@ class TheoryEnterResponse {
   /// JSON에서 객체로 변환
   factory TheoryEnterResponse.fromJson(Map<String, dynamic> json) {
     return TheoryEnterResponse(
-      chapterId: json['chapter_id'] as int,
-      chapterTitle: json['chapter_title'] as String,
+      chapterId: json['chapterId'] as int,
+      chapterTitle: json['chapterTitle'] as String,
       theories: (json['theories'] as List<dynamic>)
           .map((theoryJson) => Theory.fromJson(theoryJson as Map<String, dynamic>))
           .toList(),
-      currentTheoryId: json['current_theory_id'] as int,
+      currentTheoryId: json['currentTheoryId'] as int,
     );
   }
 
   /// 객체에서 JSON으로 변환
   Map<String, dynamic> toJson() {
     return {
-      'chapter_id': chapterId,
-      'chapter_title': chapterTitle,
+      'chapterId': chapterId,
+      'chapterTitle': chapterTitle,
       'theories': theories.map((theory) => theory.toJson()).toList(),
-      'current_theory_id': currentTheoryId,
+      'currentTheoryId': currentTheoryId,
     };
   }
 

@@ -15,17 +15,20 @@ class EducationApi {
 
   /// 챕터 목록 조회
   /// GET /api/education/chapters
-  /// 
+  ///
   /// Returns: List<ChapterCardResponse>
   /// Throws: DioException on network error
   Future<List<ChapterCardResponse>> getChapters() async {
     try {
       final response = await _dio.get('$_baseUrl/chapters');
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List<dynamic>;
         return data
-            .map((json) => ChapterCardResponse.fromJson(json as Map<String, dynamic>))
+            .map(
+              (json) =>
+                  ChapterCardResponse.fromJson(json as Map<String, dynamic>),
+            )
             .toList();
       } else {
         throw DioException(
@@ -46,7 +49,7 @@ class EducationApi {
 
   /// 이론 진입
   /// POST /api/education/theory/enter
-  /// 
+  ///
   /// [request]: 이론 진입 요청 데이터
   /// Returns: TheoryEnterResponse
   /// Throws: DioException on network error
@@ -56,9 +59,11 @@ class EducationApi {
         '$_baseUrl/theory/enter',
         data: request.toJson(),
       );
-      
+
       if (response.statusCode == 200) {
-        return TheoryEnterResponse.fromJson(response.data as Map<String, dynamic>);
+        return TheoryEnterResponse.fromJson(
+          response.data as Map<String, dynamic>,
+        );
       } else {
         throw DioException(
           requestOptions: response.requestOptions,
@@ -78,7 +83,7 @@ class EducationApi {
 
   /// 이론 진도 갱신
   /// PUT /api/education/theory/progress
-  /// 
+  ///
   /// [request]: 이론 진도 갱신 요청 데이터
   /// Returns: void (성공 시 응답 없음)
   /// Throws: DioException on network error
@@ -88,7 +93,7 @@ class EducationApi {
         '$_baseUrl/theory/progress',
         data: request.toJson(),
       );
-      
+
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw DioException(
           requestOptions: response.requestOptions,
@@ -108,7 +113,7 @@ class EducationApi {
 
   /// 이론 완료 처리
   /// POST /api/education/theory/complete
-  /// 
+  ///
   /// [request]: 이론 완료 처리 요청 데이터
   /// Returns: void (성공 시 응답 없음)
   /// Throws: DioException on network error
@@ -118,7 +123,7 @@ class EducationApi {
         '$_baseUrl/theory/complete',
         data: request.toJson(),
       );
-      
+
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw DioException(
           requestOptions: response.requestOptions,

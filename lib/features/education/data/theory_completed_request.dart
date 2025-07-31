@@ -10,14 +10,14 @@ class TheoryCompletedRequest {
   /// JSON에서 객체로 변환
   factory TheoryCompletedRequest.fromJson(Map<String, dynamic> json) {
     return TheoryCompletedRequest(
-      chapterId: json['chapter_id'] as int,
+      chapterId: json['chapterId'] as int,
     );
   }
 
   /// 객체에서 JSON으로 변환
   Map<String, dynamic> toJson() {
     return {
-      'chapter_id': chapterId,
+      'chapterId': chapterId,
     };
   }
 
