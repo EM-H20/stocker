@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/config/app_routes.dart';
+import '../../../app/core/widgets/action_button.dart';
 
 class TheoryScreen extends StatefulWidget {
   const TheoryScreen({super.key});
@@ -172,6 +173,16 @@ class _TheoryScreenState extends State<TheoryScreen> {
     }
   }
 
+  // 이론 완료 처리
+  void _completeTheory() {
+    // TODO: EducationProvider를 통해 이론 완료 API 호출
+    // final provider = Provider.of<EducationProvider>(context, listen: false);
+    // await provider.completeTheory(chapterId);
+
+    // 이전 화면으로 돌아가기
+    context.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -317,44 +328,37 @@ class _TheoryScreenState extends State<TheoryScreen> {
               children: [
                 // 이전 버튼
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _currentPage > 0 ? _previousPage : null,
-                    icon: const Icon(Icons.arrow_back),
-                    label: const Text('이전'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.outline.withValues(alpha: 0.1),
-                      foregroundColor: Theme.of(context).colorScheme.onSurface,
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
+                  child: ActionButton(
+                    text: '이전',
+                    icon: Icons.arrow_back,
+                    color:
+                        _currentPage > 0
+                            ? Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.3)
+                            : Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.1),
+                    onPressed: _currentPage > 0 ? _previousPage : () {},
+                    height: 48.h,
                   ),
                 ),
                 SizedBox(width: 12.w),
 
                 // 다음 버튼
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _currentPage < totalPages - 1 ? _nextPage : null,
-                    icon: const Icon(Icons.arrow_forward),
-                    label: Text(_currentPage < totalPages - 1 ? '다음' : '완료'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 1),
-                      foregroundColor: Theme.of(
-                        context,
-                      ).colorScheme.onPrimary.withValues(alpha: 1),
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                    ),
+                  child: ActionButton(
+                    text: _currentPage < totalPages - 1 ? '다음' : '완료',
+                    icon:
+                        _currentPage < totalPages - 1
+                            ? Icons.arrow_forward
+                            : Icons.check,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    onPressed:
+                        _currentPage < totalPages - 1
+                            ? _nextPage
+                            : _completeTheory,
+                    height: 48.h,
                   ),
                 ),
               ],
