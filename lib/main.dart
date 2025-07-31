@@ -5,9 +5,13 @@ import 'package:provider/provider.dart';
 import 'app/config/app_router.dart';
 import 'app/config/app_theme.dart';
 import 'features/home/presentation/home_navigation_provider.dart';
+import 'features/education/presentation/education_provider.dart';
+import 'features/education/domain/education_repository.dart';
+import 'features/education/data/education_api.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 // TODO: 추후 추가할 Provider들
 // import 'features/auth/presentation/auth_provider.dart';
-// import 'features/education/presentation/education_provider.dart';
 
 void main() {
   runApp(const StockerApp());
@@ -31,9 +35,28 @@ class StockerApp extends StatelessWidget {
           providers: [
             // 홈 네비게이션 상태 관리
             ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
+
+            // Education 상태 관리
+            ChangeNotifierProvider(
+              create: (_) {
+                // Dio 인스턴스 생성
+                final dio = Dio();
+                // FlutterSecureStorage 인스턴스 생성
+                const storage = FlutterSecureStorage();
+                // EducationApi 인스턴스 생성
+                final educationApi = EducationApi(dio);
+                // EducationRepository 인스턴스 생성
+                final educationRepository = EducationRepository(
+                  educationApi,
+                  storage,
+                );
+                // EducationProvider 인스턴스 생성
+                return EducationProvider(educationRepository);
+              },
+            ),
+
             // TODO: 추후 추가할 Provider들
             // ChangeNotifierProvider(create: (_) => AuthProvider()),
-            // ChangeNotifierProvider(create: (_) => EducationProvider()),
             // ChangeNotifierProvider(create: (_) => AttendanceProvider()),
             // ChangeNotifierProvider(create: (_) => AptitudeProvider()),
           ],
