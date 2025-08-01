@@ -14,6 +14,7 @@ class ChapterInfo {
   });
 
   /// 복사본 생성
+  /// 이유 : Provider에서 챕터 정보를 업데이트할 때 사용
   ChapterInfo copyWith({
     int? id,
     String? title,
@@ -34,6 +35,7 @@ class ChapterInfo {
         'isTheoryCompleted: $isTheoryCompleted, isQuizCompleted: $isQuizCompleted)';
   }
 
+  // chapterInfo가 같은지 비교(id, title, isTheoryCompleted, isQuizCompleted)
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -44,6 +46,7 @@ class ChapterInfo {
         other.isQuizCompleted == isQuizCompleted;
   }
 
+  // chapterInfo의 해시코드
   @override
   int get hashCode {
     return Object.hash(id, title, isTheoryCompleted, isQuizCompleted);

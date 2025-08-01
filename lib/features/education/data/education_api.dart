@@ -16,12 +16,13 @@ class EducationApi {
   /// 챕터 목록 조회
   /// GET /api/education/chapters
   ///
-  /// Returns: List<ChapterCardResponse>
+  /// Returns: List ChapterCardResponse
   /// Throws: DioException on network error
   Future<List<ChapterCardResponse>> getChapters() async {
     try {
       final response = await _dio.get('$_baseUrl/chapters');
 
+      // 성공 응답 확인
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List<dynamic>;
         return data
@@ -60,6 +61,7 @@ class EducationApi {
         data: request.toJson(),
       );
 
+      // 성공 응답 확인
       if (response.statusCode == 200) {
         return TheoryEnterResponse.fromJson(
           response.data as Map<String, dynamic>,
@@ -94,6 +96,7 @@ class EducationApi {
         data: request.toJson(),
       );
 
+      // 성공 응답 확인
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw DioException(
           requestOptions: response.requestOptions,
@@ -124,6 +127,7 @@ class EducationApi {
         data: request.toJson(),
       );
 
+      // 성공 응답 확인
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw DioException(
           requestOptions: response.requestOptions,

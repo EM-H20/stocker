@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
 
+// 현재 진행 학습 정보 카드 위젯
 class CurrentLearningCard extends StatelessWidget {
   final String title;
   final String description;
@@ -26,6 +27,7 @@ class CurrentLearningCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // 현재 진행 학습 정보 카드 위젯
     return Card(
       elevation: 4,
       shadowColor: colorScheme.shadow.withValues(alpha: 0.3),

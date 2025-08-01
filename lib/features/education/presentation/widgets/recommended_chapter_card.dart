@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// 추천 학습 챕터 카드 위젯
-///
-/// 추천 학습 챕터를 표시하는 재사용 가능한 리스트 타일 카드입니다.
+// 추천 학습 챕터 카드 위젯
 class RecommendedChapterCard extends StatelessWidget {
   const RecommendedChapterCard({
     super.key,
@@ -23,6 +21,7 @@ class RecommendedChapterCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // 추천 학습 챕터 카드 위젯
     return Card(
       margin: EdgeInsets.only(bottom: 12.h),
       child: ListTile(

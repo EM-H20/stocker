@@ -266,6 +266,18 @@ class EducationProvider extends ChangeNotifier {
     return index >= 0 ? index : 0;
   }
 
+  /// 현재 이론 인덱스 설정
+  void setCurrentTheoryIndex(int index) {
+    if (_currentTheorySession != null &&
+        index >= 0 &&
+        index < _currentTheorySession!.theories.length) {
+      _currentTheorySession = _currentTheorySession!.copyWith(
+        currentTheoryIndex: index,
+      );
+      notifyListeners();
+    }
+  }
+
   /// 로컬 챕터 완료 상태 업데이트
   void _updateLocalChapterCompletion(int chapterId, bool isCompleted) {
     final chapterIndex = _chapters.indexWhere((c) => c.id == chapterId);

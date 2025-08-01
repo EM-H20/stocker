@@ -12,11 +12,8 @@ class TheoryInfo {
   });
 
   /// 복사본 생성
-  TheoryInfo copyWith({
-    int? id,
-    String? word,
-    String? content,
-  }) {
+  /// 이유 : Provider에서 이론 정보를 업데이트할 때 사용
+  TheoryInfo copyWith({int? id, String? word, String? content}) {
     return TheoryInfo(
       id: id ?? this.id,
       word: word ?? this.word,
@@ -29,6 +26,7 @@ class TheoryInfo {
     return 'TheoryInfo(id: $id, word: $word, content: $content)';
   }
 
+  // theoryInfo가 같은지 비교(id, word, content)
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -38,6 +36,7 @@ class TheoryInfo {
         other.content == content;
   }
 
+  // theoryInfo의 해시코드
   @override
   int get hashCode => Object.hash(id, word, content);
 }

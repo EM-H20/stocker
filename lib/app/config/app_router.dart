@@ -64,11 +64,14 @@ class AppRouter {
         ],
       ),
 
-      // 독립적인 전체 화면들 (ShellRoute 외부)
       // 이론 학습 화면
       GoRoute(
         path: AppRoutes.theory,
-        builder: (context, state) => const TheoryScreen(),
+        builder: (context, state) {
+          final chapterIdStr = state.uri.queryParameters['chapterId'];
+          final chapterId = int.tryParse(chapterIdStr ?? '') ?? 1;
+          return TheoryScreen(chapterId: chapterId);
+        },
       ),
 
       // TODO: 추후 추가될 라우트들

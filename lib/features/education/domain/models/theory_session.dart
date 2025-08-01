@@ -61,6 +61,7 @@ class TheorySession {
     List<TheoryInfo>? theories,
     int? currentTheoryIndex,
   }) {
+    // return 정보 : Provider에서 이론 세션을 업데이트할 때 사용
     return TheorySession(
       chapterId: chapterId ?? this.chapterId,
       chapterTitle: chapterTitle ?? this.chapterTitle,
@@ -69,12 +70,14 @@ class TheorySession {
     );
   }
 
+  // theorySession의 정보를 문자열로 반환
   @override
   String toString() {
     return 'TheorySession(chapterId: $chapterId, chapterTitle: $chapterTitle, '
         'theories: ${theories.length} items, currentTheoryIndex: $currentTheoryIndex)';
   }
 
+  // theorySession이 같은지 비교(chapterId, chapterTitle, currentTheoryIndex, theories)
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -85,12 +88,15 @@ class TheorySession {
         _listEquals(other.theories, theories);
   }
 
+  // theorySession의 해시코드
   @override
   int get hashCode {
     return Object.hash(chapterId, chapterTitle, currentTheoryIndex, theories);
   }
 
-  /// 리스트 동등성 비교 헬퍼 함수
+  // 리스트 동등성 비교 헬퍼 함수
+  // 이유 : theorySession이 같은지 비교할 때 사용
+  // 리스트는 == 연산자를 사용할 수 없기 때문에 직접 비교
   bool _listEquals<T>(List<T> a, List<T> b) {
     if (a.length != b.length) return false;
     for (int i = 0; i < a.length; i++) {

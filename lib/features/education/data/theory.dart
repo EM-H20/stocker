@@ -1,3 +1,5 @@
+import '../domain/models/theory_info.dart';
+
 /// 개별 이론 정보 모델
 /// TheoryEnterResponseDto 내부의 theories 배열 요소
 class Theory {
@@ -22,11 +24,7 @@ class Theory {
 
   /// 객체에서 JSON으로 변환
   Map<String, dynamic> toJson() {
-    return {
-      'theoryId': theoryId,
-      'word': word,
-      'content': content,
-    };
+    return {'theoryId': theoryId, 'word': word, 'content': content};
   }
 
   /// 디버깅용 문자열 표현
@@ -49,15 +47,17 @@ class Theory {
   int get hashCode => Object.hash(theoryId, word, content);
 
   /// 복사본 생성
-  Theory copyWith({
-    int? theoryId,
-    String? word,
-    String? content,
-  }) {
+  Theory copyWith({int? theoryId, String? word, String? content}) {
     return Theory(
       theoryId: theoryId ?? this.theoryId,
       word: word ?? this.word,
       content: content ?? this.content,
     );
+  }
+
+  /// 도메인 모델로 변환
+  /// Theory(data) → TheoryInfo(domain)
+  TheoryInfo toDomain() {
+    return TheoryInfo(id: theoryId, word: word, content: content);
   }
 }

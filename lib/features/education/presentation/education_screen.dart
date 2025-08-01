@@ -96,7 +96,7 @@ class _EducationScreenState extends State<EducationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 검색바
-              const SearchBarWidget(hintText: '챙터나 주제를 검색하세요'),
+              const SearchBarWidget(hintText: '챕터나 주제를 검색하세요'),
               SizedBox(height: 28.h),
 
               // 현재 진행 학습 카드

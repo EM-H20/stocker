@@ -7,7 +7,6 @@ import '../data/theory_enter_response.dart';
 import '../data/theory_update_request.dart';
 import '../data/theory_completed_request.dart';
 import 'models/chapter_info.dart';
-import 'models/theory_info.dart';
 import 'models/theory_session.dart';
 
 /// Education 관련 Repository 클래스
@@ -16,7 +15,7 @@ import 'models/theory_session.dart';
 class EducationRepository {
   final EducationApi _api;
   final FlutterSecureStorage _storage;
-  
+
   // 로컬 저장소 키 상수
   static const String _chaptersKey = 'education_chapters';
   static const String _currentTheoryKey = 'current_theory_data';
@@ -25,12 +24,12 @@ class EducationRepository {
   EducationRepository(this._api, this._storage);
 
   /// 챕터 목록 조회
-  /// 
+  ///
   /// 1. 로컬 캐시 확인
   /// 2. 캐시가 없거나 만료된 경우 API 호출
   /// 3. 새 데이터를 로컬에 저장
-  /// 
-  /// Returns: List<ChapterInfo>
+  ///
+  /// Returns: List ChapterInfo
   /// Throws: Exception on error
   Future<List<ChapterInfo>> getChapters({bool forceRefresh = false}) async {
     try {
@@ -44,10 +43,10 @@ class EducationRepository {
 
       // API에서 최신 데이터 가져오기
       final chapters = await _api.getChapters();
-      
+
       // 로컬 캐시에 저장
       await _cacheChapters(chapters);
-      
+
       // Domain 모델로 변환하여 반환
       return chapters.map(_mapToChapterInfo).toList();
     } catch (e) {
@@ -56,13 +55,13 @@ class EducationRepository {
       if (cachedChapters != null && cachedChapters.isNotEmpty) {
         return cachedChapters.map(_mapToChapterInfo).toList();
       }
-      
+
       throw Exception('챕터 목록 조회 실패: $e');
     }
   }
 
   /// 이론 진입
-  /// 
+  ///
   /// [chapterId]: 진입할 챕터 ID
   /// Returns: TheorySession
   /// Throws: Exception on error
@@ -70,10 +69,10 @@ class EducationRepository {
     try {
       final request = TheoryEnterRequest(chapterId: chapterId);
       final response = await _api.enterTheory(request);
-      
+
       // 현재 이론 데이터를 로컬에 저장
       await _cacheCurrentTheory(response);
-      
+
       // Domain 모델로 변환하여 반환
       return _mapToTheorySession(response);
     } catch (e) {
@@ -82,7 +81,7 @@ class EducationRepository {
   }
 
   /// 이론 진도 갱신
-  /// 
+  ///
   /// [chapterId]: 챕터 ID
   /// [currentTheoryId]: 현재 조회 중인 이론 ID
   /// Returns: void
@@ -93,9 +92,9 @@ class EducationRepository {
         chapterId: chapterId,
         currentTheoryId: currentTheoryId,
       );
-      
+
       await _api.updateTheoryProgress(request);
-      
+
       // 로컬 진도 정보 업데이트
       await _saveTheoryProgress(chapterId, currentTheoryId);
     } catch (e) {
@@ -104,7 +103,7 @@ class EducationRepository {
   }
 
   /// 이론 완료 처리
-  /// 
+  ///
   /// [chapterId]: 완료할 챕터 ID
   /// Returns: void
   /// Throws: Exception on error
@@ -112,10 +111,10 @@ class EducationRepository {
     try {
       final request = TheoryCompletedRequest(chapterId: chapterId);
       await _api.completeTheory(request);
-      
+
       // 로컬 캐시 업데이트 (해당 챕터의 이론 완료 상태 변경)
       await _updateChapterTheoryCompletion(chapterId, true);
-      
+
       // 현재 이론 데이터 삭제
       await _clearCurrentTheory();
     } catch (e) {
@@ -124,12 +123,14 @@ class EducationRepository {
   }
 
   /// 로컬에 저장된 이론 진도 조회
-  /// 
+  ///
   /// [chapterId]: 챕터 ID
   /// Returns: 마지막 조회한 이론 ID (없으면 null)
   Future<int?> getTheoryProgress(int chapterId) async {
     try {
-      final progressStr = await _storage.read(key: '$_theoryProgressKey$chapterId');
+      final progressStr = await _storage.read(
+        key: '$_theoryProgressKey$chapterId',
+      );
       return progressStr != null ? int.parse(progressStr) : null;
     } catch (e) {
       return null;
@@ -137,7 +138,7 @@ class EducationRepository {
   }
 
   /// 현재 이론 데이터 조회 (로컬 캐시)
-  /// 
+  ///
   /// Returns: 캐시된 TheorySession (없으면 null)
   Future<TheorySession?> getCurrentTheory() async {
     try {
@@ -158,7 +159,7 @@ class EducationRepository {
     try {
       await _storage.delete(key: _chaptersKey);
       await _storage.delete(key: _currentTheoryKey);
-      
+
       // 모든 이론 진도 데이터 삭제
       final allKeys = await _storage.readAll();
       for (final key in allKeys.keys) {
@@ -180,7 +181,10 @@ class EducationRepository {
       if (chaptersStr != null) {
         final List<dynamic> jsonList = jsonDecode(chaptersStr) as List<dynamic>;
         return jsonList
-            .map((json) => ChapterCardResponse.fromJson(json as Map<String, dynamic>))
+            .map(
+              (json) =>
+                  ChapterCardResponse.fromJson(json as Map<String, dynamic>),
+            )
             .toList();
       }
       return null;
@@ -202,7 +206,10 @@ class EducationRepository {
   /// 현재 이론 데이터를 로컬에 캐시
   Future<void> _cacheCurrentTheory(TheoryEnterResponse response) async {
     try {
-      await _storage.write(key: _currentTheoryKey, value: jsonEncode(response.toJson()));
+      await _storage.write(
+        key: _currentTheoryKey,
+        value: jsonEncode(response.toJson()),
+      );
     } catch (e) {
       // 캐시 저장 실패는 무시
     }
@@ -230,17 +237,21 @@ class EducationRepository {
   }
 
   /// 챕터의 이론 완료 상태 업데이트
-  Future<void> _updateChapterTheoryCompletion(int chapterId, bool isCompleted) async {
+  Future<void> _updateChapterTheoryCompletion(
+    int chapterId,
+    bool isCompleted,
+  ) async {
     try {
       final cachedChapters = await _getCachedChapters();
       if (cachedChapters != null) {
-        final updatedChapters = cachedChapters.map((chapter) {
-          if (chapter.chapterId == chapterId) {
-            return chapter.copyWith(isTheoryCompleted: isCompleted);
-          }
-          return chapter;
-        }).toList();
-        
+        final updatedChapters =
+            cachedChapters.map((chapter) {
+              if (chapter.chapterId == chapterId) {
+                return chapter.copyWith(isTheoryCompleted: isCompleted);
+              }
+              return chapter;
+            }).toList();
+
         await _cacheChapters(updatedChapters);
       }
     } catch (e) {
@@ -262,11 +273,8 @@ class EducationRepository {
 
   /// TheoryEnterResponse를 TheorySession으로 변환
   TheorySession _mapToTheorySession(TheoryEnterResponse response) {
-    final theories = response.theories.map((theory) => TheoryInfo(
-      id: theory.theoryId,
-      word: theory.word,
-      content: theory.content,
-    )).toList();
+    final theories =
+        response.theories.map((theory) => theory.toDomain()).toList();
 
     // currentTheoryId를 인덱스로 변환
     final currentIndex = theories.indexWhere(
