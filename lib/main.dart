@@ -6,7 +6,7 @@ import 'app/config/app_router.dart';
 import 'app/config/app_theme.dart';
 import 'features/home/presentation/home_navigation_provider.dart';
 // TODO: 추후 추가할 Provider들
-// import 'features/auth/presentation/auth_provider.dart';
+import 'features/auth/presentation/auth_provider.dart';
 // import 'features/education/presentation/education_provider.dart';
 
 void main() {
@@ -32,7 +32,7 @@ class StockerApp extends StatelessWidget {
             // 홈 네비게이션 상태 관리
             ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
             // TODO: 추후 추가할 Provider들
-            // ChangeNotifierProvider(create: (_) => AuthProvider()),
+            ChangeNotifierProvider(create: (_) => AuthProvider()),
             // ChangeNotifierProvider(create: (_) => EducationProvider()),
             // ChangeNotifierProvider(create: (_) => AttendanceProvider()),
             // ChangeNotifierProvider(create: (_) => AptitudeProvider()),
