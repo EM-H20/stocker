@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:stocker/features/auth/presentation/auth_provider.dart';
 
 import 'app/config/app_router.dart';
 import 'app/config/app_theme.dart';
@@ -10,8 +11,6 @@ import 'features/education/domain/education_repository.dart';
 import 'features/education/data/education_api.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-// TODO: 추후 추가할 Provider들
-// import 'features/auth/presentation/auth_provider.dart';
 
 void main() {
   runApp(const StockerApp());
@@ -56,7 +55,7 @@ class StockerApp extends StatelessWidget {
             ),
 
             // TODO: 추후 추가할 Provider들
-            // ChangeNotifierProvider(create: (_) => AuthProvider()),
+            ChangeNotifierProvider(create: (_) => AuthProvider()),
             // ChangeNotifierProvider(create: (_) => EducationProvider()),
             // ChangeNotifierProvider(create: (_) => AttendanceProvider()),
             // ChangeNotifierProvider(create: (_) => AptitudeProvider()),
