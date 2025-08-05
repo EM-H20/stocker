@@ -57,6 +57,7 @@ class StockerApp extends StatelessWidget {
 
             // TODO: 추후 추가할 Provider들
             // ChangeNotifierProvider(create: (_) => AuthProvider()),
+            // ChangeNotifierProvider(create: (_) => EducationProvider()),
             // ChangeNotifierProvider(create: (_) => AttendanceProvider()),
             // ChangeNotifierProvider(create: (_) => AptitudeProvider()),
           ],
