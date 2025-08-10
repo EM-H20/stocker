@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 // 분리된 위젯들 import
 import 'widgets/search_bar_widget.dart';
 import 'widgets/recommended_chapter_card.dart';
 import 'widgets/current_learning_card.dart';
+import 'widgets/global_progress_bar.dart';
 import 'package:stocker/app/config/app_routes.dart';
 import 'package:go_router/go_router.dart';
+import 'education_provider.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -15,27 +18,13 @@ class EducationScreen extends StatefulWidget {
 }
 
 class _EducationScreenState extends State<EducationScreen> {
-  // 현재 진행 학습 데이터
-  Map<String, dynamic> currentLearning = {
-    'title': '챕터 1: 주식 투자 기초',
-    'description': '주식 시장의 기본 개념과 투자 원칙을 학습하여 안전한 투자의 기초를 다지는 챕터입니다.',
-    'progress': 0.7,
-    'progressText': '7/10 레슨 완료',
-    'icon': Icons.trending_up,
-  };
-
-  // 추천 학습 챕터를 선택했을 때 현재 진행 학습으로 설정
-  void _selectRecommendedContent(Map<String, dynamic> content) {
-    setState(() {
-      currentLearning = {
-        'title': content['title'],
-        'description': content['description'],
-        'progress': 0.0, // 새로 시작하는 학습이므로 0%
-        'progressText': '0/10 레슨 완료',
-        'icon': content['icon'],
-      };
+  @override
+  void initState() {
+    super.initState();
+    // 화면 로드 시 챕터 목록을 가져옴
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EducationProvider>().loadChapters();
     });
-    debugPrint('선택된 학습: ${content['title']}');
   }
 
   @override
@@ -44,48 +33,7 @@ class _EducationScreenState extends State<EducationScreen> {
     final colorScheme = theme.colorScheme;
 
     // 주식 관련 Mock Data
-    final stockEducationData = [
-      {
-        'title': '기술적 분석 기초',
-        'description': '차트 패턴과 기술적 지표를 통한 주가 분석 방법',
-        'icon': Icons.show_chart,
-      },
-      {
-        'title': '기본적 분석 심화',
-        'description': '재무제표 분석과 기업 가치 평가 방법',
-        'icon': Icons.analytics,
-      },
-      {
-        'title': '포트폴리오 관리',
-        'description': '리스크 분산과 자산 배분 전략',
-        'icon': Icons.pie_chart,
-      },
-      {
-        'title': '파생상품 투자',
-        'description': '옵션, 선물 등 파생상품의 이해와 활용',
-        'icon': Icons.trending_up,
-      },
-      {
-        'title': '글로벌 주식 투자',
-        'description': '해외 주식 시장 분석과 투자 전략',
-        'icon': Icons.public,
-      },
-      {
-        'title': '암호화폐 투자',
-        'description': '비트코인, 이더리움 등 암호화폐 투자 가이드',
-        'icon': Icons.currency_bitcoin,
-      },
-      {
-        'title': 'ESG 투자',
-        'description': '지속가능한 투자와 ESG 기업 평가',
-        'icon': Icons.eco,
-      },
-      {
-        'title': '리스크 관리',
-        'description': '투자 리스크 측정과 헤지 전략',
-        'icon': Icons.security,
-      },
-    ];
+    // 하드코딩된 더미 데이터 제거 - Provider에서 실제 데이터 사용
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -95,19 +43,50 @@ class _EducationScreenState extends State<EducationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 검색바
+              // 검색바 (상단으로 이동)
               const SearchBarWidget(hintText: '챕터나 주제를 검색하세요'),
-              SizedBox(height: 28.h),
+              SizedBox(height: 16.h),
 
-              // 현재 진행 학습 카드
-              CurrentLearningCard(
-                title: currentLearning['title'],
-                description: currentLearning['description'],
-                progress: currentLearning['progress'],
-                progressText: currentLearning['progressText'],
-                onTheoryPressed: () => {context.go(AppRoutes.theory)},
-                onQuizPressed:
-                    () => debugPrint('${currentLearning['title']} 퀴즈 풀기 클릭'),
+              // 전체 진행률 바 (재사용 가능한 컴포넌트)
+              const GlobalProgressBar(),
+              SizedBox(height: 12.h),
+
+              // 현재 진행 학습 카드 - Provider 데이터 사용
+              Consumer<EducationProvider>(
+                builder: (context, provider, child) {
+                  // 로딩 중이거나 챕터가 없는 경우 기본 카드 표시
+                  if (provider.isLoadingChapters || provider.chapters.isEmpty) {
+                    return CurrentLearningCard(
+                      title: '학습 준비 중...',
+                      description: '챕터 정보를 불러오고 있습니다.',
+                      onTheoryPressed: null,
+                      onQuizPressed: null,
+                    );
+                  }
+
+                  // 현재 진행 중인 챕터 찾기 (미완료 챕터 중 첫 번째)
+                  final currentChapter =
+                      provider.chapters
+                              .where((chapter) => !chapter.isTheoryCompleted)
+                              .isNotEmpty
+                          ? provider.chapters
+                              .where((chapter) => !chapter.isTheoryCompleted)
+                              .first
+                          : provider.chapters.first;
+
+                  return CurrentLearningCard(
+                    title: currentChapter.title,
+                    description: '현재 진행 중인 챕터입니다. 이론 학습을 완료한 후 퀴즈에 도전하세요.',
+                    onTheoryPressed: () {
+                      provider.enterTheory(currentChapter.id);
+                      context.go(AppRoutes.theory);
+                    },
+                    onQuizPressed: () {
+                      // 퀴즈 화면으로 이동
+                      context.go(AppRoutes.quiz);
+                    },
+                  );
+                },
               ),
               SizedBox(height: 28.h),
 
@@ -124,18 +103,47 @@ class _EducationScreenState extends State<EducationScreen> {
               ),
               SizedBox(height: 16.h),
 
-              // 추천 학습 챕터 리스트
-              ...stockEducationData.map((data) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.2.w), // 좌우 여백
-                  child: RecommendedChapterCard(
-                    title: data['title'] as String,
-                    description: data['description'] as String,
-                    icon: data['icon'] as IconData,
-                    onTap: () => _selectRecommendedContent(data),
-                  ),
-                );
-              }),
+              // 추천 학습 챕터 리스트 - Provider 데이터 사용
+              Consumer<EducationProvider>(
+                builder: (context, provider, child) {
+                  if (provider.isLoadingChapters) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (provider.chaptersError != null) {
+                    return Center(
+                      child: Text(
+                        '챕터 로드 실패: ${provider.chaptersError}',
+                        style: TextStyle(color: colorScheme.error),
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    children:
+                        provider.chapters.map((chapter) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4.2.w),
+                            child: RecommendedChapterCard(
+                              title: chapter.title,
+                              description:
+                                  chapter.isTheoryCompleted
+                                      ? '이론 학습 완료 ✓'
+                                      : '이론 학습을 시작하세요',
+                              icon:
+                                  chapter.isTheoryCompleted
+                                      ? Icons.check_circle
+                                      : Icons.play_circle_outline,
+                              onTap: () {
+                                provider.enterTheory(chapter.id);
+                                context.go(AppRoutes.theory);
+                              },
+                            ),
+                          );
+                        }).toList(),
+                  );
+                },
+              ),
             ],
           ),
         ),

@@ -7,8 +7,6 @@ import '../../../../app/core/widgets/action_button.dart';
 class CurrentLearningCard extends StatelessWidget {
   final String title;
   final String description;
-  final double progress;
-  final String progressText;
   final VoidCallback? onTheoryPressed;
   final VoidCallback? onQuizPressed;
 
@@ -16,8 +14,6 @@ class CurrentLearningCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.description,
-    required this.progress,
-    required this.progressText,
     this.onTheoryPressed,
     this.onQuizPressed,
   });
@@ -81,41 +77,6 @@ class CurrentLearningCard extends StatelessWidget {
                 color: colorScheme.onSurfaceVariant,
                 height: 1.5,
               ),
-            ),
-            SizedBox(height: 24.h), // 기존 20.h에서 확대
-            // 진행률 바
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '진행률',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      progressText,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12.h), // 기존 8.h에서 확대
-                LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    colorScheme.primary,
-                  ),
-                  minHeight: 8.h,
-                ),
-              ],
             ),
             SizedBox(height: 24.h), // ActionButton을 위한 공간
             // ActionButton 추가

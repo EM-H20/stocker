@@ -82,6 +82,48 @@ class EducationProvider extends ChangeNotifier {
   /// 현재 진행률 (0.0 ~ 1.0)
   double get progressRatio => _currentTheorySession?.progressRatio ?? 0.0;
 
+  /// 전체 교육 과정 통합 진행률 (0.0 ~ 1.0)
+  /// 진행률 = (이론 완료 챕터 수 + 퀴즈 완료 챕터 수) / (전체 챕터 수 × 2)
+  double get globalProgressRatio {
+    if (_chapters.isEmpty) return 0.0;
+    
+    final totalTasks = _chapters.length * 2; // 각 챕터당 이론 + 퀴즈 = 2개 작업
+    final completedTasks = getCompletedTaskCount();
+    
+    if (totalTasks == 0) return 0.0;
+    return completedTasks / totalTasks;
+  }
+
+  /// 전체 작업 개수 조회 (챕터 수 × 2)
+  int getTotalTaskCount() {
+    return _chapters.length * 2; // 각 챕터당 이론 + 퀴즈
+  }
+
+  /// 완료된 작업 개수 조회 (완료된 이론 + 완료된 퀴즈)
+  int getCompletedTaskCount() {
+    int completedTheories = _chapters.where((chapter) => chapter.isTheoryCompleted).length;
+    int completedQuizzes = _chapters.where((chapter) => chapter.isQuizCompleted).length;
+    return completedTheories + completedQuizzes;
+  }
+
+  /// 전체 진행률을 백분율로 반환
+  double get globalProgressPercentage => globalProgressRatio * 100;
+
+  /// 현재 전체 진행 상황 요약
+  String get globalProgressSummary {
+    final completed = getCompletedTaskCount();
+    final total = getTotalTaskCount();
+    return '$completed / $total 작업 완료';
+  }
+
+  /// 상세 진행 상황 요약
+  String get detailedProgressSummary {
+    final completedTheories = _chapters.where((chapter) => chapter.isTheoryCompleted).length;
+    final completedQuizzes = _chapters.where((chapter) => chapter.isQuizCompleted).length;
+    final totalChapters = _chapters.length;
+    return '이론: $completedTheories/$totalChapters, 퀴즈: $completedQuizzes/$totalChapters';
+  }
+
   // === 챕터 관련 메서드 ===
 
   /// 챕터 목록 로드

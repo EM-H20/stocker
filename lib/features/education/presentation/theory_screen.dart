@@ -129,49 +129,6 @@ class _TheoryScreenState extends State<TheoryScreen> {
 
           return Column(
             children: [
-              // 진행률 표시
-              Container(
-                margin: EdgeInsets.all(16.w),
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.auto_stories,
-                      color: const Color(0xFF4CAF50),
-                      size: 24.sp,
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${theorySession.chapterTitle} - 이론',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            '${provider.currentTheoryIndex + 1} / ${theories.length} 페이지',
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
               // 이론 내용
               Expanded(
                 child: PageView.builder(
