@@ -1,7 +1,6 @@
 // api 요청 관리, dio 를 설정하여 api와의 통신을 담당함
 
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../app/core/services/token_storage_service.dart';
 
 class ApiClient {

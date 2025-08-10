@@ -9,7 +9,7 @@ import 'app/config/app_theme.dart';
 import 'features/home/presentation/home_navigation_provider.dart';
 import 'features/auth/presentation/auth_provider.dart';
 
-// Repository & API
+// Repository & API//
 import 'features/auth/domain/auth_repository.dart';
 import 'features/auth/data/source/auth_api.dart';
 import 'features/auth/data/repository/auth_api_repository.dart';
@@ -19,8 +19,8 @@ import 'features/auth/data/repository/auth_mock_repository.dart';
 import 'app/core/network/dio.dart';
 
 /// ✅ 더미(mock) 여부 설정
-//const useMock = true;  //더미데이터 사용시
-final useMock=false;  //실제 API 사용시
+const useMock = true;  //더미데이터 사용시
+//const useMock=false;  //실제 API 사용시
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

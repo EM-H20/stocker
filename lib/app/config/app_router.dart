@@ -4,7 +4,7 @@ import '../core/widgets/error_page.dart';
 import '../../features/home/presentation/home_shell.dart';
 import '../../features/education/presentation/education_screen.dart';
 import '../../features/attendance/presentation/attendance_screen.dart';
-//import '../../features/aptitude/presentation/aptitude_screen.dart';
+import '../../features/aptitude/presentation/screens/aptitude_initial_screen.dart';
 import '../../features/wrong_note/presentation/wrong_note_screen.dart';
 import '../../features/mypage/presentation/mypage_screen.dart';
 import '../../features/education/presentation/theory_screen.dart';
@@ -48,11 +48,11 @@ class AppRouter {
                 NoTransitionPage(child: const AttendanceScreen()),
           ),
           // 성향분석 탭
-          // GoRoute(
-          //   path: AppRoutes.aptitude,
-          //   pageBuilder: (context, state) =>
-          //       NoTransitionPage(child: const AptitudeScreen()),
-          // ),
+          GoRoute(
+            path: AppRoutes.aptitude,
+            pageBuilder: (context, state) =>
+                NoTransitionPage(child: const AptitudeInitialScreen()),
+          ),
           // 오답노트 탭
           GoRoute(
             path: AppRoutes.wrongNote,

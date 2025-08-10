@@ -1,4 +1,3 @@
-
 import 'package:go_router/go_router.dart';
 import '../../../app/config/app_routes.dart';
 
@@ -6,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../app/core/widgets/action_button.dart';
 import '../../auth/presentation/auth_provider.dart';
-
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -17,6 +15,30 @@ class LoginScreen extends StatelessWidget {
 
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
+
+    // ✅ [수정] 로그인 로직을 별도의 비동기 함수로 분리합니다.
+    Future<void> handleLogin() async {
+      // 위젯이 여전히 유효한지 먼저 확인합니다.
+      if (!context.mounted) return;
+
+      final isSuccess = await authProvider.login(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
+
+      // 비동기 작업 후에도 위젯이 유효한지 다시 확인합니다.
+      if (context.mounted) {
+        if (isSuccess) {
+          context.go(AppRoutes.education);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? '로그인에 실패했습니다.'),
+            ),
+          );
+        }
+      }
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -61,20 +83,12 @@ class LoginScreen extends StatelessWidget {
                 text: '로그인',
                 icon: Icons.login,
                 color: Colors.blue,
-                onPressed: () {
-                  authProvider.login(
-                    emailController.text.trim(),
-                    passwordController.text.trim(),
-                  );
-                  if (authProvider.user != null && context.mounted) { //요기 주목 
-                    context.go(AppRoutes.education); // 로그인 성공 시 교육 화면으로 이동
-                  }
-                },
+                onPressed: authProvider.isLoading ? null : handleLogin,
               ),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () {
-                  context.push(AppRoutes.register); // 회원가입 화면으로 이동
+                  context.push(AppRoutes.register);
                 },
                 child: const Text('회원가입'),
               ),
