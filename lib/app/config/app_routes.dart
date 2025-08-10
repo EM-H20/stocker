@@ -21,6 +21,7 @@ class AppRoutes {
   // 교육 관련 세부 경로
   static const String chapter = '/education/chapter';
   static const String quiz = '/education/quiz';
+  static const String quizResult = '/education/quiz-result';
   static const String theory = '/education/theory';
 
   // 메모 관련

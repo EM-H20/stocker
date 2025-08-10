@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../domain/education_repository.dart';
+import '../domain/education_mock_repository.dart';
 import '../domain/models/chapter_info.dart';
 import '../domain/models/theory_info.dart';
 import '../domain/models/theory_session.dart';
@@ -7,9 +8,21 @@ import '../domain/models/theory_session.dart';
 /// Education 기능의 상태관리 Provider
 /// ChangeNotifier를 상속하여 UI 상태 변화를 관리
 class EducationProvider extends ChangeNotifier {
-  final EducationRepository _repository;
+  final EducationRepository? _repository;
+  final EducationMockRepository? _mockRepository;
+  final bool _useMock;
 
-  EducationProvider(this._repository);
+  /// 실제 API Repository를 사용하는 생성자
+  EducationProvider(EducationRepository repository)
+    : _repository = repository,
+      _mockRepository = null,
+      _useMock = false;
+
+  /// Mock Repository를 사용하는 생성자 (UI 개발/테스트용)
+  EducationProvider.withMock(EducationMockRepository mockRepository)
+    : _repository = null,
+      _mockRepository = mockRepository,
+      _useMock = true;
 
   // === 챕터 관련 상태 ===
   List<ChapterInfo> _chapters = [];
@@ -82,7 +95,11 @@ class EducationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _chapters = await _repository.getChapters(forceRefresh: forceRefresh);
+      if (_useMock) {
+        _chapters = await _mockRepository!.getChaptersForUser();
+      } else {
+        _chapters = await _repository!.getChapters(forceRefresh: forceRefresh);
+      }
       _chaptersError = null;
     } catch (e) {
       _chaptersError = e.toString();
@@ -118,14 +135,19 @@ class EducationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _currentTheorySession = await _repository.enterTheory(chapterId);
+      if (_useMock) {
+        _currentTheorySession = await _mockRepository!.enterTheory(chapterId);
+        // Mock에서는 진도 저장 기능 없음
+      } else {
+        _currentTheorySession = await _repository!.enterTheory(chapterId);
 
-      // 저장된 진도가 있으면 해당 위치로 이동
-      final savedProgress = await _repository.getTheoryProgress(chapterId);
-      if (savedProgress != null && _currentTheorySession != null) {
-        _currentTheorySession = _currentTheorySession!.copyWith(
-          currentTheoryIndex: _findTheoryIndexById(savedProgress),
-        );
+        // 저장된 진도가 있으면 해당 위치로 이동
+        final savedProgress = await _repository.getTheoryProgress(chapterId);
+        if (savedProgress != null && _currentTheorySession != null) {
+          _currentTheorySession = _currentTheorySession!.copyWith(
+            currentTheoryIndex: _findTheoryIndexById(savedProgress),
+          );
+        }
       }
 
       _theoryError = null;
@@ -193,7 +215,11 @@ class EducationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _repository.completeTheory(_currentTheorySession!.chapterId);
+      if (_useMock) {
+        await _mockRepository!.completeTheory(_currentTheorySession!.chapterId);
+      } else {
+        await _repository!.completeTheory(_currentTheorySession!.chapterId);
+      }
 
       // 로컬 상태 업데이트
       _updateLocalChapterCompletion(_currentTheorySession!.chapterId, true);
@@ -223,7 +249,10 @@ class EducationProvider extends ChangeNotifier {
 
   /// 전체 캐시 삭제
   Future<void> clearCache() async {
-    await _repository.clearCache();
+    if (!_useMock) {
+      await _repository!.clearCache();
+    }
+    // Mock에서는 캐시 삭제 기능 없음
     _chapters.clear();
     _currentTheorySession = null;
     _chaptersError = null;
@@ -242,10 +271,17 @@ class EducationProvider extends ChangeNotifier {
     try {
       final currentTheory = this.currentTheory;
       if (currentTheory != null) {
-        await _repository.updateTheoryProgress(
-          _currentTheorySession!.chapterId,
-          currentTheory.id,
-        );
+        if (_useMock) {
+          // Mock에서는 진도 업데이트 기능 없음
+          debugPrint(
+            'Mock: 진도 업데이트 - 챕터: ${_currentTheorySession!.chapterId}, 이론: ${currentTheory.id}',
+          );
+        } else {
+          await _repository!.updateTheoryProgress(
+            _currentTheorySession!.chapterId,
+            currentTheory.id,
+          );
+        }
       }
     } catch (e) {
       debugPrint('진도 업데이트 실패: $e');

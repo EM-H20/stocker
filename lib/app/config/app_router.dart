@@ -8,23 +8,32 @@ import '../../features/aptitude/presentation/aptitude_screen.dart';
 import '../../features/wrong_note/presentation/wrong_note_screen.dart';
 import '../../features/mypage/presentation/mypage_screen.dart';
 import '../../features/education/presentation/theory_screen.dart';
+import '../../features/quiz/presentation/quiz_screen.dart';
+import '../../features/quiz/presentation/quiz_result_screen.dart';
 
 /// 앱 전체의 라우팅을 관리하는 GoRouter 설정
 class AppRouter {
-  // GoRouter 인스턴스는 앱 전체에서 사용할 수 있도록 static으로 선언
   static final GoRouter _router = GoRouter(
     initialLocation: AppRoutes.education,
     routes: [
+      // 로그인 화면
+      // GoRoute(
+      //   path: AppRoutes.login,
+      //   builder: (context, state) => LoginScreen(),
+      // ),
+
+      // // 회원가입 화면
+      // GoRoute(
+      //   path: AppRoutes.register,
+      //   builder: (context, state) => SignupScreen(),
+      // ),
+
       // ShellRoute로 BottomNavigationBar를 유지하면서 탭 라우팅
       ShellRoute(
         builder: (context, state, child) {
           return HomeShell(child: child);
         },
         routes: [
-          // app_routes.dart에 정의된 경로들을 app_router에서 경로로 사용함.
-          // 아래 코드는 builder를 통해 화면을 렌더링 함.
-          // 사용 법은 home_shell에 나와 있음
-
           // 교육 탭
           GoRoute(
             path: AppRoutes.education,
@@ -74,6 +83,26 @@ class AppRouter {
         },
       ),
 
+      // 퀴즈 화면
+      GoRoute(
+        path: AppRoutes.quiz,
+        builder: (context, state) {
+          final chapterIdStr = state.uri.queryParameters['chapterId'];
+          final chapterId = int.tryParse(chapterIdStr ?? '') ?? 1;
+          return QuizScreen(chapterId: chapterId);
+        },
+      ),
+
+      // 퀴즈 결과 화면
+      GoRoute(
+        path: AppRoutes.quizResult,
+        builder: (context, state) {
+          final chapterIdStr = state.uri.queryParameters['chapterId'];
+          final chapterId = int.tryParse(chapterIdStr ?? '') ?? 1;
+          return QuizResultScreen(chapterId: chapterId);
+        },
+      ),
+
       // TODO: 추후 추가될 라우트들
       // - 로그인/회원가입 화면
       // - 스플래시 화면
@@ -85,6 +114,5 @@ class AppRouter {
         (context, state) => ErrorPage(errorPath: state.matchedLocation),
   );
 
-  /// GoRouter 인스턴스 반환
   static GoRouter get router => _router;
 }

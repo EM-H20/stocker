@@ -265,9 +265,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
                         ),
                       ),
 
-                    if (provider.currentTheoryIndex > 0 &&
-                        provider.currentTheoryIndex < theories.length - 1)
-                      SizedBox(width: 12.w),
+                    if (provider.currentTheoryIndex > 0) SizedBox(width: 12.w),
 
                     // 다음/완료 버튼
                     if (provider.currentTheoryIndex < theories.length - 1)
