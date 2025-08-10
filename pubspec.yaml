@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
 
   # 아이폰 스타일 기본 아이콘 (Cupertino 디자인용)
   cupertino_icons: ^1.0.8
@@ -62,3 +63,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/stocker_logo.png

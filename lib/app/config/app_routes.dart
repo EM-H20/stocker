@@ -9,7 +9,7 @@ class AppRoutes {
 
   // 인증 관련
   static const String login = '/login';
-  static const String register = '/register';
+  static const String register = '/signup';
 
   // 메인 탭 경로들
   static const String education = '/education';
