@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/core/widgets/action_button.dart';
+import '../../../../app/config/app_theme.dart';
 
 /// 교육 기능 전용 에러 위젯
 /// 이론, 퀴즈 등 교육 관련 화면에서 재사용 가능한 에러 UI
@@ -68,7 +69,7 @@ class EducationErrorWidget extends StatelessWidget {
             ActionButton(
               text: retryButtonText,
               icon: Icons.refresh,
-              color: const Color(0xFF4CAF50),
+              color: AppTheme.successColor,
               onPressed: onRetry,
             ),
           ],

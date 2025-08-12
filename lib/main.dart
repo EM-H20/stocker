@@ -84,7 +84,6 @@ class StockerApp extends StatelessWidget {
             title: 'Stocker',
             debugShowCheckedModeBanner: false,
 
-            // 테마 설정
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.system,

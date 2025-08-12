@@ -21,12 +21,12 @@ class CurrentLearningCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     // 현재 진행 학습 정보 카드 위젯
     return Card(
       elevation: 4,
-      shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
+      color: AppTheme.darkSurface,
+      shadowColor: AppTheme.grey900.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
         padding: EdgeInsets.all(24.w), // 기존 20.w에서 확대
@@ -39,12 +39,12 @@ class CurrentLearningCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
+                    color: AppTheme.primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(
                     Icons.trending_up,
-                    color: colorScheme.primary,
+                    color: AppTheme.primaryColor,
                     size: 24.sp,
                   ),
                 ),
@@ -53,7 +53,7 @@ class CurrentLearningCard extends StatelessWidget {
                   child: Text(
                     '현재 진행 학습',
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: colorScheme.onSurface,
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -65,7 +65,7 @@ class CurrentLearningCard extends StatelessWidget {
             Text(
               title,
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: colorScheme.onSurface,
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -74,7 +74,7 @@ class CurrentLearningCard extends StatelessWidget {
             Text(
               description,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+                color: AppTheme.grey400,
                 height: 1.5,
               ),
             ),
@@ -98,7 +98,7 @@ class CurrentLearningCard extends StatelessWidget {
                   child: ActionButton(
                     text: '퀴즈 풀기',
                     icon: Icons.quiz_outlined,
-                    color: AppTheme.grey700, // app_theme.dart의 강조색 사용
+                    color: AppTheme.successColor, // app_theme.dart의 성공색 사용
                     onPressed: onQuizPressed ?? () => debugPrint('퀴즈 풀기 클릭'),
                   ),
                 ),

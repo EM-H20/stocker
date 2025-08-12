@@ -7,6 +7,7 @@ import 'widgets/recommended_chapter_card.dart';
 import 'widgets/current_learning_card.dart';
 import 'widgets/global_progress_bar.dart';
 import 'package:stocker/app/config/app_routes.dart';
+import 'package:stocker/app/config/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'education_provider.dart';
 
@@ -36,7 +37,7 @@ class _EducationScreenState extends State<EducationScreen> {
     // 하드코딩된 더미 데이터 제거 - Provider에서 실제 데이터 사용
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: AppTheme.darkBackground,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(18.w),

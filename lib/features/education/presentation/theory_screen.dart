@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../app/config/app_routes.dart';
+import '../../../app/config/app_theme.dart';
 import '../../../app/core/widgets/action_button.dart';
 import 'education_provider.dart';
 import 'widgets/education_error_widget.dart';
@@ -37,9 +38,9 @@ class _TheoryScreenState extends State<TheoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: AppTheme.darkBackground,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
+        backgroundColor: AppTheme.darkBackground,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
@@ -61,7 +62,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
           if (provider.isLoadingTheory) {
             return const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4CAF50)),
+                valueColor: AlwaysStoppedAnimation<Color>(AppTheme.successColor),
               ),
             );
           }
@@ -143,7 +144,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
                       margin: EdgeInsets.symmetric(horizontal: 16.w),
                       padding: EdgeInsets.all(20.w),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A2A),
+                        color: AppTheme.darkSurface,
                         borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: SingleChildScrollView(
@@ -157,7 +158,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
                                 vertical: 6.h,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4CAF50),
+                                color: AppTheme.successColor,
                                 borderRadius: BorderRadius.circular(20.r),
                               ),
                               child: Text(
@@ -230,7 +231,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
                         child: ActionButton(
                           text: '다음',
                           icon: Icons.arrow_forward,
-                          color: const Color(0xFF4CAF50),
+                          color: AppTheme.successColor,
                           onPressed: () {
                             _pageController.nextPage(
                               duration: const Duration(milliseconds: 300),
@@ -244,7 +245,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
                         child: ActionButton(
                           text: '이론 완료',
                           icon: Icons.check_circle,
-                          color: const Color(0xFF4CAF50),
+                          color: AppTheme.successColor,
                           onPressed: () => _completeTheory(provider),
                         ),
                       ),

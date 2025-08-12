@@ -2,22 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../education_provider.dart';
+import '../../../../app/config/app_theme.dart';
 
 /// 전체 학습 진행률 바 위젯
 /// 교육 메인 화면과 이론 화면에서 재사용 가능한 컴포넌트
 class GlobalProgressBar extends StatelessWidget {
-  /// 다크 테마 사용 여부 (이론 화면에서 사용)
-  final bool isDarkTheme;
-
   /// 여백 설정
   final EdgeInsets? margin;
 
-  const GlobalProgressBar({super.key, this.isDarkTheme = false, this.margin});
+  const GlobalProgressBar({super.key, this.margin});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDarkTheme = theme.brightness == Brightness.dark;
 
     return Consumer<EducationProvider>(
       builder: (context, provider, child) {
@@ -27,8 +26,7 @@ class GlobalProgressBar extends StatelessWidget {
             margin: margin ?? EdgeInsets.only(bottom: 16.h),
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color:
-                  isDarkTheme ? const Color(0xFF2A2A2A) : colorScheme.surface,
+              color: isDarkTheme ? AppTheme.darkSurface : colorScheme.surface,
               borderRadius: BorderRadius.circular(12.r),
               border:
                   isDarkTheme
@@ -43,8 +41,8 @@ class GlobalProgressBar extends StatelessWidget {
                   Icons.school_outlined,
                   color:
                       isDarkTheme
-                          ? const Color(0xFF4CAF50)
-                          : colorScheme.primary,
+                          ? AppTheme.successColor
+                          : AppTheme.primaryColor,
                   size: 20.sp,
                 ),
                 SizedBox(width: 12.w),
@@ -64,7 +62,7 @@ class GlobalProgressBar extends StatelessWidget {
           margin: margin ?? EdgeInsets.only(bottom: 16.h),
           padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
-            color: isDarkTheme ? const Color(0xFF2A2A2A) : colorScheme.surface,
+            color: isDarkTheme ? AppTheme.darkSurface : colorScheme.surface,
             borderRadius: BorderRadius.circular(12.r),
             border:
                 isDarkTheme
@@ -94,10 +92,7 @@ class GlobalProgressBar extends StatelessWidget {
                       Text(
                         '전체 학습 진행률',
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color:
-                              isDarkTheme
-                                  ? Colors.white
-                                  : colorScheme.onSurface,
+                          color: isDarkTheme ? Colors.white : Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -111,8 +106,8 @@ class GlobalProgressBar extends StatelessWidget {
                     decoration: BoxDecoration(
                       color:
                           isDarkTheme
-                              ? const Color(0xFF4CAF50).withValues(alpha: 0.2)
-                              : colorScheme.primary.withValues(alpha: 0.1),
+                              ? AppTheme.successColor.withValues(alpha: 0.2)
+                              : AppTheme.primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Text(
@@ -138,7 +133,7 @@ class GlobalProgressBar extends StatelessWidget {
                         ? Colors.grey[700]
                         : colorScheme.outline.withValues(alpha: 0.2),
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  isDarkTheme ? const Color(0xFF4CAF50) : colorScheme.primary,
+                  isDarkTheme ? AppTheme.successColor : AppTheme.primaryColor,
                 ),
                 minHeight: 6.h,
               ),
@@ -148,10 +143,7 @@ class GlobalProgressBar extends StatelessWidget {
               Text(
                 provider.detailedProgressSummary,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color:
-                      isDarkTheme
-                          ? Colors.grey[400]
-                          : colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: isDarkTheme ? Colors.grey[400] : AppTheme.grey400,
                 ),
               ),
             ],
