@@ -9,6 +9,16 @@ class AppTheme {
   static const Color accentColor = Color(0xFFB00020); // 강조색 (빨간색)
   static const Color surfaceColor = Color(0xFFFAFAFA); // 배경색
 
+  // 상태 색상
+  static const Color successColor = Color(0xFF4CAF50); // 성공/정답 (초록색)
+  static const Color errorColor = Color(0xFFFF5252); // 오류/오답 (빨간색)
+  static const Color warningColor = Color(0xFFFF9800); // 경고/미완료 (주황색)
+  static const Color infoColor = Color(0xFF2196F3); // 정보/재시도 (파란색)
+
+  // 다크 테마 색상
+  static const Color darkSurface = Color(0xFF2A2A2A); // 다크 카드/배경
+  static const Color darkBackground = Color(0xFF1A1A1A); // 다크 메인 배경 (스크린 배경)
+
   // 그레이 스케일
   static const Color grey50 = Color(0xFFFAFAFA);
   static const Color grey100 = Color(0xFFF5F5F5);
