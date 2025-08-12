@@ -24,10 +24,6 @@ class WrongNoteStatsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.darkSurface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppTheme.successColor.withValues(alpha: 0.3),
-          width: 1,
-        ),
       ),
       child: Row(
         children: [

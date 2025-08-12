@@ -22,13 +22,6 @@ class WrongAnswerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.darkSurface,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color:
-              item.isRetried
-                  ? AppTheme.infoColor.withValues(alpha: 0.3)
-                  : AppTheme.warningColor.withValues(alpha: 0.3),
-          width: 1,
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

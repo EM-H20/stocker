@@ -73,46 +73,70 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.darkBackground,
-      appBar: AppBar(
-        backgroundColor: AppTheme.darkBackground,
-        elevation: 0,
-        title: Text(
-          '오답노트',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-          ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // 커스텀 헤더
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+              child: Row(
+                children: [
+                  Text(
+                    '오답노트',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 28.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.w,
+                      vertical: 6.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.errorColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text(
+                      '${_wrongAnswers.length}개',
+                      style: TextStyle(
+                        color: AppTheme.errorColor,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // 상단 통계 카드
+            WrongNoteStatsCard(wrongAnswers: _wrongAnswers),
+
+            // 필터 탭
+            WrongNoteFilterTabs(
+              selectedFilter: _selectedFilter,
+              onFilterChanged: (filter) {
+                setState(() {
+                  _selectedFilter = filter;
+                });
+              },
+            ),
+
+            // 오답 목록
+            Expanded(
+              child:
+                  filteredAnswers.isEmpty
+                      ? WrongNoteEmptyState(
+                        onGoToQuiz: () {
+                          // 교육 탭으로 이동
+                        },
+                      )
+                      : _buildWrongAnswersList(filteredAnswers),
+            ),
+          ],
         ),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          // 상단 통계 카드
-          WrongNoteStatsCard(wrongAnswers: _wrongAnswers),
-
-          // 필터 탭
-          WrongNoteFilterTabs(
-            selectedFilter: _selectedFilter,
-            onFilterChanged: (filter) {
-              setState(() {
-                _selectedFilter = filter;
-              });
-            },
-          ),
-
-          // 오답 목록
-          Expanded(
-            child:
-                filteredAnswers.isEmpty
-                    ? WrongNoteEmptyState(
-                      onGoToQuiz: () {
-                        // 교육 탭으로 이동
-                      },
-                    )
-                    : _buildWrongAnswersList(filteredAnswers),
-          ),
-        ],
       ),
     );
   }
