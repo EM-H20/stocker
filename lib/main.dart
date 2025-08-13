@@ -88,7 +88,7 @@ class StockerApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.system,
 
-            // GoRouter 설정
+            // GoRouter 설정했다.
             routerConfig: AppRouter.router,
           ),
         );
