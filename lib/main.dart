@@ -4,14 +4,18 @@ import 'package:provider/provider.dart';
 import 'app/config/app_router.dart';
 import 'app/config/app_theme.dart';
 import 'features/home/presentation/home_navigation_provider.dart';
-import 'features/education/presentation/education_provider.dart';
-import 'features/education/domain/education_repository.dart';
-import 'features/education/domain/education_mock_repository.dart';
 import 'features/education/data/education_api.dart';
-import 'features/quiz/presentation/quiz_provider.dart';
-import 'features/quiz/domain/quiz_repository.dart';
-import 'features/quiz/domain/quiz_mock_repository.dart';
+import 'features/education/domain/education_mock_repository.dart';
+import 'features/education/domain/education_repository.dart';
+import 'features/education/presentation/education_provider.dart';
 import 'features/quiz/data/quiz_api.dart';
+import 'features/quiz/domain/quiz_mock_repository.dart';
+import 'features/quiz/domain/quiz_repository.dart';
+import 'features/quiz/presentation/quiz_provider.dart';
+import 'features/wrong_note/data/wrong_note_api.dart';
+import 'features/wrong_note/data/wrong_note_mock_repository.dart';
+import 'features/wrong_note/domain/wrong_note_repository.dart';
+import 'features/wrong_note/presentation/wrong_note_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -76,6 +80,27 @@ class StockerApp extends StatelessWidget {
                   final quizApi = QuizApi(dio);
                   final quizRepository = QuizRepository(quizApi, storage);
                   return QuizProvider(quizRepository);
+                }
+              },
+            ),
+
+            // WrongNote 상태 관리 (Mock/Real API 분기)
+            ChangeNotifierProvider(
+              create: (_) {
+                if (useMock) {
+                  // Mock Repository 사용
+                  final mockRepository = WrongNoteMockRepository();
+                  return WrongNoteProvider.withMock(mockRepository);
+                } else {
+                  // 실제 API Repository 사용
+                  final dio = Dio();
+                  const storage = FlutterSecureStorage();
+                  final wrongNoteApi = WrongNoteApi(dio);
+                  final wrongNoteRepository = WrongNoteRepository(
+                    wrongNoteApi,
+                    storage,
+                  );
+                  return WrongNoteProvider(wrongNoteRepository);
                 }
               },
             ),

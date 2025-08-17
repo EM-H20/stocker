@@ -40,7 +40,8 @@ class QuizInfo {
   String get correctAnswerText => options[correctAnswerIndex];
 
   /// 선택한 답이 정답인지 확인
-  bool isCorrectAnswer(int selectedIndex) => selectedIndex == correctAnswerIndex;
+  bool isCorrectAnswer(int selectedIndex) =>
+      selectedIndex == correctAnswerIndex;
 
   @override
   String toString() {

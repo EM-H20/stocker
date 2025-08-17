@@ -3,16 +3,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../app/core/widgets/action_button.dart';
 import '../../../../app/config/app_theme.dart';
-import '../wrong_note_screen.dart';
+import '../../data/models/wrong_note_response.dart';
 
 /// 개별 오답 카드 위젯
 ///
 /// 틀린 문제의 상세 정보와 다시 풀기 기능을 제공하는 카드
 class WrongAnswerCard extends StatelessWidget {
-  final WrongAnswerItem item;
+  final WrongNoteItem wrongNote;
   final VoidCallback onRetry;
+  final VoidCallback? onRemove;
 
-  const WrongAnswerCard({super.key, required this.item, required this.onRetry});
+  const WrongAnswerCard({
+    super.key, 
+    required this.wrongNote, 
+    required this.onRetry,
+    this.onRemove,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +42,7 @@ class WrongAnswerCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Text(
-                  item.chapterTitle,
+                  wrongNote.chapterTitle,
                   style: TextStyle(
                     color: AppTheme.successColor,
                     fontSize: 12.sp,
@@ -49,16 +55,16 @@ class WrongAnswerCard extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
                   color:
-                      item.isRetried
+                      wrongNote.isRetried
                           ? AppTheme.infoColor.withValues(alpha: 0.2)
                           : AppTheme.warningColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Text(
-                  item.isRetried ? '재시도 완료' : '미완료',
+                  wrongNote.isRetried ? '재시도 완료' : '미완료',
                   style: TextStyle(
                     color:
-                        item.isRetried
+                        wrongNote.isRetried
                             ? AppTheme.infoColor
                             : AppTheme.warningColor,
                     fontSize: 12.sp,
@@ -82,7 +88,7 @@ class WrongAnswerCard extends StatelessWidget {
           ),
           SizedBox(height: 4.h),
           Text(
-            item.question,
+            wrongNote.question,
             style: TextStyle(color: Colors.white, fontSize: 14.sp, height: 1.4),
           ),
 
@@ -105,7 +111,7 @@ class WrongAnswerCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      item.correctAnswer,
+                      '정답: ${wrongNote.correctAnswer}',
                       style: TextStyle(
                         color: AppTheme.successColor,
                         fontSize: 13.sp,
@@ -130,7 +136,7 @@ class WrongAnswerCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4.h),
                     Text(
-                      item.userAnswer,
+                      '내 답: ${wrongNote.userAnswer}',
                       style: TextStyle(
                         color: AppTheme.errorColor,
                         fontSize: 13.sp,
@@ -156,7 +162,7 @@ class WrongAnswerCard extends StatelessWidget {
           ),
           SizedBox(height: 4.h),
           Text(
-            item.explanation,
+            wrongNote.explanation,
             style: TextStyle(
               color: AppTheme.grey300,
               fontSize: 13.sp,
@@ -170,11 +176,11 @@ class WrongAnswerCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                _formatDate(item.wrongDate),
+                '${wrongNote.wrongDate.month}/${wrongNote.wrongDate.day}',
                 style: TextStyle(color: AppTheme.grey500, fontSize: 12.sp),
               ),
               const Spacer(),
-              if (!item.isRetried)
+              if (!wrongNote.isRetried)
                 ActionButton(
                   text: '다시 풀기',
                   icon: Icons.refresh,
@@ -186,19 +192,5 @@ class WrongAnswerCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  /// 날짜 포맷팅
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date).inDays;
-
-    if (difference == 0) {
-      return '오늘';
-    } else if (difference == 1) {
-      return '어제';
-    } else {
-      return '$difference일 전';
-    }
   }
 }
