@@ -30,4 +30,8 @@ class AppRoutes {
   // 설정 관련
   static const String settings = '/settings';
   static const String profile = '/profile';
+
+  // 성향 분석 세부 경로
+  static const String aptitudeQuiz = '/aptitude/quiz';
+  static const String aptitudeResult = '/aptitude/result';
 }
