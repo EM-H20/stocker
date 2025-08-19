@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../app/config/app_theme.dart';
 import '../../wrong_note/data/wrong_note_mock_repository.dart';
 import '../../wrong_note/data/models/wrong_note_response.dart';
 import 'widgets/profile_header.dart';
@@ -59,7 +58,7 @@ class _MypageScreenState extends State<MypageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.darkBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child:
             _isLoading

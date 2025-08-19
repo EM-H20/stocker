@@ -31,7 +31,7 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.darkBackground,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Consumer<WrongNoteProvider>(
           builder: (context, provider, child) {
