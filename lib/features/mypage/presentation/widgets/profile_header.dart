@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../app/config/app_theme.dart';
 
 /// 마이페이지 상단 프로필 헤더 위젯
 class ProfileHeader extends StatelessWidget {
@@ -41,7 +40,7 @@ class ProfileHeader extends StatelessWidget {
                 child: Icon(
                   Icons.edit,
                   size: 20.sp,
-                  color: AppTheme.primaryColor,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
             ],

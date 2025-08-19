@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../app/config/app_theme.dart';
 
 /// 노트 섹션 위젯
 class NoteSection extends StatelessWidget {
@@ -34,7 +33,7 @@ class NoteSection extends StatelessWidget {
                 child: Icon(
                   Icons.add,
                   size: 24.sp,
-                  color: AppTheme.primaryColor,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
             ],
@@ -52,17 +51,17 @@ class NoteSection extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: AppTheme.grey300,
+          color: Theme.of(context).dividerColor,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.grey300.withValues(alpha: 0.2),
-            blurRadius: 3,
-            offset: const Offset(0, 1),
+            color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -78,8 +77,8 @@ class NoteSection extends StatelessWidget {
           SizedBox(height: 4.h),
           Text(
             note.preview,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppTheme.grey600,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,

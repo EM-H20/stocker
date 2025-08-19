@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../app/config/app_theme.dart';
 
 /// 현재 진행 챕터 정보 카드 위젯
 ///
@@ -27,7 +26,7 @@ class ChapterInfoCard extends StatelessWidget {
 
     return Card(
       elevation: theme.cardTheme.elevation,
-      color: AppTheme.darkSurface,
+      color: Theme.of(context).cardColor,
       shape: theme.cardTheme.shape,
       child: Padding(
         padding: EdgeInsets.all(20.w),
@@ -39,7 +38,7 @@ class ChapterInfoCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.play_circle_filled,
-                  color: AppTheme.primaryColor,
+                  color: Theme.of(context).primaryColor,
                   size: 24.sp,
                 ),
                 SizedBox(width: 12.w),
@@ -68,7 +67,7 @@ class ChapterInfoCard extends StatelessWidget {
             Text(
               description,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: AppTheme.grey400,
+                color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6),
                 height: 1.5,
               ),
             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../app/config/app_theme.dart';
 
 // 추천 학습 챕터 카드 위젯
 class RecommendedChapterCard extends StatelessWidget {
@@ -24,11 +23,11 @@ class RecommendedChapterCard extends StatelessWidget {
     // 추천 학습 챕터 카드 위젯
     return Card(
       margin: EdgeInsets.only(bottom: 12.h),
-      color: AppTheme.darkSurface,
+      color: Theme.of(context).cardColor,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.2),
-          child: Icon(icon, color: AppTheme.primaryColor),
+          backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.2),
+          child: Icon(icon, color: Theme.of(context).primaryColor),
         ),
         title: Text(
           title,
@@ -40,12 +39,12 @@ class RecommendedChapterCard extends StatelessWidget {
         subtitle: Text(
           description,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppTheme.grey400,
+            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
           ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,
-          color: AppTheme.grey500,
+          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
           size: 16.sp,
         ),
         onTap: onTap,

@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'app/config/app_router.dart';
-import 'app/config/app_theme.dart';
-import 'features/home/presentation/home_navigation_provider.dart';
-import 'features/education/data/education_api.dart';
-import 'features/education/domain/education_mock_repository.dart';
-import 'features/education/domain/education_repository.dart';
-import 'features/education/presentation/education_provider.dart';
-import 'features/quiz/data/quiz_api.dart';
-import 'features/quiz/domain/quiz_mock_repository.dart';
-import 'features/quiz/domain/quiz_repository.dart';
-import 'features/quiz/presentation/quiz_provider.dart';
-import 'features/wrong_note/data/wrong_note_api.dart';
-import 'features/wrong_note/data/wrong_note_mock_repository.dart';
-import 'features/wrong_note/domain/wrong_note_repository.dart';
-import 'features/wrong_note/presentation/wrong_note_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:stocker/features/education/domain/education_mock_repository.dart';
+import 'package:stocker/features/education/data/education_api.dart';
+import 'package:stocker/features/education/domain/education_repository.dart';
+import 'package:stocker/features/quiz/domain/quiz_mock_repository.dart';
+import 'package:stocker/features/quiz/data/quiz_api.dart';
+import 'package:stocker/features/quiz/domain/quiz_repository.dart';
+import 'package:stocker/features/wrong_note/data/wrong_note_mock_repository.dart';
+import 'package:stocker/app/core/providers/theme_provider.dart';
+import 'app/config/app_theme.dart';
+import 'app/config/app_router.dart';
+import 'features/home/presentation/home_navigation_provider.dart';
+import 'features/education/presentation/education_provider.dart';
+import 'features/quiz/presentation/quiz_provider.dart';
+import 'features/wrong_note/presentation/wrong_note_provider.dart';
+import 'features/wrong_note/data/wrong_note_api.dart';
+import 'features/wrong_note/domain/wrong_note_repository.dart';
 
 /// ✅ 더미(mock) 여부 설정
 const useMock = true; // 실제 API 사용시 false
@@ -42,6 +43,11 @@ class StockerApp extends StatelessWidget {
       builder: (context, child) {
         return MultiProvider(
           providers: [
+            // 테마 상태 관리
+            ChangeNotifierProvider(
+              create: (_) => ThemeProvider()..initialize(),
+            ),
+
             // 홈 네비게이션 상태 관리
             ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
 
@@ -105,16 +111,20 @@ class StockerApp extends StatelessWidget {
               },
             ),
           ],
-          child: MaterialApp.router(
-            title: 'Stocker',
-            debugShowCheckedModeBanner: false,
+          child: Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              return MaterialApp.router(
+                title: 'Stocker',
+                debugShowCheckedModeBanner: false,
 
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.system,
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                themeMode: themeProvider.themeMode,
 
-            // GoRouter 설정했다.
-            routerConfig: AppRouter.router,
+                // GoRouter 설정했다.
+                routerConfig: AppRouter.router,
+              );
+            },
           ),
         );
       },

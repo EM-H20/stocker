@@ -7,6 +7,7 @@ import 'widgets/aptitude_analysis_card.dart';
 import 'widgets/attendance_status_card.dart';
 import 'widgets/wrong_note_card.dart';
 import 'widgets/note_section.dart';
+import 'widgets/theme_toggle_widget.dart';
 
 class MypageScreen extends StatefulWidget {
   const MypageScreen({super.key});
@@ -112,7 +113,12 @@ class _MypageScreenState extends State<MypageScreen> {
                           // TODO: 새 노트 추가 기능 구현
                         },
                       ),
-
+                    
+                      SizedBox(height: 16.h),
+                    
+                      // 테마 설정
+                      const ThemeToggleWidget(),
+                    
                       SizedBox(height: 24.h),
                     ],
                   ),

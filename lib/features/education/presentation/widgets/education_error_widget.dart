@@ -69,7 +69,7 @@ class EducationErrorWidget extends StatelessWidget {
             ActionButton(
               text: retryButtonText,
               icon: Icons.refresh,
-              color: AppTheme.successColor,
+              color: AppTheme.successColor, // 성공색은 고정 사용
               onPressed: onRetry,
             ),
           ],

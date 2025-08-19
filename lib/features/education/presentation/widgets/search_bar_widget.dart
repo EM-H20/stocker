@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../app/config/app_theme.dart';
 
 /// 교육 화면용 검색바 위젯
 ///
@@ -28,22 +27,22 @@ class SearchBarWidget extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: AppTheme.grey500,
+          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
         ),
         prefixIcon: Icon(
           Icons.search,
-          color: AppTheme.grey500,
+          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
           size: 20.sp,
         ),
         filled: true,
-        fillColor: AppTheme.darkSurface,
+        fillColor: Theme.of(context).cardColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: AppTheme.primaryColor, width: 2.w),
+          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.w),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),

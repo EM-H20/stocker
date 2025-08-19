@@ -78,6 +78,11 @@ class AppTheme {
         ),
       ),
 
+      // 아이콘 테마
+      iconTheme: const IconThemeData(
+        color: grey900,
+      ),
+
       // 카드 테마
       cardTheme: CardTheme(
         elevation: 2,
@@ -128,8 +133,13 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
         brightness: Brightness.dark,
+        surface: darkSurface,
+        background: darkBackground,
         error: accentColor,
       ),
+
+      // Scaffold 배경색
+      scaffoldBackgroundColor: darkBackground,
 
       // 텍스트 테마
       textTheme: _buildTextTheme(Brightness.dark),
@@ -162,6 +172,49 @@ class AppTheme {
           fontSize: 11.sp,
           fontWeight: FontWeight.w400,
         ),
+      ),
+
+      // 아이콘 테마
+      iconTheme: const IconThemeData(
+        color: Colors.white,
+      ),
+
+      // 카드 테마
+      cardTheme: CardTheme(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      ),
+
+      // 버튼 테마
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 2,
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+        ),
+      ),
+
+      // 입력 필드 테마
+      inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: const BorderSide(color: grey600),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: const BorderSide(color: primaryColor, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.r),
+          borderSide: const BorderSide(color: accentColor),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       ),
     );
   }

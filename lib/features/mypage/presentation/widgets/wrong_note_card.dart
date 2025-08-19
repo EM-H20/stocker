@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../app/config/app_theme.dart';
 import '../../../wrong_note/data/models/wrong_note_response.dart';
 
 /// 오답노트 카드 위젯
@@ -36,15 +35,15 @@ class WrongNoteCard extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(20.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: AppTheme.grey300,
+                color: Theme.of(context).dividerColor,
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppTheme.grey300.withValues(alpha: 0.3),
+                  color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -62,7 +61,7 @@ class WrongNoteCard extends StatelessWidget {
                 Container(
                   width: 1.w,
                   height: 40.h,
-                  color: AppTheme.grey300,
+                  color: Theme.of(context).dividerColor,
                 ),
                 Expanded(
                   child: _buildStatColumn(
@@ -74,7 +73,7 @@ class WrongNoteCard extends StatelessWidget {
                 Container(
                   width: 1.w,
                   height: 40.h,
-                  color: AppTheme.grey300,
+                  color: Theme.of(context).dividerColor,
                 ),
                 Expanded(
                   child: _buildStatColumn(
@@ -97,7 +96,7 @@ class WrongNoteCard extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppTheme.grey600,
+            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
           ),
         ),
         SizedBox(height: 4.h),

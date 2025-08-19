@@ -32,7 +32,7 @@ class AttendanceStatusCard extends StatelessWidget {
                 child: Text(
                   '전체 보기',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppTheme.primaryColor,
+                    color: Theme.of(context).primaryColor,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -43,7 +43,7 @@ class AttendanceStatusCard extends StatelessWidget {
           Text(
             '8월 3째주',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.grey600,
+              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
             ),
           ),
           SizedBox(height: 16.h),
@@ -63,10 +63,10 @@ class AttendanceStatusCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isToday 
-                          ? AppTheme.primaryColor
+                          ? Theme.of(context).primaryColor
                           : isAttended 
                               ? AppTheme.successColor 
-                              : AppTheme.grey300,
+                              : Theme.of(context).disabledColor,
                     ),
                     child: Center(
                       child: Text(
@@ -76,7 +76,7 @@ class AttendanceStatusCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                           color: isToday || isAttended 
                               ? Colors.white 
-                              : AppTheme.grey700,
+                              : Theme.of(context).textTheme.bodyMedium?.color,
                         ),
                       ),
                     ),

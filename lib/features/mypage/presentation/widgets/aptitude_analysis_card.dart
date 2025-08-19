@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../app/config/app_theme.dart';
 
 /// 투자성향 분석 카드 위젯
 class AptitudeAnalysisCard extends StatelessWidget {
@@ -31,10 +30,10 @@ class AptitudeAnalysisCard extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.all(20.w),
               decoration: BoxDecoration(
-                color: AppTheme.grey100,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(
-                  color: AppTheme.grey300,
+                  color: Theme.of(context).dividerColor,
                   width: 1,
                 ),
               ),
@@ -54,7 +53,7 @@ class AptitudeAnalysisCard extends StatelessWidget {
                         Text(
                           '투자성향에 대한 간단 설명',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.grey600,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
                         ),
                       ],
@@ -63,7 +62,7 @@ class AptitudeAnalysisCard extends StatelessWidget {
                   Icon(
                     Icons.arrow_forward_ios,
                     size: 16.sp,
-                    color: AppTheme.primaryColor,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ],
               ),

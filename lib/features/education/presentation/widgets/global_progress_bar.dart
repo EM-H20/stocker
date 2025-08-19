@@ -26,7 +26,7 @@ class GlobalProgressBar extends StatelessWidget {
             margin: margin ?? EdgeInsets.only(bottom: 16.h),
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: isDarkTheme ? AppTheme.darkSurface : colorScheme.surface,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(12.r),
               border:
                   isDarkTheme
@@ -42,7 +42,7 @@ class GlobalProgressBar extends StatelessWidget {
                   color:
                       isDarkTheme
                           ? AppTheme.successColor
-                          : AppTheme.primaryColor,
+                          : Theme.of(context).primaryColor,
                   size: 20.sp,
                 ),
                 SizedBox(width: 12.w),
@@ -62,7 +62,7 @@ class GlobalProgressBar extends StatelessWidget {
           margin: margin ?? EdgeInsets.only(bottom: 16.h),
           padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
-            color: isDarkTheme ? AppTheme.darkSurface : colorScheme.surface,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12.r),
             border:
                 isDarkTheme
@@ -107,7 +107,7 @@ class GlobalProgressBar extends StatelessWidget {
                       color:
                           isDarkTheme
                               ? AppTheme.successColor.withValues(alpha: 0.2)
-                              : AppTheme.primaryColor.withValues(alpha: 0.1),
+                              : Theme.of(context).primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Text(
@@ -133,7 +133,7 @@ class GlobalProgressBar extends StatelessWidget {
                         ? Colors.grey[700]
                         : colorScheme.outline.withValues(alpha: 0.2),
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  isDarkTheme ? AppTheme.successColor : AppTheme.primaryColor,
+                  isDarkTheme ? AppTheme.successColor : Theme.of(context).primaryColor,
                 ),
                 minHeight: 6.h,
               ),
@@ -143,7 +143,7 @@ class GlobalProgressBar extends StatelessWidget {
               Text(
                 provider.detailedProgressSummary,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDarkTheme ? Colors.grey[400] : AppTheme.grey400,
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                 ),
               ),
             ],
