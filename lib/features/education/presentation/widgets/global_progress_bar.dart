@@ -92,7 +92,7 @@ class GlobalProgressBar extends StatelessWidget {
                       Text(
                         '전체 학습 진행률',
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: isDarkTheme ? Colors.white : Colors.white,
+                          color: isDarkTheme ? Colors.white : AppTheme.grey900,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

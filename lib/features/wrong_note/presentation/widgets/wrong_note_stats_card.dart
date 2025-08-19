@@ -14,6 +14,7 @@ class WrongNoteStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final totalWrong = wrongAnswers.length;
     final retriedCount = wrongAnswers.where((item) => item.isRetried).length;
     final pendingCount = totalWrong - retriedCount;
@@ -22,8 +23,26 @@ class WrongNoteStatsCard extends StatelessWidget {
       margin: EdgeInsets.all(16.w),
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurface,
+        color: theme.brightness == Brightness.dark 
+            ? AppTheme.darkSurface 
+            : Colors.grey[50],
         borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: theme.brightness == Brightness.dark 
+              ? AppTheme.grey600.withValues(alpha: 0.3) 
+              : AppTheme.grey300.withValues(alpha: 0.5),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.brightness == Brightness.dark 
+                ? Colors.black.withValues(alpha: 0.3) 
+                : Colors.grey.withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -50,7 +69,9 @@ class WrongNoteStatsCard extends StatelessWidget {
                 Text(
                   '오답 현황',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: theme.brightness == Brightness.dark 
+                        ? Colors.white 
+                        : AppTheme.grey900,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
                   ),
@@ -75,18 +96,30 @@ class WrongNoteStatsCard extends StatelessWidget {
 
   /// 통계 아이템
   Widget _buildStatItem(String label, int count, Color color) {
-    return Column(
-      children: [
-        Text(
-          count.toString(),
-          style: TextStyle(
-            color: color,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Text(label, style: TextStyle(color: Colors.grey[400], fontSize: 12.sp)),
-      ],
+    return Builder(
+      builder: (context) {
+        return Column(
+          children: [
+            Text(
+              count.toString(),
+              style: TextStyle(
+                color: color,
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              label, 
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? Colors.grey[400] 
+                    : AppTheme.grey600, 
+                fontSize: 12.sp,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

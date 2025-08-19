@@ -17,6 +17,7 @@ class WrongNoteFilterTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final filters = ['전체', '주식 기초', '기술적 분석', '기업 분석'];
 
     return Container(
@@ -38,18 +39,38 @@ class WrongNoteFilterTabs extends StatelessWidget {
                 color:
                   isSelected
                       ? AppTheme.successColor
-                      : AppTheme.darkSurface,
+                      : (theme.brightness == Brightness.dark 
+                          ? AppTheme.darkSurface 
+                          : Colors.grey[50]),
                 borderRadius: BorderRadius.circular(25.r),
                 border: Border.all(
                   color:
-                      isSelected ? AppTheme.successColor : AppTheme.grey600,
-                  width: 1,
+                      isSelected 
+                          ? AppTheme.successColor 
+                          : (theme.brightness == Brightness.dark 
+                              ? AppTheme.grey600.withValues(alpha: 0.5) 
+                              : AppTheme.grey300.withValues(alpha: 0.7)),
+                  width: 1.5,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.brightness == Brightness.dark 
+                        ? Colors.black.withValues(alpha: 0.2) 
+                        : Colors.grey.withValues(alpha: 0.15),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                    spreadRadius: 0,
+                  ),
+                ],
               ),
               child: Text(
                 filter,
                 style: TextStyle(
-                  color: isSelected ? Colors.white : AppTheme.grey300,
+                  color: isSelected 
+                      ? Colors.white 
+                      : (theme.brightness == Brightness.dark 
+                          ? AppTheme.grey300 
+                          : AppTheme.grey700),
                   fontSize: 14.sp,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),

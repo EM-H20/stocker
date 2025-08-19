@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../app/config/app_theme.dart';
 
 /// 교육 화면용 검색바 위젯
 ///
@@ -20,6 +21,7 @@ class SearchBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkTheme = theme.brightness == Brightness.dark;
 
     return TextField(
       controller: controller,
@@ -38,7 +40,9 @@ class SearchBarWidget extends StatelessWidget {
         fillColor: Theme.of(context).cardColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none,
+          borderSide: isDarkTheme 
+              ? BorderSide.none 
+              : BorderSide(color: AppTheme.grey300, width: 1.w),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
@@ -46,7 +50,9 @@ class SearchBarWidget extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none,
+          borderSide: isDarkTheme 
+              ? BorderSide.none 
+              : BorderSide(color: AppTheme.grey300, width: 1.w),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       ),

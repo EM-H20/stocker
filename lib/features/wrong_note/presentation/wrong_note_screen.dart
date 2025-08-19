@@ -73,7 +73,10 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
                       ),
                       child: Text(
                         '다시 시도',
-                        style: TextStyle(color: Colors.white, fontSize: 14.sp),
+                        style: TextStyle(
+                          color: Colors.white, 
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ),
                   ],
@@ -106,7 +109,9 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
                       Text(
                         '오답노트',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).brightness == Brightness.dark 
+                              ? Colors.white 
+                              : AppTheme.grey900,
                           fontSize: 28.sp,
                           fontWeight: FontWeight.bold,
                         ),

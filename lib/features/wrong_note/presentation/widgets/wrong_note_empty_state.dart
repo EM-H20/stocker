@@ -21,12 +21,20 @@ class WrongNoteEmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.quiz_outlined, size: 64.sp, color: AppTheme.grey600),
+          Icon(
+            Icons.quiz_outlined, 
+            size: 64.sp, 
+            color: Theme.of(context).brightness == Brightness.dark 
+                ? AppTheme.grey600 
+                : AppTheme.grey500,
+          ),
           SizedBox(height: 16.h),
           Text(
             '오답이 없습니다',
             style: TextStyle(
-              color: AppTheme.grey400,
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? AppTheme.grey400 
+                  : AppTheme.grey700,
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
             ),
@@ -34,7 +42,12 @@ class WrongNoteEmptyState extends StatelessWidget {
           SizedBox(height: 8.h),
           Text(
             '퀴즈를 풀고 틀린 문제들을 복습해보세요',
-            style: TextStyle(color: AppTheme.grey500, fontSize: 14.sp),
+            style: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? AppTheme.grey500 
+                  : AppTheme.grey600, 
+              fontSize: 14.sp,
+            ),
           ),
           SizedBox(height: 24.h),
           ActionButton(

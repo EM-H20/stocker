@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:stocker/app/config/app_routes.dart';
+import 'package:stocker/app/config/app_theme.dart';
+import 'package:stocker/app/core/widgets/action_button.dart';
 import 'package:provider/provider.dart';
-import '../../../app/config/app_routes.dart';
-import '../../../app/config/app_theme.dart';
-import '../../../app/core/widgets/action_button.dart';
 import 'education_provider.dart';
 import 'widgets/education_error_widget.dart';
 
@@ -43,13 +43,17 @@ class _TheoryScreenState extends State<TheoryScreen> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppTheme.grey900,
+            size: 24.sp,
+          ),
           onPressed: () => context.go(AppRoutes.education),
         ),
         title: Text(
           '이론 학습',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppTheme.grey900,
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
           ),
@@ -91,7 +95,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
                   Text(
                     '이론 데이터가 없습니다',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppTheme.grey900,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -118,7 +122,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
                   Text(
                     '이론 페이지가 없습니다',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppTheme.grey900,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.w500,
                     ),
@@ -164,7 +168,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
                               child: Text(
                                 '페이지 ${index + 1}',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppTheme.grey900,
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -177,7 +181,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
                               Text(
                                 theory.word,
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : AppTheme.grey900,
                                   fontSize: 20.sp,
                                   fontWeight: FontWeight.bold,
                                 ),

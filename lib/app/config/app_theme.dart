@@ -221,76 +221,76 @@ class AppTheme {
 
   /// 텍스트 테마 빌더
   static TextTheme _buildTextTheme(Brightness brightness) {
-    final Color textColor =
-        brightness == Brightness.light ? grey900 : Colors.white;
+    final Color primaryTextColor = brightness == Brightness.light ? grey900 : Colors.white;
+    final Color secondaryTextColor = brightness == Brightness.light ? grey700 : grey400;
 
     return TextTheme(
       // 헤드라인
       headlineLarge: TextStyle(
         fontSize: 32.sp,
         fontWeight: FontWeight.bold,
-        color: textColor,
+        color: primaryTextColor,
       ),
       headlineMedium: TextStyle(
         fontSize: 28.sp,
         fontWeight: FontWeight.bold,
-        color: textColor,
+        color: primaryTextColor,
       ),
       headlineSmall: TextStyle(
         fontSize: 24.sp,
         fontWeight: FontWeight.w600,
-        color: textColor,
+        color: primaryTextColor,
       ),
 
       // 타이틀
       titleLarge: TextStyle(
         fontSize: 22.sp,
         fontWeight: FontWeight.w600,
-        color: textColor,
+        color: primaryTextColor,
       ),
       titleMedium: TextStyle(
         fontSize: 16.sp,
         fontWeight: FontWeight.w500,
-        color: textColor,
+        color: primaryTextColor,
       ),
       titleSmall: TextStyle(
         fontSize: 14.sp,
         fontWeight: FontWeight.w500,
-        color: textColor,
+        color: primaryTextColor,
       ),
 
       // 본문
       bodyLarge: TextStyle(
         fontSize: 16.sp,
         fontWeight: FontWeight.normal,
-        color: textColor,
+        color: primaryTextColor,
       ),
       bodyMedium: TextStyle(
         fontSize: 14.sp,
         fontWeight: FontWeight.normal,
-        color: textColor,
+        color: primaryTextColor,
       ),
       bodySmall: TextStyle(
         fontSize: 12.sp,
         fontWeight: FontWeight.normal,
-        color: brightness == Brightness.light ? grey600 : grey400,
+        color: secondaryTextColor,
       ),
 
       // 라벨
       labelLarge: TextStyle(
         fontSize: 14.sp,
         fontWeight: FontWeight.w500,
-        color: textColor,
+        color: primaryTextColor,
       ),
       labelMedium: TextStyle(
         fontSize: 12.sp,
         fontWeight: FontWeight.w500,
-        color: textColor,
+        color: primaryTextColor,
       ),
       labelSmall: TextStyle(
         fontSize: 11.sp,
         fontWeight: FontWeight.w500,
-        color: brightness == Brightness.light ? grey600 : grey400,
+        color: secondaryTextColor,
       ),
     );
   }

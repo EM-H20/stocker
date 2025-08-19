@@ -39,7 +39,9 @@ class CurrentLearningCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(
@@ -53,7 +55,10 @@ class CurrentLearningCard extends StatelessWidget {
                   child: Text(
                     '현재 진행 학습',
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
+                      color:
+                          theme.brightness == Brightness.dark
+                              ? Colors.white
+                              : AppTheme.grey900,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -65,7 +70,10 @@ class CurrentLearningCard extends StatelessWidget {
             Text(
               title,
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: Colors.white,
+                color:
+                    theme.brightness == Brightness.dark
+                        ? Colors.white
+                        : AppTheme.grey900,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -74,7 +82,9 @@ class CurrentLearningCard extends StatelessWidget {
             Text(
               description,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.color?.withValues(alpha: 0.6),
                 height: 1.5,
               ),
             ),

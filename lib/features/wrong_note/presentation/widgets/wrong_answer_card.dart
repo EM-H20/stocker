@@ -22,12 +22,31 @@ class WrongAnswerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: AppTheme.darkSurface,
-        borderRadius: BorderRadius.circular(12.r),
+        color: theme.brightness == Brightness.dark 
+            ? AppTheme.darkSurface 
+            : Colors.grey[50],
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: theme.brightness == Brightness.dark 
+              ? AppTheme.grey600.withValues(alpha: 0.3) 
+              : AppTheme.grey300.withValues(alpha: 0.5),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.brightness == Brightness.dark 
+                ? Colors.black.withValues(alpha: 0.3) 
+                : Colors.grey.withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +100,9 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             '문제',
             style: TextStyle(
-              color: AppTheme.grey400,
+              color: theme.brightness == Brightness.dark 
+                  ? AppTheme.grey400 
+                  : AppTheme.grey600,
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
             ),
@@ -89,7 +110,13 @@ class WrongAnswerCard extends StatelessWidget {
           SizedBox(height: 4.h),
           Text(
             wrongNote.question,
-            style: TextStyle(color: Colors.white, fontSize: 14.sp, height: 1.4),
+            style: TextStyle(
+              color: theme.brightness == Brightness.dark 
+                  ? Colors.white 
+                  : AppTheme.grey900, 
+              fontSize: 14.sp, 
+              height: 1.4,
+            ),
           ),
 
           SizedBox(height: 12.h),
@@ -155,7 +182,9 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             '해설',
             style: TextStyle(
-              color: AppTheme.grey400,
+              color: theme.brightness == Brightness.dark 
+                  ? AppTheme.grey400 
+                  : AppTheme.grey600,
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
             ),
@@ -164,7 +193,9 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             wrongNote.explanation,
             style: TextStyle(
-              color: AppTheme.grey300,
+              color: theme.brightness == Brightness.dark 
+                  ? AppTheme.grey300 
+                  : AppTheme.grey700,
               fontSize: 13.sp,
               height: 1.4,
             ),
@@ -177,7 +208,12 @@ class WrongAnswerCard extends StatelessWidget {
             children: [
               Text(
                 '${wrongNote.wrongDate.month}/${wrongNote.wrongDate.day}',
-                style: TextStyle(color: AppTheme.grey500, fontSize: 12.sp),
+                style: TextStyle(
+                  color: theme.brightness == Brightness.dark 
+                      ? AppTheme.grey500 
+                      : AppTheme.grey600, 
+                  fontSize: 12.sp,
+                ),
               ),
               const Spacer(),
               if (!wrongNote.isRetried)
