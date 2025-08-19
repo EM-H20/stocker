@@ -39,7 +39,7 @@ class _EducationScreenState extends State<EducationScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(18.w),
+          padding: EdgeInsets.all(20.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -122,23 +122,20 @@ class _EducationScreenState extends State<EducationScreen> {
                   return Column(
                     children:
                         provider.chapters.map((chapter) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4.2.w),
-                            child: RecommendedChapterCard(
-                              title: chapter.title,
-                              description:
-                                  chapter.isTheoryCompleted
-                                      ? '이론 학습 완료 ✓'
-                                      : '이론 학습을 시작하세요',
-                              icon:
-                                  chapter.isTheoryCompleted
-                                      ? Icons.check_circle
-                                      : Icons.play_circle_outline,
-                              onTap: () {
-                                provider.enterTheory(chapter.id);
-                                context.go(AppRoutes.theory);
-                              },
-                            ),
+                          return RecommendedChapterCard(
+                            title: chapter.title,
+                            description:
+                                chapter.isTheoryCompleted
+                                    ? '이론 학습 완료 ✓'
+                                    : '이론 학습을 시작하세요',
+                            icon:
+                                chapter.isTheoryCompleted
+                                    ? Icons.check_circle
+                                    : Icons.play_circle_outline,
+                            onTap: () {
+                              provider.enterTheory(chapter.id);
+                              context.go(AppRoutes.theory);
+                            },
                           );
                         }).toList(),
                   );

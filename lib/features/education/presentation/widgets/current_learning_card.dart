@@ -28,8 +28,9 @@ class CurrentLearningCard extends StatelessWidget {
       color: Theme.of(context).cardColor,
       shadowColor: Theme.of(context).shadowColor.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+      margin: EdgeInsets.zero,
       child: Padding(
-        padding: EdgeInsets.all(24.w), // 기존 20.w에서 확대
+        padding: EdgeInsets.all(20.w), // 기존 20.w에서 확대
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -46,7 +47,10 @@ class CurrentLearningCard extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.trending_up,
-                    color: Theme.of(context).primaryColor,
+                    color:
+                        theme.brightness == Brightness.dark
+                            ? Colors.white
+                            : Theme.of(context).primaryColor,
                     size: 24.sp,
                   ),
                 ),
@@ -96,7 +100,10 @@ class CurrentLearningCard extends StatelessWidget {
                   child: ActionButton(
                     text: '이론 학습',
                     icon: Icons.book_outlined,
-                    color: Theme.of(context).primaryColor, // 테마 기반 색상 사용
+                    color:
+                        theme.brightness == Brightness.dark
+                            ? AppTheme.infoColor
+                            : Theme.of(context).primaryColor,
                     // 아래 코드 해석 :
                     // onTheoryPressed가 null이면 debugPrint('이론 학습 클릭')을 실행
                     // 그렇지 않으면 onTheoryPressed를 실행
@@ -108,7 +115,10 @@ class CurrentLearningCard extends StatelessWidget {
                   child: ActionButton(
                     text: '퀴즈 풀기',
                     icon: Icons.quiz_outlined,
-                    color: AppTheme.successColor, // 성공색은 고정 사용
+                    color:
+                        theme.brightness == Brightness.dark
+                            ? AppTheme.successColor
+                            : AppTheme.successColor,
                     onPressed: onQuizPressed ?? () => debugPrint('퀴즈 풀기 클릭'),
                   ),
                 ),
