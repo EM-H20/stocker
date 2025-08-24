@@ -4,12 +4,14 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.0
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
-  logger: ^1.4.0
-  intl: ^0.19.0
+  logger: ^2.6.1
+  intl: ^0.20.2
   flutter:
+    sdk: flutter
+  flutter_localizations: 
     sdk: flutter
   
 
@@ -42,10 +44,10 @@ dependencies:
 
   # 유틸리티 및 환경 설정
   flutter_spinkit: ^5.2.2          # 로딩 인디케이터
-  flutter_dotenv: ^5.2.1           # .env 환경 변수 관리
+  flutter_dotenv: ^6.0.0           # .env 환경 변수 관리
 
   # 메모 기능 (리치 텍스트 에디터)
-  flutter_quill: ^11.4.1           # 메모 입력, 체크리스트 등 지원
+  flutter_quill: ^11.4.2           # 메모 입력, 체크리스트 등 지원
 
   # 앱 통합 관리
   flutter_launcher_icons: ^0.14.4  # 앱 아이콘 관리 flutter pub run flutter_launcher_icons:main 
@@ -67,3 +69,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/stocker_logo.png
+
+dependency_overrides:
+  win32: ^5.13.0   

@@ -36,8 +36,8 @@ class AptitudeProvider with ChangeNotifier {
   /// 현재 검사 후 나온 결과
   AptitudeResult? _currentResult;
   AptitudeResult? get currentResult => _currentResult;
-  
-  // ✅ [수정] 'currentResult'의 setter 추가
+
+  // ✅ [수정] 'currentResult'의 setter 추가  마쟈???!!!!???
   set currentResult(AptitudeResult? value) {
     _currentResult = value;
     // notifyListeners(); // 필요에 따라 UI 갱신을 알릴 수 있음

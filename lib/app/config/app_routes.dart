@@ -34,4 +34,9 @@ class AppRoutes {
   // 성향 분석 세부 경로
   static const String aptitudeQuiz = '/aptitude/quiz';
   static const String aptitudeResult = '/aptitude/result';
+  static const String aptitudeTypesList = '/aptitude/types';
+
+  // 노트 관련 경로
+  static const String noteList = '/notes';
+  static const String noteEditor = '/notes/editor';
 }

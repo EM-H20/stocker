@@ -18,7 +18,7 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
   @override
   void initState() {
     super.initState();
-    // 화면이 처음 빌드될 때, 모든 성향 타입 목록을 가져옵니다.
+    // 화면이 처음 빌드될 때, Provider를 통해 모든 성향 타입 목록을 가져옵니다.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AptitudeProvider>().fetchAllTypes();
     });
@@ -66,7 +66,7 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                     contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
                     leading: CircleAvatar(
                       radius: 24,
-                      backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                      backgroundColor: Theme.of(context).primaryColor.withAlpha(25),
                       child: Icon(
                         _getIconForType(type.typeCode),
                         color: Theme.of(context).primaryColor,
@@ -85,8 +85,8 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                     onTap: () async {
                       final success = await provider.fetchResultByType(type.typeCode);
                       if (mounted && success) {
-                        // 상세 결과 화면으로 이동
-                        context.push(AppRoutes.aptitudeResult);
+                        // 상세 결과 화면으로 이동할 때, '나의 결과'가 아님을 알림 (extra: false)
+                        context.push(AppRoutes.aptitudeResult, extra: false);
                       }
                     },
                   ),
