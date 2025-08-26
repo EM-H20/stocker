@@ -10,19 +10,21 @@ import '../../features/mypage/presentation/mypage_screen.dart';
 import '../../features/education/presentation/theory_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/signup_screen.dart';
+import '../../features/quiz/presentation/quiz_screen.dart';
+import '../../features/quiz/presentation/quiz_result_screen.dart';
 
 /// 앱 전체의 라우팅을 관리하는 GoRouter 설정
 class AppRouter {
   static final GoRouter _router = GoRouter(
-    initialLocation: AppRoutes.login, // 초기 화면을 로그인 화면으로 설정
+    initialLocation: AppRoutes.education, // euimin 스타일 유지: 교육 화면을 초기 화면으로
     routes: [
-      // 로그인 화면
+      // 로그인 화면 (merge 브랜치에서 추가된 기능)
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => LoginScreen(),
       ),
 
-      // 회원가입 화면
+      // 회원가입 화면 (merge 브랜치에서 추가된 기능)
       GoRoute(
         path: AppRoutes.register,
         builder: (context, state) => SignupScreen(),
@@ -82,6 +84,31 @@ class AppRouter {
           return TheoryScreen(chapterId: chapterId);
         },
       ),
+
+      // 퀴즈 화면 (euimin 브랜치 기능)
+      GoRoute(
+        path: AppRoutes.quiz,
+        builder: (context, state) {
+          final chapterIdStr = state.uri.queryParameters['chapterId'];
+          final chapterId = int.tryParse(chapterIdStr ?? '') ?? 1;
+          return QuizScreen(chapterId: chapterId);
+        },
+      ),
+
+      // 퀴즈 결과 화면 (euimin 브랜치 기능)
+      GoRoute(
+        path: AppRoutes.quizResult,
+        builder: (context, state) {
+          final chapterIdStr = state.uri.queryParameters['chapterId'];
+          final chapterId = int.tryParse(chapterIdStr ?? '') ?? 1;
+          return QuizResultScreen(chapterId: chapterId);
+        },
+      ),
+
+      // TODO: 추후 추가될 라우트들
+      // - subin 브랜치의 노트, 성향분석 라우트들
+      // - 스플래시 화면
+      // - 온보딩 화면
     ],
 
     // 에러 페이지 처리

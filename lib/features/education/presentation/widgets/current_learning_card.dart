@@ -7,8 +7,6 @@ import '../../../../app/core/widgets/action_button.dart';
 class CurrentLearningCard extends StatelessWidget {
   final String title;
   final String description;
-  final double progress;
-  final String progressText;
   final VoidCallback? onTheoryPressed;
   final VoidCallback? onQuizPressed;
 
@@ -16,8 +14,6 @@ class CurrentLearningCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.description,
-    required this.progress,
-    required this.progressText,
     this.onTheoryPressed,
     this.onQuizPressed,
   });
@@ -25,15 +21,16 @@ class CurrentLearningCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     // 현재 진행 학습 정보 카드 위젯
     return Card(
       elevation: 4,
-      shadowColor: colorScheme.shadow.withValues(alpha: 0.3),
+      color: Theme.of(context).cardColor,
+      shadowColor: Theme.of(context).shadowColor.withValues(alpha: 0.3),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+      margin: EdgeInsets.zero,
       child: Padding(
-        padding: EdgeInsets.all(24.w), // 기존 20.w에서 확대
+        padding: EdgeInsets.all(20.w), // 기존 20.w에서 확대
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -43,12 +40,17 @@ class CurrentLearningCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(
+                      context,
+                    ).primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(
                     Icons.trending_up,
-                    color: colorScheme.primary,
+                    color:
+                        theme.brightness == Brightness.dark
+                            ? Colors.white
+                            : Theme.of(context).primaryColor,
                     size: 24.sp,
                   ),
                 ),
@@ -57,7 +59,10 @@ class CurrentLearningCard extends StatelessWidget {
                   child: Text(
                     '현재 진행 학습',
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: colorScheme.onSurface,
+                      color:
+                          theme.brightness == Brightness.dark
+                              ? Colors.white
+                              : AppTheme.grey900,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -69,7 +74,10 @@ class CurrentLearningCard extends StatelessWidget {
             Text(
               title,
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: colorScheme.onSurface,
+                color:
+                    theme.brightness == Brightness.dark
+                        ? Colors.white
+                        : AppTheme.grey900,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -78,44 +86,11 @@ class CurrentLearningCard extends StatelessWidget {
             Text(
               description,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.color?.withValues(alpha: 0.6),
                 height: 1.5,
               ),
-            ),
-            SizedBox(height: 24.h), // 기존 20.h에서 확대
-            // 진행률 바
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '진행률',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      progressText,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12.h), // 기존 8.h에서 확대
-                LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    colorScheme.primary,
-                  ),
-                  minHeight: 8.h,
-                ),
-              ],
             ),
             SizedBox(height: 24.h), // ActionButton을 위한 공간
             // ActionButton 추가
@@ -125,7 +100,10 @@ class CurrentLearningCard extends StatelessWidget {
                   child: ActionButton(
                     text: '이론 학습',
                     icon: Icons.book_outlined,
-                    color: AppTheme.primaryColor, // app_theme.dart의 색상 사용
+                    color:
+                        theme.brightness == Brightness.dark
+                            ? AppTheme.infoColor
+                            : Theme.of(context).primaryColor,
                     // 아래 코드 해석 :
                     // onTheoryPressed가 null이면 debugPrint('이론 학습 클릭')을 실행
                     // 그렇지 않으면 onTheoryPressed를 실행
@@ -137,7 +115,10 @@ class CurrentLearningCard extends StatelessWidget {
                   child: ActionButton(
                     text: '퀴즈 풀기',
                     icon: Icons.quiz_outlined,
-                    color: AppTheme.grey700, // app_theme.dart의 강조색 사용
+                    color:
+                        theme.brightness == Brightness.dark
+                            ? AppTheme.successColor
+                            : AppTheme.successColor,
                     onPressed: onQuizPressed ?? () => debugPrint('퀴즈 풀기 클릭'),
                   ),
                 ),

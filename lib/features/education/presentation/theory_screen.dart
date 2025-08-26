@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
 import '../../../app/config/app_routes.dart';
-import '../../../app/core/widgets/action_button.dart';
+import '../../../app/config/app_theme.dart';
 import 'education_provider.dart';
 import 'widgets/education_error_widget.dart';
+import 'widgets/theory_page_widget.dart';
+import 'widgets/theory_navigation_widget.dart';
+import 'widgets/theory_empty_state_widget.dart';
 
 class TheoryScreen extends StatefulWidget {
   const TheoryScreen({super.key, required this.chapterId});
@@ -37,33 +41,13 @@ class _TheoryScreenState extends State<TheoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white, size: 24.sp),
-          onPressed: () => context.go(AppRoutes.education),
-        ),
-        title: Text(
-          '이론 학습',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-      ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: _buildAppBar(context),
       body: Consumer<EducationProvider>(
         builder: (context, provider, child) {
           // 로딩 상태
           if (provider.isLoadingTheory) {
-            return const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4CAF50)),
-              ),
-            );
+            return _buildLoadingState();
           }
 
           // 에러 상태
@@ -77,232 +61,104 @@ class _TheoryScreenState extends State<TheoryScreen> {
 
           // 이론 세션이 없는 경우
           if (provider.currentTheorySession == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.book_outlined,
-                    size: 64.sp,
-                    color: Colors.grey[400],
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    '이론 데이터가 없습니다',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return const TheoryEmptyStateWidget(message: '이론 데이터가 없습니다');
           }
 
           final theorySession = provider.currentTheorySession!;
           final theories = theorySession.theories;
 
           if (theories.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.book_outlined,
-                    size: 64.sp,
-                    color: Colors.grey[400],
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    '이론 페이지가 없습니다',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return const TheoryEmptyStateWidget(message: '이론 페이지가 없습니다');
           }
 
-          return Column(
-            children: [
-              // 진행률 표시
-              Container(
-                margin: EdgeInsets.all(16.w),
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A2A2A),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.auto_stories,
-                      color: const Color(0xFF4CAF50),
-                      size: 24.sp,
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${theorySession.chapterTitle} - 이론',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            '${provider.currentTheoryIndex + 1} / ${theories.length} 페이지',
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // 이론 내용
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    provider.setCurrentTheoryIndex(index);
-                  },
-                  itemCount: theories.length,
-                  itemBuilder: (context, index) {
-                    final theory = theories[index];
-                    return Container(
-                      margin: EdgeInsets.symmetric(horizontal: 16.w),
-                      padding: EdgeInsets.all(20.w),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A2A),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // 페이지 번호
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 6.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF4CAF50),
-                                borderRadius: BorderRadius.circular(20.r),
-                              ),
-                              child: Text(
-                                '페이지 ${index + 1}',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 20.h),
-
-                            // 이론 제목
-                            if (theory.word.isNotEmpty) ...[
-                              Text(
-                                theory.word,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20.sp,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 16.h),
-                            ],
-
-                            // 이론 내용
-                            Text(
-                              theory.content,
-                              style: TextStyle(
-                                color: Colors.grey[300],
-                                fontSize: 16.sp,
-                                height: 1.6,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-              // 하단 버튼들
-              Container(
-                padding: EdgeInsets.all(16.w),
-                child: Row(
-                  children: [
-                    // 이전 버튼
-                    if (provider.currentTheoryIndex > 0)
-                      Expanded(
-                        child: ActionButton(
-                          text: '이전',
-                          icon: Icons.arrow_back,
-                          color: Colors.grey[600]!,
-                          onPressed: () {
-                            _pageController.previousPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                        ),
-                      ),
-
-                    if (provider.currentTheoryIndex > 0 &&
-                        provider.currentTheoryIndex < theories.length - 1)
-                      SizedBox(width: 12.w),
-
-                    // 다음/완료 버튼
-                    if (provider.currentTheoryIndex < theories.length - 1)
-                      Expanded(
-                        child: ActionButton(
-                          text: '다음',
-                          icon: Icons.arrow_forward,
-                          color: const Color(0xFF4CAF50),
-                          onPressed: () {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                        ),
-                      )
-                    else
-                      Expanded(
-                        child: ActionButton(
-                          text: '이론 완료',
-                          icon: Icons.check_circle,
-                          color: const Color(0xFF4CAF50),
-                          onPressed: () => _completeTheory(provider),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          );
+          return _buildTheoryContent(context, provider, theories);
         },
       ),
     );
   }
 
+  /// AppBar 빌드
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return AppBar(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      elevation: 0,
+      leading: IconButton(
+        icon: Icon(
+          Icons.arrow_back,
+          color: isDarkMode ? Colors.white : AppTheme.grey900,
+          size: 24.sp,
+        ),
+        onPressed: () => context.go(AppRoutes.education),
+      ),
+      title: Text(
+        '이론 학습',
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : AppTheme.grey900,
+          fontSize: 18.sp,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      centerTitle: true,
+    );
+  }
+
+  /// 로딩 상태 위젯
+  Widget _buildLoadingState() {
+    return const Center(
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.successColor),
+      ),
+    );
+  }
+
+  /// 이론 콘텐츠 빌드
+  Widget _buildTheoryContent(
+    BuildContext context,
+    EducationProvider provider,
+    List<dynamic> theories,
+  ) {
+    return Column(
+      children: [
+        // 이론 내용
+        Expanded(
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              provider.setCurrentTheoryIndex(index);
+            },
+            itemCount: theories.length,
+            itemBuilder: (context, index) {
+              final theory = theories[index];
+              return TheoryPageWidget(theory: theory, pageIndex: index);
+            },
+          ),
+        ),
+
+        // 하단 네비게이션
+        TheoryNavigationWidget(
+          currentIndex: provider.currentTheoryIndex,
+          totalPages: theories.length,
+          onPrevious: () {
+            _pageController.previousPage(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          },
+          onNext: () {
+            _pageController.nextPage(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          },
+          onComplete: () => _completeTheory(provider),
+        ),
+      ],
+    );
+  }
+
+  /// 이론 완료 처리
   Future<void> _completeTheory(EducationProvider provider) async {
     try {
       await provider.completeTheory();

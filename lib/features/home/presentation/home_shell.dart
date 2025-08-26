@@ -29,7 +29,10 @@ class HomeShell extends StatelessWidget {
       // 현재 선택된 탭 인덱스를 반환합니다.
       currentIndex: _getCurrentIndex(location),
       onTap: (index) => _onTabTapped(context, index),
-      selectedItemColor: Theme.of(context).primaryColor,
+      selectedItemColor:
+          Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xFF64B5F6) // 다크모드: 더 밝은 파란색
+              : Theme.of(context).primaryColor, // 라이트모드: 기본 테마 색상
       unselectedItemColor: Colors.grey,
       selectedLabelStyle: TextStyle(
         fontSize: 12.sp,

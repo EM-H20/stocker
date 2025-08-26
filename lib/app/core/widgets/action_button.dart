@@ -26,22 +26,31 @@ class ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    
+    // 버튼 배경색이 어두운지 밝은지 판단하여 텍스트/아이콘 색상 결정
+    final double luminance = color.computeLuminance();
+    final Color foregroundColor = luminance > 0.5 ? Colors.black : Colors.white;
 
     return ElevatedButton.icon(
       onPressed: onPressed,
-      icon: Icon(icon, size: 16.sp),
+      icon: Icon(icon, size: 16.sp, color: foregroundColor),
       label: Text(
         text,
         style: theme.textTheme.labelMedium?.copyWith(
           fontWeight: FontWeight.w600,
+          color: foregroundColor,
         ),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
-        foregroundColor: Colors.white,
+        foregroundColor: foregroundColor,
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         minimumSize: Size(width ?? 80.w, height ?? 36.h),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+        elevation: theme.brightness == Brightness.dark ? 4 : 2,
+        shadowColor: theme.brightness == Brightness.dark 
+            ? Colors.black.withValues(alpha: 0.3) 
+            : Colors.grey.withValues(alpha: 0.3),
       ),
     );
   }

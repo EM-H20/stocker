@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../app/config/app_theme.dart';
 
 /// 교육 화면용 검색바 위젯
 ///
@@ -20,7 +21,7 @@ class SearchBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final isDarkTheme = theme.brightness == Brightness.dark;
 
     return TextField(
       controller: controller,
@@ -28,26 +29,30 @@ class SearchBarWidget extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onSurfaceVariant,
+          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
         ),
         prefixIcon: Icon(
           Icons.search,
-          color: colorScheme.onSurfaceVariant,
+          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
           size: 20.sp,
         ),
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest,
+        fillColor: Theme.of(context).cardColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none,
+          borderSide: isDarkTheme 
+              ? BorderSide.none 
+              : BorderSide(color: AppTheme.grey300, width: 1.w),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2.w),
+          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.w),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none,
+          borderSide: isDarkTheme 
+              ? BorderSide.none 
+              : BorderSide(color: AppTheme.grey300, width: 1.w),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       ),

@@ -1,10 +1,194 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
-class WrongNoteScreen extends StatelessWidget {
+import 'widgets/wrong_answer_card.dart';
+import 'widgets/wrong_note_empty_state.dart';
+import 'wrong_note_provider.dart';
+import '../../../app/config/app_theme.dart';
+
+/// 오답노트 메인 화면
+///
+/// 사용자가 틀린 퀴즈 문제들을 모아서 복습할 수 있는 화면입니다.
+/// 챕터별로 분류되어 있으며, 다시 풀기 기능을 제공합니다.
+class WrongNoteScreen extends StatefulWidget {
   const WrongNoteScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('WrongNote')));
+  State<WrongNoteScreen> createState() => _WrongNoteScreenState();
+}
+
+class _WrongNoteScreenState extends State<WrongNoteScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // 화면 로드 시 오답노트 데이터 로드
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<WrongNoteProvider>().loadWrongNotes();
+    });
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Consumer<WrongNoteProvider>(
+          builder: (context, provider, child) {
+            // 로딩 중일 때
+            if (provider.isLoading) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppTheme.primaryColor),
+              );
+            }
+
+            // 에러가 있을 때
+            if (provider.hasError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64.sp,
+                      color: AppTheme.errorColor,
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      provider.errorMessage ?? '오류가 발생했습니다.',
+                      style: TextStyle(
+                        color: AppTheme.errorColor,
+                        fontSize: 16.sp,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 16.h),
+                    ElevatedButton(
+                      onPressed: () {
+                        provider.clearError();
+                        provider.loadWrongNotes();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor,
+                      ),
+                      child: Text(
+                        '다시 시도',
+                        style: TextStyle(
+                          color: Colors.white, 
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            final wrongNotes = provider.wrongNotes;
+
+            // 오답노트가 비어있을 때
+            if (wrongNotes.isEmpty) {
+              return WrongNoteEmptyState(
+                onGoToQuiz: () {
+                  // 교육 탭으로 이동 (실제로는 Navigator나 context.go 사용)
+                },
+              );
+            }
+
+            // 정상적으로 데이터가 있을 때
+            return Column(
+              children: [
+                // 커스텀 헤더
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 20.w,
+                    vertical: 16.h,
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        '오답노트',
+                        style: TextStyle(
+                          color: Theme.of(context).brightness == Brightness.dark 
+                              ? Colors.white 
+                              : AppTheme.grey900,
+                          fontSize: 28.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 6.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppTheme.errorColor.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: Text(
+                          '${wrongNotes.length}개',
+                          style: TextStyle(
+                            color: AppTheme.errorColor,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // 오답 목록
+                Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    itemCount: wrongNotes.length,
+                    itemBuilder: (context, index) {
+                      final wrongNote = wrongNotes[index];
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: WrongAnswerCard(
+                          wrongNote: wrongNote,
+                          onRetry:
+                              () => provider.markAsRetried(wrongNote.quizId),
+                          onRemove:
+                              () => provider.removeWrongNote(wrongNote.quizId),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// 오답 아이템 모델
+class WrongAnswerItem {
+  final int id;
+  final int chapterId;
+  final String chapterTitle;
+  final String question;
+  final String correctAnswer;
+  final String userAnswer;
+  final String explanation;
+  final DateTime wrongDate;
+  bool isRetried;
+
+  WrongAnswerItem({
+    required this.id,
+    required this.chapterId,
+    required this.chapterTitle,
+    required this.question,
+    required this.correctAnswer,
+    required this.userAnswer,
+    required this.explanation,
+    required this.wrongDate,
+    this.isRetried = false,
+  });
 }
