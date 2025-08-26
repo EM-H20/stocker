@@ -46,3 +46,8 @@ app.*.map.json
 
 # rules
 .windsurfrules
+
+# claude
+.claude/
+.mcp.json
+CLAUDE.md
