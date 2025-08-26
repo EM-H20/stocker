@@ -117,43 +117,53 @@ class _HomeShellListener extends StatefulWidget {
 }
 
 class __HomeShellListenerState extends State<_HomeShellListener> {
+  // ✅ [수정] Provider 참조를 안전하게 저장할 변수들
+  AuthProvider? _authProvider;
+  AttendanceProvider? _attendanceProvider;
+
   @override
-  void initState() {
-    super.initState();
-    // AuthProvider의 로그인 성공 Notifier를 구독(listen)합니다.
-    context.read<AuthProvider>().loginSuccessNotifier.addListener(_showAttendanceQuizIfNeeded);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // ✅ [수정] didChangeDependencies에서 Provider 참조를 안전하게 저장
+    _authProvider = context.read<AuthProvider>();
+    _attendanceProvider = context.read<AttendanceProvider>();
+    
+    // 리스너 등록 (저장된 참조 사용)
+    _authProvider?.loginSuccessNotifier.addListener(_showAttendanceQuizIfNeeded);
   }
 
   @override
   void dispose() {
-    // 위젯이 사라질 때 리스너를 반드시 제거하여 메모리 누수를 방지합니다.
-    context.read<AuthProvider>().loginSuccessNotifier.removeListener(_showAttendanceQuizIfNeeded);
+    // ✅ [수정] dispose에서는 저장된 참조를 사용 (context 사용하지 않음)
+    // 이렇게 하면 위젯이 비활성화된 후에도 안전하게 리스너를 제거할 수 있습니다
+    _authProvider?.loginSuccessNotifier.removeListener(_showAttendanceQuizIfNeeded);
     super.dispose();
   }
 
   // 로그인 성공 시, 출석 퀴즈 팝업을 띄우는 핵심 로직
   Future<void> _showAttendanceQuizIfNeeded() async {
-    if (!mounted) return; // ✅ [추가] 리스너 호출 시점에도 context 유효성 확인
+    // ✅ [수정] mounted 체크와 Provider null 체크 추가
+    if (!mounted || _authProvider == null || _attendanceProvider == null) return;
 
-    if (context.read<AuthProvider>().loginSuccessNotifier.value == true) {
-      final attendanceProvider = context.read<AttendanceProvider>();
+    if (_authProvider!.loginSuccessNotifier.value == true) {
       final today = DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
-      if (attendanceProvider.attendanceStatus[today] != true) {
-        await attendanceProvider.setQuizLoading(true); // ✅ [추가] 퀴즈 로딩 시작
-        final success = await attendanceProvider.fetchTodaysQuiz();
+      if (_attendanceProvider!.attendanceStatus[today] != true) {
+        await _attendanceProvider!.setQuizLoading(true); // ✅ 퀴즈 로딩 시작
+        final success = await _attendanceProvider!.fetchTodaysQuiz();
         
-        if (mounted && success && attendanceProvider.quizzes.isNotEmpty) {
+        // ✅ [수정] context 사용 전에 mounted 다시 확인
+        if (mounted && success && _attendanceProvider!.quizzes.isNotEmpty) {
           showDialog(
             context: context,
             barrierDismissible: false,
             builder: (_) => ChangeNotifierProvider.value(
-              value: attendanceProvider,
-              child: AttendanceQuizDialog(quizzes: attendanceProvider.quizzes),
+              value: _attendanceProvider!,
+              child: AttendanceQuizDialog(quizzes: _attendanceProvider!.quizzes),
             ),
           );
         }
-        await attendanceProvider.setQuizLoading(false); // ✅ [추가] 퀴즈 로딩 종료
+        await _attendanceProvider!.setQuizLoading(false); // ✅ 퀴즈 로딩 종료
       }
     }
   }
