@@ -9,7 +9,7 @@ class AppRoutes {
 
   // 인증 관련
   static const String login = '/login';
-  static const String register = '/register';
+  static const String register = '/signup';
 
   // 메인 탭 경로들
   static const String education = '/education';
@@ -31,4 +31,13 @@ class AppRoutes {
   // 설정 관련
   static const String settings = '/settings';
   static const String profile = '/profile';
+
+  // 성향 분석 세부 경로
+  static const String aptitudeQuiz = '/aptitude/quiz';
+  static const String aptitudeResult = '/aptitude/result';
+  static const String aptitudeTypesList = '/aptitude/types';
+
+  // 노트 관련 경로
+  static const String noteList = '/notes';
+  static const String noteEditor = '/notes/editor';
 }

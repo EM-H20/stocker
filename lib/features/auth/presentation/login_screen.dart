@@ -1,87 +1,99 @@
+import 'package:go_router/go_router.dart';
+import '../../../app/config/app_routes.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
-
-import '../../../app/config/app_routes.dart';
-import 'auth_provider.dart';
-import '../presentation/widgets/auth_switch_button.dart';  // 수정된 경로
-import '../presentation/widgets/auth_text_field.dart';  // 수정된 경로
-import '../presentation/widgets/password_helper_text.dart';  // 수정된 경로
+import '../../../app/core/widgets/action_button.dart';
+import '../../auth/presentation/auth_provider.dart';
 
 class LoginScreen extends StatelessWidget {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-  // 더미 데이터: 로그인 성공 시 사용할 값
-  final String dummyEmail = "test@example.com";
-  final String dummyPassword = "Password123!";
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+
+    // ✅ [수정] 로그인 로직을 별도의 비동기 함수로 분리합니다.
+    Future<void> handleLogin() async {
+      // 위젯이 여전히 유효한지 먼저 확인합니다.
+      if (!context.mounted) return;
+
+      final isSuccess = await authProvider.login(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
+
+      // 비동기 작업 후에도 위젯이 유효한지 다시 확인합니다.
+      if (context.mounted) {
+        if (isSuccess) {
+          context.go(AppRoutes.education);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authProvider.errorMessage ?? '로그인에 실패했습니다.'),
+            ),
+          );
+        }
+      }
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('로그인')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const SizedBox(height: 50),
-            // 이메일 입력 필드
-            AuthTextField(
-              controller: emailController,
-              hintText: '이메일을 입력하세요',
-            ),
-            const SizedBox(height: 16),
-            // 비밀번호 입력 필드
-            AuthTextField(
-              controller: passwordController,
-              hintText: '비밀번호를 입력하세요',
-              isPassword: true,
-            ),
-            const SizedBox(height: 16),
-            // 비밀번호 조건 안내
-            PasswordHelperText(isValid: passwordController.text.length >= 8),
-            const SizedBox(height: 20),
-            Consumer<AuthProvider>(
-              builder: (context, authProvider, child) {
-                return authProvider.isLoading
-                    ? const CircularProgressIndicator() // 로딩 중에는 스피너 표시
-                    : ElevatedButton(
-                        onPressed: () {
-                          // 더미 로그인 처리
-                          if (emailController.text == dummyEmail &&
-                              passwordController.text == dummyPassword) {
-                            // 로그인 성공
-                            authProvider.setUser(dummyEmail);
-                            context.go(AppRoutes.education);
-                          } else {
-                            // 로그인 실패
-                            authProvider.setErrorMessage('아이디 또는 비밀번호가 틀렸습니다.');
-                          }
-                        },
-                        child: const Text('로그인'),
-                      );
-              },
-            ),
-            const SizedBox(height: 20),
-            // 회원가입 화면으로 이동
-            AuthSwitchButton(
-              buttonText: '회원가입',
-              onPressed: () {
-                context.go(AppRoutes.register); // GoRouter로 회원가입 화면으로 이동
-              },
-            ),
-            // 로그인 실패 시 오류 메시지 표시
-            Consumer<AuthProvider>(
-              builder: (context, authProvider, child) {
-                return authProvider.errorMessage.isNotEmpty
-                    ? Text(
-                        authProvider.errorMessage,
-                        style: const TextStyle(color: Colors.red),
-                      )
-                    : const SizedBox.shrink();
-              },
-            ),
-          ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 48),
+              Center(
+                child: Image.asset(
+                  'assets/images/stocker_logo.png',
+                  width: 120,
+                  height: 120,
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                '로그인',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 48),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(
+                  labelText: '✉️ 이메일',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: '🔒 비밀번호',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 32),
+              ActionButton(
+                text: '로그인',
+                icon: Icons.login,
+                color: Colors.blue,
+                onPressed: authProvider.isLoading ? null : handleLogin,
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  context.push(AppRoutes.register);
+                },
+                child: const Text('회원가입'),
+              ),
+            ],
+          ),
         ),
       ),
     );

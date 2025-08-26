@@ -4,11 +4,16 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.0
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
+  logger: ^2.6.1
+  intl: ^0.20.2
   flutter:
     sdk: flutter
+  flutter_localizations: 
+    sdk: flutter
+  
 
   # 아이폰 스타일 기본 아이콘 (Cupertino 디자인용)
   cupertino_icons: ^1.0.8
@@ -38,15 +43,16 @@ dependencies:
   fl_chart: ^1.0.0                 # 꺾은선, 막대 등 통계 그래프
 
   # 유틸리티 및 환경 설정
-  flutter_spinkit: ^5.2.1          # 로딩 인디케이터
-  flutter_dotenv: ^5.2.1           # .env 환경 변수 관리
+  flutter_spinkit: ^5.2.2          # 로딩 인디케이터
+  flutter_dotenv: ^6.0.0           # .env 환경 변수 관리
 
   # 메모 기능 (리치 텍스트 에디터)
-  flutter_quill: ^11.4.1           # 메모 입력, 체크리스트 등 지원
+  flutter_quill: ^11.4.2           # 메모 입력, 체크리스트 등 지원
 
   # 앱 통합 관리
   flutter_launcher_icons: ^0.14.4  # 앱 아이콘 관리 flutter pub run flutter_launcher_icons:main 
   change_app_package_name: ^1.5.0  # 앱 이름 관리  flutter pub run change_app_package_name:main com.팀명.stocker
+
 
 
 dev_dependencies:
@@ -54,11 +60,15 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
 
-# flutter_launcher_icons
-# flutter_launcher_icons:
-#   image_path: "assets/icon/app_icon.png"
-#   android: true
-#   ios: true
+flutter_launcher_icons:
+   image_path: "assets/icon/app_icon.png"
+   android: true
+   ios: true
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/stocker_logo.png
+
+dependency_overrides:
+  win32: ^5.13.0   
