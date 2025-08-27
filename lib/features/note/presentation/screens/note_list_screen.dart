@@ -1,5 +1,6 @@
 // FILE: lib/features/note/presentation/screens/note_list_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -34,22 +35,46 @@ class _NoteListScreenState extends State<NoteListScreen> {
     final notes = provider.notes;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('나의 투자 노트'),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Theme.of(context).appBarTheme.iconTheme?.color,
+            size: 20.sp,
+          ),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go(AppRoutes.mypage);
+            }
+          },
+        ),
+        title: Text(
+          '나의 투자 노트',
+          style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       body: provider.isLoading
-          ? const Center(child: SpinKitFadingCircle(color: Colors.blue))
+          ? Center(
+              child: SpinKitFadingCircle(
+                color: Theme.of(context).primaryColor,
+                size: 50.w,
+              ),
+            )
           : notes.isEmpty
-              ? const Center(
-                  child: Text(
-                    '아직 작성된 노트가 없어요.\n아래 버튼을 눌러 첫 노트를 작성해보세요!',
-                    textAlign: TextAlign.center,
-                  ),
-                )
+              ? _buildEmptyState(context)
               : RefreshIndicator(
                   onRefresh: () => provider.fetchAllNotes(),
+                  color: Theme.of(context).primaryColor,
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(16.w),
                     itemCount: notes.length,
                     itemBuilder: (context, index) {
                       final note = notes[index];
@@ -59,48 +84,148 @@ class _NoteListScreenState extends State<NoteListScreen> {
                           // 기존 노트를 편집하기 위해 에디터 화면으로 이동
                           context.push(AppRoutes.noteEditor, extra: note);
                         },
-                        onDelete: () {
-                          // 삭제 확인 다이얼로그 표시
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('노트 삭제'),
-                              content: const Text('정말로 이 노트를 삭제하시겠습니까?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  child: const Text('취소'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    provider.deleteNote(note.id);
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('삭제', style: TextStyle(color: Colors.red)),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                        onDelete: () => _showDeleteDialog(context, provider, note),
                       );
                     },
                   ),
                 ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // 템플릿 선택 다이얼로그를 띄우고 결과를 받음
-          final selectedTemplate = await showDialog<NoteTemplate>(
-            context: context,
-            builder: (_) => const TemplatePickerDialog(),
-          );
-
-          if (mounted && selectedTemplate != null) {
-            // 템플릿을 선택했다면, 새 노트 작성을 위해 에디터 화면으로 이동
-            context.push(AppRoutes.noteEditor, extra: selectedTemplate);
-          }
-        },
-        child: const Icon(Icons.add),
+        onPressed: () => _showTemplateDialog(context),
+        backgroundColor: Theme.of(context).primaryColor,
+        foregroundColor: Colors.white,
+        child: Icon(Icons.add, size: 24.sp),
       ),
     );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(32.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.note_add_outlined,
+              size: 80.w,
+              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+            ),
+            SizedBox(height: 24.h),
+            Text(
+              '아직 작성된 노트가 없어요',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              '아래 버튼을 눌러 첫 노트를 작성해보세요!',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontSize: 14.sp,
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 32.h),
+            ElevatedButton.icon(
+              onPressed: () => _showTemplateDialog(context),
+              icon: Icon(Icons.add, size: 20.sp),
+              label: Text(
+                '첫 노트 작성하기',
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, NoteProvider provider, dynamic note) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: Text(
+          '노트 삭제',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          '정말로 이 노트를 삭제하시겠습니까?\n삭제된 노트는 복구할 수 없습니다.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontSize: 14.sp,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              '취소',
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              provider.deleteNote(note.id);
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '노트가 삭제되었습니다',
+                    style: TextStyle(fontSize: 14.sp),
+                  ),
+                  backgroundColor: Theme.of(context).primaryColor,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              '삭제',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showTemplateDialog(BuildContext context) async {
+    final selectedTemplate = await showDialog<NoteTemplate>(
+      context: context,
+      builder: (_) => const TemplatePickerDialog(),
+    );
+
+    if (mounted && selectedTemplate != null && context.mounted) {
+      context.push(AppRoutes.noteEditor, extra: selectedTemplate);
+    }
   }
 }
