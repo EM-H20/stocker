@@ -58,25 +58,22 @@ class HomeShell extends StatelessWidget {
     );
   }
 
-  /// 현재 위치에 따른 탭 인덱스 반환
+  /// 현재 위치에 따른 탭 인덱스 반환 (4개 탭)
   int _getCurrentIndex(String location) {
     if (location.startsWith(AppRoutes.education)) return 0;
     if (location.startsWith(AppRoutes.attendance)) return 1;
-    if (location.startsWith(AppRoutes.aptitude)) return 2;
-    if (location.startsWith(AppRoutes.wrongNote)) return 3;
-    if (location.startsWith(AppRoutes.mypage)) return 4;
+    if (location.startsWith(AppRoutes.wrongNote)) return 2;
+    if (location.startsWith(AppRoutes.mypage)) return 3;
     return 0;
   }
 
-  /// 탭이 선택되어 있는지 확인
+  /// 탭이 선택되어 있는지 확인 (4개 탭)
   bool _isTabSelected(String location, TabItem tab) {
     switch (tab) {
       case TabItem.education:
         return location == AppRoutes.education;
       case TabItem.attendance:
         return location == AppRoutes.attendance;
-      case TabItem.aptitude:
-        return location == AppRoutes.aptitude;
       case TabItem.wrongNote:
         return location == AppRoutes.wrongNote;
       case TabItem.mypage:
@@ -84,7 +81,7 @@ class HomeShell extends StatelessWidget {
     }
   }
 
-  /// 탭 클릭 시 GoRouter로 라우팅
+  /// 탭 클릭 시 GoRouter로 라우팅 (4개 탭)
   void _onTabTapped(BuildContext context, int index) {
     switch (index) {
       case 0:
@@ -94,12 +91,9 @@ class HomeShell extends StatelessWidget {
         context.go(AppRoutes.attendance);
         break;
       case 2:
-        context.go(AppRoutes.aptitude);
-        break;
-      case 3:
         context.go(AppRoutes.wrongNote);
         break;
-      case 4:
+      case 3:
         context.go(AppRoutes.mypage);
         break;
     }
