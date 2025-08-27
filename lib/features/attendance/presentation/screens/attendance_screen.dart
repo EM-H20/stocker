@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
 import '../provider/attendance_provider.dart';
 import '../widgets/attendance_calendar.dart';
@@ -49,7 +51,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(provider.errorMessage ?? '퀴즈를 불러오는 데 실패했습니다.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppTheme.errorColor,
         ),
       );
     }
@@ -69,23 +71,30 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             centerTitle: true,
           ),
           body: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.w),
             child: Column(
               children: [
                 const AttendanceCalendar(),
                 const Spacer(),
                 if (provider.isQuizLoading)
-                  const SpinKitFadingCircle(color: Colors.blue, size: 50.0)
+                  SpinKitFadingCircle(
+                    color: Theme.of(context).primaryColor,
+                    size: 50.r,
+                  )
                 else
                   ActionButton(
                     text: isAlreadyAttended ? '오늘은 이미 출석했습니다' : '오늘의 퀴즈 풀고 출석하기',
                     icon: isAlreadyAttended ? Icons.check_circle : Icons.quiz,
-                    color: isAlreadyAttended ? Colors.grey : Colors.blue,
+                    color: isAlreadyAttended 
+                        ? (Theme.of(context).brightness == Brightness.dark 
+                            ? AppTheme.grey600 
+                            : AppTheme.grey400)
+                        : Theme.of(context).primaryColor,
                     onPressed: isAlreadyAttended ? null : _onStartQuizPressed,
                     width: double.infinity,
-                    height: 50,
+                    height: 50.h,
                   ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
               ],
             ),
           ),

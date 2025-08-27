@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -66,22 +67,24 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
         title: const Text('투자 성향 분석'),
       ),
       body: provider.isLoading && questions.isEmpty
-          ? const Center(child: SpinKitFadingCircle(color: Colors.blue))
+          ? Center(child: SpinKitFadingCircle(color: Theme.of(context).colorScheme.primary))
           : Column(
               children: [
                 // 1. 진행률 표시 바
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(16.w),
                   child: LinearPercentIndicator(
                     percent: totalQuestions > 0 ? (provider.answers.length / totalQuestions) : 0,
-                    lineHeight: 12.0,
+                    lineHeight: 12.h,
                     center: Text(
                       '${provider.answers.length} / $totalQuestions',
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onPrimary, fontSize: 10.sp, fontWeight: FontWeight.bold),
                     ),
-                    backgroundColor: Colors.grey[300],
-                    progressColor: Theme.of(context).primaryColor,
-                    barRadius: const Radius.circular(6),
+                    backgroundColor: Theme.of(context).brightness == Brightness.light 
+                        ? Colors.grey[300] 
+                        : Colors.grey[700],
+                    progressColor: Theme.of(context).colorScheme.primary,
+                    barRadius: Radius.circular(6.r),
                   ),
                 ),
                 // 2. 질문 페이지 뷰
@@ -93,7 +96,7 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                     itemBuilder: (context, index) {
                       final question = questions[index];
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: EdgeInsets.symmetric(horizontal: 24.w),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -101,17 +104,18 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                             Text(
                               'Q${index + 1}. ${question.text}',
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 22,
+                              style: TextStyle(
+                                fontSize: 22.sp,
                                 fontWeight: FontWeight.bold,
                                 height: 1.5, // 줄 간격
+                                color: Theme.of(context).textTheme.headlineSmall?.color,
                               ),
                             ),
-                            const SizedBox(height: 48),
+                            SizedBox(height: 48.h),
                             // 답변 선택지 목록
                             ...question.choices.map((choice) {
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 12.0),
+                                padding: EdgeInsets.only(bottom: 12.h),
                                 child: QuizOptionButton(
                                   text: choice.text,
                                   isSelected: provider.answers[question.id] == choice.value,
@@ -138,20 +142,22 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                 ),
                 // 3. 결과 제출 버튼 (모든 질문에 답했을 때만 활성화)
                 Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: EdgeInsets.all(24.w),
                   child: ElevatedButton(
                     onPressed: (provider.answers.length == totalQuestions && totalQuestions > 0)
                         ? _submit
                         : null, // 모든 질문에 답하지 않으면 버튼 비활성화
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey[300],
+                      minimumSize: Size(double.infinity, 50.h),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      disabledBackgroundColor: Theme.of(context).brightness == Brightness.light 
+                          ? Colors.grey[300] 
+                          : Colors.grey[700],
                     ),
                     child: provider.isLoading
-                        ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2.0)
-                        : const Text('결과 분석하기', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        ? CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary, strokeWidth: 2.0)
+                        : Text('결과 분석하기', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],

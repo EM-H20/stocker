@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
 import '../../data/dto/quiz_submission_dto.dart';
 import '../../domain/model/attendance_quiz.dart';
@@ -63,7 +65,7 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(success ? '출석이 완료되었습니다!' : provider.errorMessage ?? '출석 처리 중 오류가 발생했습니다.'),
-          backgroundColor: success ? Colors.blue : Colors.red,
+          backgroundColor: success ? AppTheme.successColor : AppTheme.errorColor,
         ),
       );
     }
@@ -72,76 +74,113 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AttendanceProvider>();
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return AlertDialog(
       title: Text('오늘의 출석 퀴즈 (${_currentIndex + 1}/${widget.quizzes.length})'),
-      // ✅ [수정] content를 SizedBox로 감싸서 명시적인 너비를 제공합니다.
-      // 이렇게 하면 AlertDialog가 크기를 계산할 때 발생하는 레이아웃 오류를 해결할 수 있습니다.
       content: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.8, // 화면 너비의 80%로 고정
+        width: 0.8.sw,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // 개선된 Progress Indicator
             LinearPercentIndicator(
               percent: (_currentIndex + 1) / widget.quizzes.length,
-              lineHeight: 12.0,
+              lineHeight: 14.h, // 두께 증가
               center: Text(
                 '${((_currentIndex + 1) / widget.quizzes.length * 100).toStringAsFixed(0)}%',
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w700,
+                  shadows: isDarkMode 
+                      ? [Shadow(color: Colors.black54, blurRadius: 1)] 
+                      : [Shadow(color: Colors.white70, blurRadius: 1)],
+                ),
               ),
-              backgroundColor: Colors.grey[300],
-              progressColor: Theme.of(context).primaryColor,
-              barRadius: const Radius.circular(6),
+              backgroundColor: isDarkMode ? AppTheme.grey700 : AppTheme.grey200,
+              progressColor: AppTheme.successColor, // 교육 위젯과 동일한 초록색
+              barRadius: Radius.circular(7.r),
             ),
-            const SizedBox(height: 24),
-            SizedBox(
-              height: 80,
+            SizedBox(height: 28.h),
+            // 동적 높이 조정된 질문 영역
+            Container(
+              constraints: BoxConstraints(
+                minHeight: 80.h,
+                maxHeight: 120.h,
+              ),
               child: Center(
                 child: Text(
                   _currentQuiz.question,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    height: 1.3,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 28.h),
+            // 💎 슈퍼 업그레이드된 OX 버튼 레이아웃
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildAnswerButton(context, isO: true),
+                SizedBox(width: 24.w), // 더 여유로운 간격
                 _buildAnswerButton(context, isO: false),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 20.h),
             if (provider.isSubmitting)
-              const SpinKitFadingCircle(
-                color: Colors.blue,
-                size: 40.0,
+              SpinKitFadingCircle(
+                color: AppTheme.successColor,
+                size: 40.r,
               ),
           ],
         ),
       ),
-      // 다이얼로그의 여백을 조절하여 UI를 개선합니다.
-      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
-      actionsPadding: const EdgeInsets.only(bottom: 10, right: 10),
+      contentPadding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 20.h),
+      actionsPadding: EdgeInsets.only(bottom: 12.h, right: 12.w),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.r),
+      ),
     );
   }
 
   Widget _buildAnswerButton(BuildContext context, {required bool isO}) {
-    Color? buttonColor;
-    IconData? resultIcon;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    Color buttonColor;
+    IconData buttonIcon;
 
     if (_showResult && _selectedAnswer == isO) {
-      resultIcon = _isCorrect ? Icons.check_circle_outline : Icons.highlight_off;
-      buttonColor = _isCorrect ? Colors.green : Colors.red;
+      // 🎯 선택된 답안 결과 - 더 임팩트 있는 아이콘과 색상
+      buttonIcon = _isCorrect 
+          ? Icons.check_circle_rounded 
+          : Icons.cancel_rounded;
+      buttonColor = _isCorrect ? AppTheme.successColor : AppTheme.errorColor;
+    } else if (_showResult) {
+      // 선택되지 않은 답안은 은은한 회색
+      buttonIcon = isO ? Icons.panorama_fish_eye : Icons.close_rounded;
+      buttonColor = isDarkMode ? AppTheme.grey600 : AppTheme.grey400;
+    } else {
+      // 🎨 기본 상태 - 더 매력적인 아이콘과 색상
+      buttonIcon = isO ? Icons.panorama_fish_eye : Icons.close_rounded;
+      buttonColor = isDarkMode ? AppTheme.grey600 : AppTheme.grey500;
     }
 
-    return ActionButton(
-      text: isO ? 'O' : 'X',
-      icon: resultIcon ?? (isO ? Icons.circle_outlined : Icons.clear),
-      color: buttonColor ?? (_showResult ? Colors.grey : Colors.blue),
-      onPressed: () => _onAnswerSelected(isO),
-      width: 100,
+    // 🚀 완전 새로워진 정사각형 ActionButton
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      child: ActionButton(
+        text: isO ? 'O' : 'X',
+        icon: buttonIcon,
+        color: buttonColor,
+        onPressed: _showResult ? null : () => _onAnswerSelected(isO),
+        width: 80.w,  // 🔥 정사각형 스타일
+        height: 80.h, // 🔥 정사각형 스타일 
+      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +32,7 @@ class AptitudeResultScreen extends StatelessWidget {
         title: Text(isMyResult ? '나의 투자 성향 결과' : result.typeName),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(24.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -39,58 +40,68 @@ class AptitudeResultScreen extends StatelessWidget {
             Text(
               result.typeName,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Text(
               result.typeDescription,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.grey[700], height: 1.6),
+              style: TextStyle(
+                fontSize: 16.sp, 
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8), 
+                height: 1.6
+              ),
             ),
-            const SizedBox(height: 48),
+            SizedBox(height: 48.h),
             _buildSectionTitle('나와 비슷한 성향의 투자 거장'),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             Card(
               elevation: 2,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.w),
                 child: Column(
                   children: [
                     CircleAvatar(
-                      radius: 50,
+                      radius: 50.r,
                       backgroundImage: NetworkImage(result.master.imageUrl),
                     ),
-                    const SizedBox(height: 16),
-                    Text(result.master.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 16.h),
+                    Text(result.master.name, style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8.h),
                     Text(result.master.description, textAlign: TextAlign.center),
-                    const SizedBox(height: 24),
-                    const Text('포트폴리오 예시', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 24.h),
+                    Text('포트폴리오 예시', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 16.h),
                     MasterPortfolioChart(portfolio: result.master.portfolio),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 48),
+            SizedBox(height: 48.h),
             _buildSectionTitle('이런 교육은 어때요?'),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             ListTile(
-              leading: const Icon(Icons.school, color: Colors.blue),
+              leading: Icon(Icons.school, color: Theme.of(context).colorScheme.primary),
               title: const Text('초보자를 위한 주식 용어 마스터'),
-              subtitle: const Text('기초부터 탄탄하게 시작해요'),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              subtitle: Text(
+                '기초부터 탄탄하게 시작해요',
+                style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios, color: Theme.of(context).iconTheme.color),
               onTap: () {},
             ),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.show_chart, color: Colors.green),
+              leading: Icon(Icons.show_chart, color: Colors.green),
               title: const Text('차트 분석 심화 과정'),
-              subtitle: const Text('기술적 분석의 모든 것'),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              subtitle: Text(
+                '기술적 분석의 모든 것',
+                style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios, color: Theme.of(context).iconTheme.color),
               onTap: () {},
             ),
-            const SizedBox(height: 48),
+            SizedBox(height: 48.h),
 
             // ✅ [수정] '나의 결과'를 볼 때만 하단 버튼들이 보이도록 처리
             if (isMyResult) ...[
@@ -101,7 +112,7 @@ class AptitudeResultScreen extends StatelessWidget {
                 },
                 child: const Text('다른 성향 보러가기'),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               OutlinedButton(
                 onPressed: () {
                   // 재검사를 위해 퀴즈 화면으로 이동
@@ -119,7 +130,7 @@ class AptitudeResultScreen extends StatelessWidget {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+      style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold),
     );
   }
 }

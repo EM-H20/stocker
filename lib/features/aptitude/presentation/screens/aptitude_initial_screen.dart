@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -32,9 +33,9 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(24.w),
         child: provider.isLoading
-            ? const Center(child: SpinKitFadingCircle(color: Colors.blue))
+            ? Center(child: SpinKitFadingCircle(color: Theme.of(context).colorScheme.primary))
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,44 +43,44 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                   Card(
                     elevation: 4.0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0),
+                      borderRadius: BorderRadius.circular(16.r),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
                       child: Column(
                         children: [
                           Icon(
                             Icons.insights,
-                            size: 60,
-                            color: Theme.of(context).primaryColor,
+                            size: 60.r,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
-                          const SizedBox(height: 24),
-                          const Text(
+                          SizedBox(height: 24.h),
+                          Text(
                             '나에게 꼭 맞는 투자 스타일 찾기',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 22,
+                              fontSize: 22.sp,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12.h),
                           Text(
                             '몇 가지 간단한 질문을 통해\n당신의 투자 성향을 진단해 드립니다.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
+                              fontSize: 16.sp,
+                              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                             ),
                           ),
-                          const SizedBox(height: 40),
+                          SizedBox(height: 40.h),
                           ElevatedButton(
                             onPressed: () {
                               // ✅ [수정] 검사 화면으로 이동
                               context.push(AppRoutes.aptitudeQuiz);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              foregroundColor: Colors.white,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
@@ -98,7 +99,7 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   if (provider.hasPreviousResult)
                     TextButton(
                       onPressed: () {
@@ -107,10 +108,10 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                         provider.currentResult = null; 
                         context.push(AppRoutes.aptitudeResult);
                       },
-                      child: const Text(
+                      child: Text(
                         '이전 결과 다시보기',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           decoration: TextDecoration.underline,
                         ),
                       ),

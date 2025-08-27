@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -50,38 +51,38 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
         title: const Text('모든 투자 성향 둘러보기'),
       ),
       body: provider.isLoading
-          ? const Center(child: SpinKitFadingCircle(color: Colors.blue))
+          ? Center(child: SpinKitFadingCircle(color: Theme.of(context).colorScheme.primary))
           : ListView.builder(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(16.w),
               itemCount: allTypes.length,
               itemBuilder: (context, index) {
                 final type = allTypes[index];
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 16.0),
+                  margin: EdgeInsets.only(bottom: 16.h),
                   elevation: 2.0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
+                    contentPadding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
                     leading: CircleAvatar(
-                      radius: 24,
-                      backgroundColor: Theme.of(context).primaryColor.withAlpha(25),
+                      radius: 24.r,
+                      backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(25),
                       child: Icon(
                         _getIconForType(type.typeCode),
-                        color: Theme.of(context).primaryColor,
-                        size: 28,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 28.r,
                       ),
                     ),
                     title: Text(
                       type.typeName,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
                     ),
                     subtitle: Text(
                       type.description,
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7)),
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16.r, color: Theme.of(context).iconTheme.color),
                     onTap: () async {
                       final success = await provider.fetchResultByType(type.typeCode);
                       if (mounted && success) {

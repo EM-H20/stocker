@@ -134,7 +134,6 @@ class AppTheme {
         seedColor: primaryColor,
         brightness: Brightness.dark,
         surface: darkSurface,
-        background: darkBackground,
         error: accentColor,
       ),
 
@@ -221,8 +220,10 @@ class AppTheme {
 
   /// 텍스트 테마 빌더
   static TextTheme _buildTextTheme(Brightness brightness) {
-    final Color primaryTextColor = brightness == Brightness.light ? grey900 : Colors.white;
-    final Color secondaryTextColor = brightness == Brightness.light ? grey700 : grey400;
+    final Color primaryTextColor =
+        brightness == Brightness.light ? grey900 : Colors.white;
+    final Color secondaryTextColor =
+        brightness == Brightness.light ? grey700 : grey400;
 
     return TextTheme(
       // 헤드라인

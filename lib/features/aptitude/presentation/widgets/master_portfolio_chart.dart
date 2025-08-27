@@ -1,6 +1,7 @@
 // features/aptitude/presentation/widgets/master_portfolio_chart.dart
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// 투자 거장의 포트폴리오를 보여주는 파이 차트 위젯
 class MasterPortfolioChart extends StatelessWidget {
@@ -27,9 +28,9 @@ class MasterPortfolioChart extends StatelessWidget {
         color: color,
         value: entry.value,
         title: '${entry.value.toStringAsFixed(1)}%',
-        radius: 80,
-        titleStyle: const TextStyle(
-          fontSize: 12,
+        radius: 80.r,
+        titleStyle: TextStyle(
+          fontSize: 12.sp,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -39,33 +40,36 @@ class MasterPortfolioChart extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          height: 200,
+          height: 200.h,
           child: PieChart(
             PieChartData(
               sections: chartSections,
               borderData: FlBorderData(show: false),
               sectionsSpace: 2,
-              centerSpaceRadius: 40,
+              centerSpaceRadius: 40.r,
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24.h),
         // 범례
         Wrap(
-          spacing: 16,
-          runSpacing: 8,
+          spacing: 16.w,
+          runSpacing: 8.h,
           alignment: WrapAlignment.center,
           children: List.generate(portfolio.length, (index) {
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 12,
-                  height: 12,
+                  width: 12.w,
+                  height: 12.h,
                   color: colorList[index % colorList.length],
                 ),
-                const SizedBox(width: 6),
-                Text(portfolio.keys.elementAt(index)),
+                SizedBox(width: 6.w),
+                Text(
+                  portfolio.keys.elementAt(index),
+                  style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                ),
               ],
             );
           }),
