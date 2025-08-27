@@ -20,7 +20,7 @@ class AttendanceStatusCard extends StatelessWidget {
   String _getWeekInfo(DateTime startOfWeek) {
     final month = startOfWeek.month;
     final weekOfMonth = ((startOfWeek.day - 1) / 7).floor() + 1;
-    return '${month}월 $weekOfMonth째주';
+    return '$month월 $weekOfMonth째주';
   }
 
   @override

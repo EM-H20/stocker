@@ -10,6 +10,9 @@ class AttendanceProvider with ChangeNotifier {
 
   AttendanceProvider(this._repository, this._authProvider);
 
+  // dispose 상태 체크를 위한 플래그
+  bool _disposed = false;
+
   Map<DateTime, bool> _attendanceStatus = {};
   Map<DateTime, bool> get attendanceStatus => _attendanceStatus;
 
@@ -30,19 +33,32 @@ class AttendanceProvider with ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  /// dispose 상태를 확인하고 안전하게 listener에게 알림
+  void _safeNotifyListeners() {
+    if (!_disposed) {
+      notifyListeners();
+    }
+  }
+
   void initialize() {
     fetchAttendanceStatus(_focusedMonth);
   }
   
   Future<void> setQuizLoading(bool value) async {
     _isQuizLoading = value;
-    notifyListeners();
+    _safeNotifyListeners();
   }
 
   Future<void> fetchAttendanceStatus(DateTime month) async {
     _focusedMonth = month;
     _isLoading = true;
-    notifyListeners();
+    _safeNotifyListeners();
 
     try {
       final attendanceList = await _repository.getAttendanceStatus(month);
@@ -52,7 +68,7 @@ class AttendanceProvider with ChangeNotifier {
       _errorMessage = '출석 현황 로딩 실패: ${e.toString()}';
     } finally {
       _isLoading = false;
-      notifyListeners();
+      _safeNotifyListeners(); // 에러 발생 지점 수정!
     }
   }
 
@@ -72,12 +88,12 @@ class AttendanceProvider with ChangeNotifier {
     final userId = _authProvider.user?.id;
     if (userId == null) {
       _errorMessage = '로그인 정보가 필요합니다.';
-      notifyListeners();
+      _safeNotifyListeners();
       return false;
     }
 
     _isSubmitting = true;
-    notifyListeners();
+    _safeNotifyListeners();
 
     try {
       final submission = QuizSubmissionDto(userId: userId, answers: userAnswers);
@@ -90,7 +106,7 @@ class AttendanceProvider with ChangeNotifier {
       return false;
     } finally {
       _isSubmitting = false;
-      notifyListeners();
+      _safeNotifyListeners();
     }
   }
 }

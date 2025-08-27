@@ -17,10 +17,11 @@ import '../../features/aptitude/presentation/screens/aptitude_quiz_screen.dart';
 import '../../features/aptitude/presentation/screens/aptitude_result_screen.dart';
 import '../../features/note/presentation/screens/note_list_screen.dart';
 import '../../features/note/presentation/screens/note_editor_screen.dart';
+import '../../features/home/presentation/main_dashboard_screen.dart';
 /// 앱 전체의 라우팅을 관리하는 GoRouter 설정
 class AppRouter {
   static final GoRouter _router = GoRouter(
-    initialLocation: AppRoutes.education, // euimin 스타일 유지: 교육 화면을 초기 화면으로
+    initialLocation: AppRoutes.main, // 새로운 메인 대시보드를 초기 화면으로
     routes: [
       // 로그인 화면 (merge 브랜치에서 추가된 기능)
       GoRoute(
@@ -34,7 +35,13 @@ class AppRouter {
         builder: (context, state) => const SignupScreen(),
       ),
 
-      // ShellRoute로 BottomNavigationBar를 유지하면서 탭 라우팅
+      // 메인 대시보드 화면
+      GoRoute(
+        path: AppRoutes.main,
+        builder: (context, state) => const MainDashboardScreen(),
+      ),
+
+      // ShellRoute로 BottomNavigationBar를 유지하면서 탭 라우팅 (4개 탭)
       ShellRoute(
         builder: (context, state, child) {
           return HomeShell(child: child);
@@ -52,13 +59,6 @@ class AppRouter {
             path: AppRoutes.attendance,
             pageBuilder: (context, state) =>
                 const NoTransitionPage(child: AttendanceScreen()),
-          ),
-          
-          // 성향분석 탭 (subin 완전한 구현으로 교체)
-          GoRoute(
-            path: AppRoutes.aptitude,
-            pageBuilder: (context, state) =>
-                const NoTransitionPage(child: AptitudeInitialScreen()),
           ),
           
           // 오답노트 탭 (euimin 기능 유지)
@@ -109,6 +109,12 @@ class AppRouter {
       ),
 
       // === subin 브랜치 새로운 기능들 ===
+      // 성향 분석 메인 화면 (독립적인 라우트)
+      GoRoute(
+        path: AppRoutes.aptitude,
+        builder: (context, state) => const AptitudeInitialScreen(),
+      ),
+      
       // 성향 분석 퀴즈 화면
       GoRoute(
         path: AppRoutes.aptitudeQuiz,

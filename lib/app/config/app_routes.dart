@@ -5,13 +5,14 @@
 class AppRoutes {
   // 기본 경로
   static const String home = '/';
+  static const String main = '/main'; // 새로운 메인 대시보드
   static const String splash = '/splash';
 
   // 인증 관련
   static const String login = '/login';
   static const String register = '/signup';
 
-  // 메인 탭 경로들
+  // 메인 탭 경로들 (4개 탭)
   static const String education = '/education';
   static const String attendance = '/attendance';
   static const String aptitude = '/aptitude';
