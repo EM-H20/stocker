@@ -1,6 +1,6 @@
 📘 Stocker 프론트엔드 공동 개발 가이드 (Flutter)
 
-Flutter + Spring Boot 기반 앱 프로젝트인 **Stocker**의 프론트엔드 개발을 위한 공동 작업 가이드입니다. 프로젝트 구조, 상태관리, API 연동, 패키지 사용 방식 등을 일관성 있게 정리하여 원활한 협업과 유지보수를 목표로 합니다.
+Flutter + Nodejs 기반 앱 프로젝트인 **Stocker**의 프론트엔드 개발을 위한 공동 작업 가이드입니다. 프로젝트 구조, 상태관리, API 연동, 패키지 사용 방식 등을 일관성 있게 정리하여 원활한 협업과 유지보수를 목표로 합니다.
 
 ---
 
@@ -19,7 +19,7 @@ Flutter + Spring Boot 기반 앱 프로젝트인 **Stocker**의 프론트엔드
     - 리치 에디터: flutter_quill ^11.4.2
     - 로깅: logger ^2.6.1
     - 기타: flutter_spinkit, haptic_feedback, shared_preferences 등
-- **백엔드**: Spring Boot REST API (JWT 기반 인증)
+- **백엔드**: Nodejs REST API (JWT 기반 인증)
 
 ---
 
