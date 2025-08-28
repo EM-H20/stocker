@@ -148,6 +148,7 @@ class QuizMockRepository {
         return [
           const QuizInfo(
             id: 1,
+            chapterId: 1, // 백엔드 호환성을 위해 추가
             question: '주식이란 무엇인가요?',
             options: [
               '기업의 부채를 나타내는 증권',
@@ -161,6 +162,7 @@ class QuizMockRepository {
           ),
           const QuizInfo(
             id: 2,
+            chapterId: 1,
             question: '보통주와 우선주의 차이점은?',
             options: [
               '보통주는 의결권이 있고, 우선주는 배당 우선권이 있다',
@@ -173,6 +175,7 @@ class QuizMockRepository {
           ),
           const QuizInfo(
             id: 3,
+            chapterId: 1,
             question: '주식 투자의 주요 수익원은?',
             options: ['이자 수익만', '배당 수익만', '자본 이득만', '배당 수익과 자본 이득'],
             correctAnswerIndex: 3,
@@ -180,6 +183,7 @@ class QuizMockRepository {
           ),
           const QuizInfo(
             id: 4,
+            chapterId: 1,
             question: 'PER이 높다는 것은 무엇을 의미하나요?',
             options: [
               '주식이 저평가되어 있다',
@@ -193,6 +197,7 @@ class QuizMockRepository {
           ),
           const QuizInfo(
             id: 5,
+            chapterId: 1,
             question: '분산투자의 주요 목적은?',
             options: [
               '수익률을 극대화하기 위해',
@@ -209,6 +214,7 @@ class QuizMockRepository {
         return [
           const QuizInfo(
             id: 6,
+            chapterId: 2,
             question: '재무제표의 3대 구성요소는?',
             options: [
               '손익계산서, 현금흐름표, 자본변동표',
@@ -221,6 +227,7 @@ class QuizMockRepository {
           ),
           const QuizInfo(
             id: 7,
+            chapterId: 2,
             question: 'ROE(자기자본이익률)는 무엇을 나타내나요?',
             options: ['총자산 대비 수익률', '매출 대비 수익률', '자기자본 대비 수익률', '부채 대비 수익률'],
             correctAnswerIndex: 2,
@@ -228,6 +235,7 @@ class QuizMockRepository {
           ),
           const QuizInfo(
             id: 8,
+            chapterId: 2,
             question: '유동비율이 높다는 것은?',
             options: ['단기 지급능력이 좋다', '장기 지급능력이 좋다', '수익성이 좋다', '성장성이 좋다'],
             correctAnswerIndex: 0,
@@ -237,8 +245,9 @@ class QuizMockRepository {
 
       default:
         return [
-          const QuizInfo(
+          QuizInfo(
             id: 99,
+            chapterId: chapterId,
             question: '기본 퀴즈 문제입니다.',
             options: ['선택지 1', '선택지 2', '선택지 3', '선택지 4'],
             correctAnswerIndex: 0,

@@ -150,6 +150,7 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
                         padding: EdgeInsets.only(bottom: 12.h),
                         child: WrongAnswerCard(
                           wrongNote: wrongNote,
+                          isRetried: provider.retriedQuizIds.contains(wrongNote.quizId),
                           onRetry:
                               () => provider.markAsRetried(wrongNote.quizId),
                           onRemove:

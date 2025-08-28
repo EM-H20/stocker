@@ -15,7 +15,7 @@ class WrongNoteCard extends StatelessWidget {
       builder: (context, wrongNoteProvider, child) {
         final wrongNotes = wrongNoteProvider.wrongNotes;
         final totalCount = wrongNotes.length;
-        final completedCount = wrongNotes.where((note) => note.isRetried).length;
+        final completedCount = wrongNotes.where((note) => wrongNoteProvider.retriedQuizIds.contains(note.quizId)).length;
         final incompleteCount = totalCount - completedCount;
 
         return Container(

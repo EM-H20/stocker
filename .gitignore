@@ -51,3 +51,6 @@ app.*.map.json
 .claude/
 .mcp.json
 CLAUDE.md
+
+# backend
+stocker_node-develop
