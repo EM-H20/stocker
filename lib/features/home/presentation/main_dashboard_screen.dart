@@ -41,31 +41,27 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 20.h),
-              
+
               // 상단: 날짜 정보
               const DateHeaderWidget(),
-              
+
               SizedBox(height: 32.h),
-              
+
               // 중간: 통계 카드들
               const StatsCardsWidget(),
-              
-              SizedBox(height: 32.h),
-              
-              // 퀴즈 섹션
-              const QuizSectionWidget(),
-              
-              SizedBox(height: 32.h),
-              
+
+              SizedBox(height: 20.h),
+
               // 기능별 접근 카드들
               const FeatureCardsWidget(),
-              
-              SizedBox(height: 20.h),
+
+              SizedBox(height: 32.h),
+              // 퀴즈 섹션
+              const QuizSectionWidget(),
             ],
           ),
         ),
       ),
     );
   }
-
 }

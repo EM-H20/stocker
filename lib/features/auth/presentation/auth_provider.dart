@@ -34,14 +34,37 @@ class AuthProvider with ChangeNotifier {
 
   /// 앱 시작 시 저장된 토큰을 확인하여 자동 로그인 처리
   Future<void> initialize() async {
-    final token = await TokenStorage.accessToken;
-    if (token != null) {
-      // 실제 앱에서는 이 토큰으로 /api/user/me 같은 API를 호출하여
-      // 사용자 정보를 가져와 _user에 할당해야 합니다.
-      _user = User(id: 0, nickname: 'Stocker', accessToken: token, refreshToken: '');
+    debugPrint('🔄 [AUTH_PROVIDER] 초기화 시작...');
+    
+    try {
+      final token = await TokenStorage.accessToken;
+      final userId = await TokenStorage.userId;
+      
+      debugPrint('🔍 [AUTH_PROVIDER] 저장된 토큰 확인 - Token: ${token != null ? "존재" : "없음"}');
+      
+      if (token != null && userId != null) {
+        // 저장된 토큰이 있으면 사용자 복원
+        final refreshToken = await TokenStorage.refreshToken ?? '';
+        
+        _user = User(
+          id: int.tryParse(userId) ?? 0, 
+          nickname: '목테스터', // Mock 환경에서는 고정 닉네임
+          accessToken: token, 
+          refreshToken: refreshToken
+        );
+        
+        debugPrint('✅ [AUTH_PROVIDER] 사용자 자동 로그인 성공 - User: ${_user!.nickname}');
+      } else {
+        debugPrint('ℹ️ [AUTH_PROVIDER] 저장된 토큰 없음 - 로그아웃 상태');
+      }
+    } catch (e) {
+      debugPrint('❌ [AUTH_PROVIDER] 초기화 중 오류 발생: $e');
+      _user = null;
+    } finally {
+      _isInitializing = false;
+      debugPrint('🏁 [AUTH_PROVIDER] 초기화 완료 - isLoggedIn: $isLoggedIn');
+      notifyListeners();
     }
-    _isInitializing = false;
-    notifyListeners();
   }
 
   /// 로그인

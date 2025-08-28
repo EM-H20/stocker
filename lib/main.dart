@@ -2,10 +2,10 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // euimin 브랜치 기능들
 import 'package:stocker/features/education/domain/education_mock_repository.dart';
@@ -62,6 +62,13 @@ const useMock = true; // 실제 API 사용시 false
 void main() async {
   await initializeDateFormatting();
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 환경 변수 로드
+  debugPrint('🔧 [INIT] Loading environment variables...');
+  await dotenv.load(fileName: ".env");
+  debugPrint(
+      '✅ [INIT] Environment loaded - API_BASE_URL: ${dotenv.env['API_BASE_URL']}');
+
   await setupDio();
   runApp(const StockerApp());
 }
@@ -98,26 +105,38 @@ class StockerApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => ThemeProvider()..initialize(),
         ),
-        
+
         // 홈 네비게이션 상태 관리
         ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
 
         // Auth Provider (subin에서 개선된 버전)
         ChangeNotifierProvider(
-          create: (context) => AuthProvider(context.read<AuthRepository>()),
+          create: (context) {
+            debugPrint(
+                '🔐 [PROVIDER] Creating AuthProvider (useMock: $useMock)');
+            final authProvider = AuthProvider(context.read<AuthRepository>());
+
+            // Mock/Real 환경 모두에서 초기화 실행
+            debugPrint('🔄 [PROVIDER] AuthProvider 초기화 시작...');
+            authProvider.initialize();
+
+            return authProvider;
+          },
         ),
 
         // Education 상태 관리 (euimin Mock/Real API 분기 패턴 유지)
         ChangeNotifierProvider(
           create: (_) {
+            debugPrint(
+                '🎯 [PROVIDER] Creating EducationProvider (useMock: $useMock)');
             if (useMock) {
               final mockRepository = EducationMockRepository();
               return EducationProvider.withMock(mockRepository);
             } else {
-              final dio = Dio();
               const storage = FlutterSecureStorage();
-              final educationApi = EducationApi(dio);
-              final educationRepository = EducationRepository(educationApi, storage);
+              final educationApi = EducationApi(dio); // 글로벌 dio 사용
+              final educationRepository =
+                  EducationRepository(educationApi, storage);
               return EducationProvider(educationRepository);
             }
           },
@@ -126,13 +145,14 @@ class StockerApp extends StatelessWidget {
         // Quiz 상태 관리 (euimin 기능)
         ChangeNotifierProvider(
           create: (_) {
+            debugPrint(
+                '🎯 [PROVIDER] Creating QuizProvider (useMock: $useMock)');
             if (useMock) {
               final mockRepository = QuizMockRepository();
               return QuizProvider.withMock(mockRepository);
             } else {
-              final dio = Dio();
               const storage = FlutterSecureStorage();
-              final quizApi = QuizApi(dio);
+              final quizApi = QuizApi(dio); // 글로벌 dio 사용
               final quizRepository = QuizRepository(quizApi, storage);
               return QuizProvider(quizRepository);
             }
@@ -142,14 +162,16 @@ class StockerApp extends StatelessWidget {
         // WrongNote 상태 관리 (euimin 기능)
         ChangeNotifierProvider(
           create: (_) {
+            debugPrint(
+                '🎯 [PROVIDER] Creating WrongNoteProvider (useMock: $useMock)');
             if (useMock) {
               final mockRepository = WrongNoteMockRepository();
               return WrongNoteProvider.withMock(mockRepository);
             } else {
-              final dio = Dio();
               const storage = FlutterSecureStorage();
-              final wrongNoteApi = WrongNoteApi(dio);
-              final wrongNoteRepository = WrongNoteRepository(wrongNoteApi, storage);
+              final wrongNoteApi = WrongNoteApi(dio); // 글로벌 dio 사용
+              final wrongNoteRepository =
+                  WrongNoteRepository(wrongNoteApi, storage);
               return WrongNoteProvider(wrongNoteRepository);
             }
           },
@@ -167,7 +189,8 @@ class StockerApp extends StatelessWidget {
 
         // Aptitude Provider (subin 새 기능)
         ChangeNotifierProvider(
-          create: (context) => AptitudeProvider(context.read<AptitudeRepository>()),
+          create: (context) =>
+              AptitudeProvider(context.read<AptitudeRepository>()),
         ),
 
         // Note Provider (subin 새 기능)

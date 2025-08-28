@@ -34,7 +34,8 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            context.go(AppRoutes.main);
+            debugPrint('🔙 [APTITUDE] 뒤로가기 버튼 클릭 - 홈으로 이동');
+            context.go(AppRoutes.home);
           },
         ),
         actions: [],
@@ -89,6 +90,7 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                           SizedBox(height: 40.h),
                           ElevatedButton(
                             onPressed: () {
+                              debugPrint('🎯 [APTITUDE_INITIAL] 투자 성향 분석 시작 버튼 클릭 - 퀴즈로 이동');
                               // ✅ [수정] 검사 화면으로 이동
                               context.push(AppRoutes.aptitudeQuiz);
                             },
@@ -121,6 +123,7 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                   if (provider.hasPreviousResult)
                     TextButton(
                       onPressed: () {
+                        debugPrint('📋 [APTITUDE_INITIAL] 이전 결과 다시보기 버튼 클릭 - 기존 결과로 이동');
                         // ✅ [수정] 결과 화면으로 이동
                         // currentResult를 null로 만들어 myResult를 보도록 함
                         provider.currentResult = null;

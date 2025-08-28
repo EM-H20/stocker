@@ -3,9 +3,8 @@
 // context.go(AppRoutes.mypage);
 // 이동
 class AppRoutes {
-  // 기본 경로
-  static const String home = '/';
-  static const String main = '/main'; // 새로운 메인 대시보드
+  // 기본 경로 (통합)
+  static const String home = '/'; // 메인 대시보드 (기본 홈)
   static const String splash = '/splash';
 
   // 인증 관련

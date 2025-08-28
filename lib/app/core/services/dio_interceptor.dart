@@ -1,5 +1,6 @@
 // lib/app/core/network/dio_interceptor.dart
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../services/token_storage.dart';
 
 class AuthInterceptor extends Interceptor {
@@ -17,8 +18,26 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
+    // 에러 상세 로깅
+    debugPrint('🚨 [AUTH_INTERCEPTOR] HTTP 에러 발생');
+    debugPrint('🚨 [AUTH_INTERCEPTOR] Error Type: ${err.type}');
+    debugPrint('🚨 [AUTH_INTERCEPTOR] Message: ${err.message}');
+    debugPrint('🚨 [AUTH_INTERCEPTOR] Request URL: ${err.requestOptions.uri}');
+    
+    if (err.response != null) {
+      debugPrint('🚨 [AUTH_INTERCEPTOR] Response Status: ${err.response!.statusCode}');
+      debugPrint('🚨 [AUTH_INTERCEPTOR] Response Data: ${err.response!.data}');
+    }
+
+    // URL 문제 감지
+    if (err.message != null && err.message!.contains('No host specified')) {
+      debugPrint('💥 [AUTH_INTERCEPTOR] URL 설정 문제 감지!');
+      debugPrint('🔧 [AUTH_INTERCEPTOR] 환경변수와 Dio 설정을 확인하세요');
+    }
+    
     // access token 만료 (401) 시 처리
     if (err.response?.statusCode == 401) {
+      debugPrint('🔑 [AUTH_INTERCEPTOR] 401 Unauthorized - 토큰 갱신 시도');
       try {
         final refreshToken = await TokenStorage.refreshToken;
         final userId = await TokenStorage.userId;
