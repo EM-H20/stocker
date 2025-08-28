@@ -7,7 +7,7 @@ class FeatureCardWidget extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
-  
+
   const FeatureCardWidget({
     super.key,
     required this.title,
@@ -54,17 +54,17 @@ class FeatureCardWidget extends StatelessWidget {
                 color: color,
               ),
             ),
-            
+
             SizedBox(height: 12.h),
-            
+
             // 제목
             Text(
               title,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: color,
-                fontSize: 14.sp,
-              ),
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                    fontSize: 14.sp,
+                  ),
               textAlign: TextAlign.center,
             ),
           ],
