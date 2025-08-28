@@ -115,8 +115,9 @@ class AptitudeResultScreen extends StatelessWidget {
               SizedBox(height: 12.h),
               OutlinedButton(
                 onPressed: () {
-                  // 재검사를 위해 퀴즈 화면으로 이동
-                  context.push(AppRoutes.aptitudeQuiz);
+                  debugPrint('🔄 [APTITUDE_RESULT] 재검사하기 버튼 클릭 - 현재 결과 화면을 교체하여 퀴즈로 이동');
+                  // ✅ [수정] pushReplacement를 사용하여 스택 누적 방지
+                  context.pushReplacement(AppRoutes.aptitudeQuiz);
                 },
                 child: const Text('재검사하기'),
               ),

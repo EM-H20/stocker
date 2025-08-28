@@ -25,7 +25,10 @@ class ProfileHeader extends StatelessWidget {
             children: [
               // 홈 버튼
               IconButton(
-                onPressed: () => context.go(AppRoutes.main),
+                onPressed: () {
+                  debugPrint('🏠 [PROFILE_HEADER] 홈 버튼 클릭 - MainDashboardScreen으로 이동');
+                  context.go(AppRoutes.home);
+                },
                 icon: Icon(
                   Icons.home,
                   size: 28.sp,

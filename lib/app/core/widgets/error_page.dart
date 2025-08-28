@@ -16,7 +16,10 @@ class ErrorPage extends StatelessWidget {
         title: const Text('페이지 오류'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(AppRoutes.home),
+          onPressed: () {
+            debugPrint('🔙 [ERROR_PAGE] 뒤로가기 버튼 클릭 - 홈으로 이동');
+            context.go(AppRoutes.home);
+          },
         ),
       ),
       body: Center(
@@ -39,9 +42,14 @@ class ErrorPage extends StatelessWidget {
               ).textTheme.bodyMedium!.copyWith(fontSize: 12.sp),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => context.go(AppRoutes.home),
-              child: Text(
+            ElevatedButton.icon(
+              onPressed: () {
+                debugPrint('🏠 [ERROR_PAGE] 홈으로 돌아가기 버튼 클릭 - MainDashboardScreen으로 이동');
+                debugPrint('📍 [ERROR_PAGE] 이동 경로: ${AppRoutes.home}');
+                context.go(AppRoutes.home);
+              },
+              icon: const Icon(Icons.home, size: 20),
+              label: Text(
                 '홈으로 돌아가기',
                 style: Theme.of(
                   context,

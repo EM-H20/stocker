@@ -130,24 +130,39 @@ class EducationProvider extends ChangeNotifier {
   ///
   /// [forceRefresh]: 강제 새로고침 여부
   Future<void> loadChapters({bool forceRefresh = false}) async {
-    if (_isLoadingChapters) return;
+    if (_isLoadingChapters) {
+      debugPrint('⚠️ [EDU_PROVIDER] 이미 챕터 로딩 중...');
+      return;
+    }
 
+    debugPrint('🔄 [EDU_PROVIDER] 챕터 목록 로드 시작 (useMock: $_useMock, forceRefresh: $forceRefresh)');
     _isLoadingChapters = true;
     _chaptersError = null;
     notifyListeners();
 
     try {
       if (_useMock) {
+        debugPrint('🎭 [EDU_PROVIDER] Mock Repository 사용');
         _chapters = await _mockRepository!.getChaptersForUser();
       } else {
+        debugPrint('🌐 [EDU_PROVIDER] Real API Repository 사용');
         _chapters = await _repository!.getChapters(forceRefresh: forceRefresh);
       }
+      
+      debugPrint('✅ [EDU_PROVIDER] 챕터 로드 성공 - 총 ${_chapters.length}개 챕터');
       _chaptersError = null;
     } catch (e) {
       _chaptersError = e.toString();
-      debugPrint('챕터 로드 실패: $e');
+      debugPrint('❌ [EDU_PROVIDER] 챕터 로드 실패: $e');
+      
+      // 에러 타입별 상세 로깅
+      if (e.toString().contains('No host specified')) {
+        debugPrint('🚨 [EDU_PROVIDER] URL 설정 문제 감지!');
+        debugPrint('🔧 [EDU_PROVIDER] .env 파일과 dio 설정을 확인하세요');
+      }
     } finally {
       _isLoadingChapters = false;
+      debugPrint('🏁 [EDU_PROVIDER] 챕터 로드 프로세스 완료');
       notifyListeners();
     }
   }
