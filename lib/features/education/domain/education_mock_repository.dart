@@ -17,24 +17,28 @@ class EducationMockRepository {
       const ChapterInfo(
         id: 1,
         title: '주식 기초 이론',
+        description: '주식 투자의 기본 개념과 원리를 학습합니다.',
         isTheoryCompleted: true, // 이론 완료, 퀴즈 미완료
         isQuizCompleted: false,
       ),
       const ChapterInfo(
         id: 2,
         title: '기술적 분석 입문',
+        description: '차트 분석과 기술적 지표 활용법을 배웁니다.',
         isTheoryCompleted: false, // 이론, 퀴즈 모두 미완료
         isQuizCompleted: false,
       ),
       const ChapterInfo(
         id: 3,
         title: '재무제표 분석',
+        description: '기업의 재무 상태와 성과를 분석하는 방법을 학습합니다.',
         isTheoryCompleted: true, // 이론, 퀴즈 모두 완료
         isQuizCompleted: true,
       ),
       const ChapterInfo(
         id: 4,
         title: '포트폴리오 관리',
+        description: '효과적인 자산 배분과 위험 관리 전략을 학습합니다.',
         isTheoryCompleted: false, // 이론, 퀴즈 모두 미완료
         isQuizCompleted: false,
       ),
@@ -92,6 +96,7 @@ class EducationMockRepository {
         return [
           const TheoryInfo(
             id: 1,
+            chapterId: 1,
             word: '주식이란 무엇인가?',
             content: '''
 # 주식의 기본 개념
@@ -118,6 +123,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 2,
+            chapterId: 1,
             word: '주식 시장의 구조',
             content: '''
 # 주식 시장의 구조
@@ -141,6 +147,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 3,
+            chapterId: 1,
             word: '주식 투자 용어',
             content: '''
 # 주식 투자 필수 용어
@@ -164,6 +171,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 4,
+            chapterId: 1,
             word: '주식 투자의 위험과 수익',
             content: '''
 # 주식 투자의 위험과 수익
@@ -192,6 +200,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 5,
+            chapterId: 1,
             word: '주식 투자 시작하기',
             content: '''
 # 주식 투자 시작하기
@@ -228,6 +237,7 @@ class EducationMockRepository {
         return [
           const TheoryInfo(
             id: 6,
+            chapterId: 2,
             word: '차트의 기본 이해',
             content: '''
 # 차트의 기본 이해
@@ -254,6 +264,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 7,
+            chapterId: 2,
             word: '캔들스틱 패턴',
             content: '''
 # 캔들스틱 패턴
@@ -287,6 +298,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 8,
+            chapterId: 2,
             word: '이동평균선',
             content: '''
 # 이동평균선 (Moving Average)
@@ -324,6 +336,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 9,
+            chapterId: 2,
             word: 'RSI와 스토캐스틱',
             content: '''
 # RSI와 스토캐스틱
@@ -363,6 +376,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 10,
+            chapterId: 2,
             word: '볼린저 밴드와 MACD',
             content: '''
 # 볼린저 밴드와 MACD
@@ -405,6 +419,7 @@ class EducationMockRepository {
         return [
           const TheoryInfo(
             id: 11,
+            chapterId: 3,
             word: '기업 분석의 기초',
             content: '''
 # 기업 분석의 기초
@@ -442,6 +457,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 12,
+            chapterId: 3,
             word: '재무제표 읽기',
             content: '''
 # 재무제표 읽기
@@ -479,6 +495,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 13,
+            chapterId: 3,
             word: '주요 재무비율',
             content: '''
 # 주요 재무비율
@@ -522,6 +539,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 14,
+            chapterId: 3,
             word: '밸류에이션 지표',
             content: '''
 # 밸류에이션 지표
@@ -573,6 +591,7 @@ class EducationMockRepository {
         return [
           const TheoryInfo(
             id: 15,
+            chapterId: 4,
             word: '투자 전략의 종류',
             content: '''
 # 투자 전략의 종류
@@ -618,6 +637,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 16,
+            chapterId: 4,
             word: '포트폴리오 구성',
             content: '''
 # 포트폴리오 구성
@@ -668,6 +688,7 @@ class EducationMockRepository {
           ),
           const TheoryInfo(
             id: 17,
+            chapterId: 4,
             word: '위험 관리',
             content: '''
 # 위험 관리
@@ -726,6 +747,7 @@ class EducationMockRepository {
         return [
           TheoryInfo(
             id: 100 + chapterId,
+            chapterId: chapterId,
             word: '챕터 $chapterId 기본 이론',
             content: '''
 # 챕터 $chapterId 기본 이론

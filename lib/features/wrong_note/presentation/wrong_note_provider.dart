@@ -13,12 +13,16 @@ class WrongNoteProvider extends ChangeNotifier {
   List<WrongNoteItem> _wrongNotes = [];
   bool _isLoading = false;
   String? _errorMessage;
+  
+  // 재시도된 퀴즈 ID들을 추적 (isRetried 대체)
+  Set<int> _retriedQuizIds = {};
 
   // Getters
   List<WrongNoteItem> get wrongNotes => _wrongNotes;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get hasError => _errorMessage != null;
+  Set<int> get retriedQuizIds => Set.from(_retriedQuizIds);
 
   /// 실제 API Repository 사용 생성자
   WrongNoteProvider(this._repository) : _mockRepository = null;
@@ -37,9 +41,13 @@ class WrongNoteProvider extends ChangeNotifier {
       if (_mockRepository != null) {
         // Mock 데이터 사용
         response = await _mockRepository.getWrongNotes('mock_user');
+        // Mock Repository에서 재시도 상태 정보도 가져오기
+        _retriedQuizIds = _mockRepository.retriedQuizIds;
       } else if (_repository != null) {
         // 실제 API 사용
         response = await _repository.getWrongNotes();
+        // 실제 API에서는 별도로 재시도 상태 정보를 가져와야 할 수 있음
+        // TODO: 실제 API 구현 시 재시도 상태 로직 추가
       } else {
         throw Exception('Repository가 설정되지 않았습니다.');
       }
@@ -78,12 +86,9 @@ class WrongNoteProvider extends ChangeNotifier {
         await _repository.markAsRetried(quizId);
       }
 
-      // 로컬 상태 업데이트
-      final index = _wrongNotes.indexWhere((item) => item.quizId == quizId);
-      if (index != -1) {
-        _wrongNotes[index] = _wrongNotes[index].copyWith(isRetried: true);
-        notifyListeners();
-      }
+      // 로컬 상태 업데이트 (재시도 Set에 추가)
+      _retriedQuizIds.add(quizId);
+      notifyListeners();
     } catch (e) {
       _setError('재시도 표시 실패: $e');
     }
@@ -113,13 +118,13 @@ class WrongNoteProvider extends ChangeNotifier {
 
   /// 재시도 여부별 필터링
   List<WrongNoteItem> getWrongNotesByRetryStatus(bool isRetried) {
-    return _wrongNotes.where((item) => item.isRetried == isRetried).toList();
+    return _wrongNotes.where((item) => _retriedQuizIds.contains(item.quizId) == isRetried).toList();
   }
 
   /// 통계 정보 가져오기
   Map<String, int> getStatistics() {
     final totalCount = _wrongNotes.length;
-    final retriedCount = _wrongNotes.where((item) => item.isRetried).length;
+    final retriedCount = _wrongNotes.where((item) => _retriedQuizIds.contains(item.quizId)).length;
     final pendingCount = totalCount - retriedCount;
 
     return {

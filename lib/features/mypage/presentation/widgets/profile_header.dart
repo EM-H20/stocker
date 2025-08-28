@@ -29,7 +29,10 @@ class ProfileHeader extends StatelessWidget {
                 icon: Icon(
                   Icons.home,
                   size: 28.sp,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.8),
                 ),
                 tooltip: '홈으로',
               ),
@@ -37,8 +40,8 @@ class ProfileHeader extends StatelessWidget {
               Text(
                 '마이 페이지',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               // 빈 공간 (균형 맞추기용)
               SizedBox(width: 48.w),
@@ -51,8 +54,8 @@ class ProfileHeader extends StatelessWidget {
               Text(
                 nickname,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
               SizedBox(width: 8.w),
               GestureDetector(
@@ -60,7 +63,7 @@ class ProfileHeader extends StatelessWidget {
                 child: Icon(
                   Icons.edit,
                   size: 20.sp,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],

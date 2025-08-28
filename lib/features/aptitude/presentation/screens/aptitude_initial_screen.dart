@@ -31,11 +31,20 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
       appBar: AppBar(
         title: const Text('나의 투자 성향 분석'),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            context.go(AppRoutes.main);
+          },
+        ),
+        actions: [],
       ),
       body: Padding(
         padding: EdgeInsets.all(24.w),
         child: provider.isLoading
-            ? Center(child: SpinKitFadingCircle(color: Theme.of(context).colorScheme.primary))
+            ? Center(
+                child: SpinKitFadingCircle(
+                    color: Theme.of(context).colorScheme.primary))
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -46,7 +55,8 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                       borderRadius: BorderRadius.circular(16.r),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 24.w, vertical: 40.h),
                       child: Column(
                         children: [
                           Icon(
@@ -69,7 +79,11 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 16.sp,
-                              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.color
+                                  ?.withValues(alpha: 0.7),
                             ),
                           ),
                           SizedBox(height: 40.h),
@@ -79,8 +93,10 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                               context.push(AppRoutes.aptitudeQuiz);
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
@@ -88,7 +104,9 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                               minimumSize: const Size(double.infinity, 50),
                             ),
                             child: Text(
-                              provider.hasPreviousResult ? '재검사하고 새로운 성향 찾기' : '투자 성향 분석 시작하기',
+                              provider.hasPreviousResult
+                                  ? '재검사하고 새로운 성향 찾기'
+                                  : '투자 성향 분석 시작하기',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -105,7 +123,7 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                       onPressed: () {
                         // ✅ [수정] 결과 화면으로 이동
                         // currentResult를 null로 만들어 myResult를 보도록 함
-                        provider.currentResult = null; 
+                        provider.currentResult = null;
                         context.push(AppRoutes.aptitudeResult);
                       },
                       child: Text(
