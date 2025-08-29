@@ -15,73 +15,10 @@ class StatsCardsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w),
-      child: Row(
-        children: [
-          // 날짜 카드
-          Expanded(
-            flex: 1,
-            child: _buildDateCard(context),
-          ),
-          SizedBox(width: 16.w),
-          
-          // 통계 카드
-          Expanded(
-            flex: 1,
-            child: _buildStatsCard(context),
-          ),
-        ],
-      ),
+      child: _buildStatsCard(context), // 통계 카드만 남김
     );
   }
 
-  /// 날짜 표시 카드
-  Widget _buildDateCard(BuildContext context) {
-    final now = DateTime.now();
-    
-    return Container(
-      padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? AppTheme.grey700.withValues(alpha: 0.3)
-              : AppTheme.grey300.withValues(alpha: 0.5),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).shadowColor.withValues(alpha: 0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(
-            '${now.month}월',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? AppTheme.grey400
-                  : AppTheme.grey600,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            '${now.day}일',
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              fontSize: 48.sp,
-              fontWeight: FontWeight.w300,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : AppTheme.grey900,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   /// 통계 정보 카드
   Widget _buildStatsCard(BuildContext context) {
