@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/config/app_routes.dart';
 import '../../../wrong_note/presentation/wrong_note_provider.dart';
+import '../../../../app/config/app_theme.dart';
 
 /// 오답노트 카드 위젯
 class WrongNoteCard extends StatelessWidget {
@@ -15,7 +16,10 @@ class WrongNoteCard extends StatelessWidget {
       builder: (context, wrongNoteProvider, child) {
         final wrongNotes = wrongNoteProvider.wrongNotes;
         final totalCount = wrongNotes.length;
-        final completedCount = wrongNotes.where((note) => wrongNoteProvider.retriedQuizIds.contains(note.quizId)).length;
+        final completedCount = wrongNotes
+            .where((note) =>
+                wrongNoteProvider.retriedQuizIds.contains(note.quizId))
+            .length;
         final incompleteCount = totalCount - completedCount;
 
         return Container(
@@ -29,17 +33,20 @@ class WrongNoteCard extends StatelessWidget {
                   Text(
                     '오답노트',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   GestureDetector(
                     onTap: () => context.go(AppRoutes.wrongNote),
                     child: Text(
                       '전체 보기',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
+                            color: Theme.of(context).brightness ==
+                                    Brightness.dark
+                                ? AppTheme.primaryColor.withValues(alpha: 0.8)
+                                : AppTheme.primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
                     ),
                   ),
                 ],
@@ -57,7 +64,8 @@ class WrongNoteCard extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
+                      color:
+                          Theme.of(context).shadowColor.withValues(alpha: 0.1),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -112,15 +120,19 @@ class WrongNoteCard extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-          ),
+                color: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.color
+                    ?.withValues(alpha: 0.7),
+              ),
         ),
         SizedBox(height: 4.h),
         Text(
           count,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+                fontWeight: FontWeight.bold,
+              ),
         ),
       ],
     );
