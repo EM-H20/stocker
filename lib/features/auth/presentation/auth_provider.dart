@@ -47,7 +47,8 @@ class AuthProvider with ChangeNotifier {
         final refreshToken = await TokenStorage.refreshToken ?? '';
         
         _user = User(
-          id: int.tryParse(userId) ?? 0, 
+          id: int.tryParse(userId) ?? 0,
+          email: 'tester@example.com', // Mock 환경에서는 고정 이메일 
           nickname: '목테스터', // Mock 환경에서는 고정 닉네임
           accessToken: token, 
           refreshToken: refreshToken
@@ -113,7 +114,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> logout() async {
     if (_user == null) return;
     try {
-      await _repository.logout(_user!.id);
+      await _repository.logout(_user!.email);
     } catch (e) {
       // 로그아웃 API 실패 시에도 로컬에서는 로그아웃 처리
       _logger.e('Logout API failed: $e');    //print와 같은 역할, _logger는 로그를 남기는 역할을 합니다.

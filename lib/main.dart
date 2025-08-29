@@ -58,7 +58,7 @@ import 'features/note/data/repository/note_mock_repository.dart';
 import 'app/core/network/dio.dart';
 
 /// ✅ 더미(mock) 여부 설정 (euimin 스타일 유지)
-const useMock = true; // 실제 API 사용시 false
+const useMock = false; // 실제 API 사용시 false
 
 void main() async {
   await initializeDateFormatting();

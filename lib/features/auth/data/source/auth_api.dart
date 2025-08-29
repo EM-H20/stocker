@@ -1,6 +1,7 @@
 
 // lib/features/auth/data/source/auth_api.dart
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../../../app/core/services/token_storage.dart';
 import '../../../auth/data/dto/login_request.dart';
 import '../../../auth/data/dto/signup_request.dart';
@@ -11,8 +12,9 @@ class AuthApi {
 
   // 로그인
   Future<AuthResponse> login(LoginRequest request) async {
+    final endpoint = dotenv.env['JWT_LOGIN_ENDPOINT'] ?? '/user/login';
     final res = await _dio.post(
-      '/api/auth/login',
+      endpoint,
       data: request.toJson(),
     );
 
@@ -30,19 +32,21 @@ class AuthApi {
 
   // 회원가입
   Future<void> signup(SignupRequest request) async {
+    final endpoint = dotenv.env['JWT_SIGNUP_ENDPOINT'] ?? '/user/signup';
     await _dio.post(
-      '/api/auth/register',
+      endpoint,
       data: request.toJson(),
     );
   }
 
-  // 로그아웃
-  Future<void> logout(int userId) async {
+  // 로그아웃 - 이메일이 필요함
+  Future<void> logout(String email) async {
     try {
+      final endpoint = dotenv.env['JWT_LOGOUT_ENDPOINT'] ?? '/user/logout';
       final access = await TokenStorage.accessToken;
       await _dio.post(
-        '/api/auth/logout',
-        data: { 'user_id': userId },
+        endpoint,
+        data: { 'email': email }, // 백엔드는 email을 기대함
         options: Options(headers: {
           if (access != null && access.isNotEmpty)
             'Authorization': 'Bearer $access',
@@ -53,33 +57,12 @@ class AuthApi {
     }
   }
 
-  // (선택) 명시적 refresh 호출이 필요할 때
+  // 백엔드는 미들웨어에서 자동으로 토큰 갱신을 처리하므로
+  // 별도의 refresh 엔드포인트 호출은 필요하지 않음
   Future<String> refreshToken() async {
-    final refresh = await TokenStorage.refreshToken;
-    final userId = await TokenStorage.userId;
-
-    if (refresh == null || userId == null) {
-      throw Exception('No refresh token or user id');
-    }
-
-    final res = await _dio.post(
-      '/api/auth/refresh',
-      data: {
-        'user_id': int.tryParse(userId) ?? userId,
-        'refresh_token': refresh,
-      },
-    );
-
-    final newAccess = res.data['access_token'] as String;
-    final newRefresh = (res.data['refresh_token'] as String?) ?? refresh;
-
-    await TokenStorage.saveTokens(
-      newAccess,
-      newRefresh,
-      int.tryParse(userId) ?? userId,
-    );
-
-    return newAccess;
+    // 백엔드 미들웨어 방식에서는 자동 처리됨
+    // 401 에러 발생 시 인터셉터에서 x-access-token 헤더를 확인
+    throw UnimplementedError('백엔드 미들웨어에서 자동 토큰 갱신 처리됨');
   }
 }
 

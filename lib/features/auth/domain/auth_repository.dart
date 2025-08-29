@@ -5,6 +5,6 @@ import 'model/user.dart';
 abstract class AuthRepository {
   Future<User> login(LoginRequest request);
   Future<void> signup(SignupRequest request);
-  Future<void> logout(int userId);
+  Future<void> logout(String email); // userId 대신 email 사용
   Future<void> refreshToken();
 }
