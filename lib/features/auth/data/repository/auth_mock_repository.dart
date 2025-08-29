@@ -18,6 +18,7 @@ class AuthMockRepository implements AuthRepository {
     // Mock 사용자 생성
     final user = User(
       id: 1,
+      email: request.email,
       nickname: '목테스터', // 더 한국적인 닉네임
       accessToken: 'mock_access_token_${DateTime.now().millisecondsSinceEpoch}',
       refreshToken: 'mock_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
@@ -46,8 +47,8 @@ class AuthMockRepository implements AuthRepository {
   }
 
   @override
-  Future<void> logout(int userId) async {
-    debugPrint('🎭 [AUTH_MOCK] Mock 로그아웃 시작 - UserId: $userId');
+  Future<void> logout(String email) async {
+    debugPrint('🎭 [AUTH_MOCK] Mock 로그아웃 시작 - Email: $email');
     
     // 로그아웃 지연시간 시뮬레이션
     await Future.delayed(const Duration(milliseconds: 300));
@@ -66,6 +67,7 @@ class AuthMockRepository implements AuthRepository {
     
     final user = User(
       id: 1,
+      email: 'tester@example.com', // Mock refresh에서는 고정 이메일
       nickname: '목테스터',
       accessToken: 'refreshed_mock_access_token_${DateTime.now().millisecondsSinceEpoch}',
       refreshToken: 'refreshed_mock_refresh_token_${DateTime.now().millisecondsSinceEpoch}',

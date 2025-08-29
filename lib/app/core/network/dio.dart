@@ -8,10 +8,10 @@ import '../services/dio_interceptor.dart';
 final Dio dio = Dio();
 
 Future<void> setupDio() async {
-  // 환경 변수에서 API URL 가져오기
-  final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
-  final connectTimeout = int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '10') ?? 10;
-  final receiveTimeout = int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '10') ?? 10;
+  // 환경 변수에서 API URL 가져오기 (백엔드 8080 포트 기본값)
+  final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8080';
+  final connectTimeout = int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '15') ?? 15;
+  final receiveTimeout = int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '15') ?? 15;
   
   // URL 검증
   if (!_isValidUrl(baseUrl)) {
@@ -29,7 +29,14 @@ Future<void> setupDio() async {
     contentType: 'application/json',
     headers: {
       'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      // MySQL/JWT 백엔드와의 호환성을 위한 추가 헤더
+      'Cache-Control': 'no-cache',
+      'X-Requested-With': 'XMLHttpRequest',
     },
+    // 리다이렉트 자동 처리 (로그인 플로우 등에서 유용)
+    followRedirects: true,
+    maxRedirects: 5,
   );
 
   // 인터셉터 설정

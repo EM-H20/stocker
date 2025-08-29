@@ -23,8 +23,8 @@ class AuthApiRepository implements AuthRepository {
   }
 
   @override
-  Future<void> logout(int userId){
-    return _api.logout(userId);
+  Future<void> logout(String email){
+    return _api.logout(email);
   }
 
   @override

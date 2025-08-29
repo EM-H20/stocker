@@ -54,7 +54,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               // 🎯 PRIORITY 1: 이어서 학습하기 (가장 중요한 기능을 최상단에!)
               const ContinueLearningWidget(),
 
-              SizedBox(height: 24.h),
+              SizedBox(height: 20.h),
 
               // 📊 PRIORITY 2: 통합된 학습 대시보드
               const LearningOverviewWidget(),
@@ -64,7 +64,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               // 📊 PRIORITY 3: 출석 및 활동 통계
               const StatsCardsWidget(),
 
-              SizedBox(height: 24.h),
+              SizedBox(height: 20.h),
 
               // 🎯 PRIORITY 4: 빠른 기능 접근
               const FeatureCardsWidget(),

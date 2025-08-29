@@ -1,51 +1,73 @@
-// api 요청 관리, dio 를 설정하여 api와의 통신을 담당함
+// API 요청 관리 - 이미 설정된 Dio 인스턴스를 사용
+// 주의: JWT 토큰 처리는 dio_interceptor.dart의 AuthInterceptor에서 처리됩니다.
 
 import 'package:dio/dio.dart';
-import '../../../app/core/services/token_storage_service.dart';
+import 'package:flutter/foundation.dart';
+import '../network/dio.dart'; // 이미 설정된 Dio 인스턴스 사용
+import 'token_storage.dart';
 
 class ApiClient {
-  final Dio dio;
+  // 싱글톤 패턴으로 전역에서 하나의 Dio 인스턴스만 사용
+  static Dio get _dio => dio;
 
-  ApiClient(this.dio) {
-    dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        // access token 주입
-        final token = await TokenStorageService().getAccessToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        return handler.next(options);
-      },
-      onError: (e, handler) async {
-        if (e.response?.statusCode == 401) {
-          // access token 만료 시 refresh 시도
-          final refreshToken = await TokenStorageService().getRefreshToken();
+  /// ✅ GET 요청 헬퍼 메서드
+  static Future<Response> get(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    debugPrint('📡 [API_CLIENT] GET 요청: $path');
+    return await _dio.get(path, queryParameters: queryParameters);
+  }
 
-          try {
-            final refreshResponse = await dio.post('/auth/refresh',
-              data: {'refreshToken': refreshToken},
-            );
+  /// ✅ POST 요청 헬퍼 메서드
+  static Future<Response> post(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    debugPrint('📤 [API_CLIENT] POST 요청: $path');
+    return await _dio.post(path, data: data, queryParameters: queryParameters);
+  }
 
-            final newAccessToken = refreshResponse.data['accessToken'];
-            final newRefreshToken = refreshResponse.data['refreshToken'];
+  /// ✅ PUT 요청 헬퍼 메서드  
+  static Future<Response> put(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    debugPrint('🔄 [API_CLIENT] PUT 요청: $path');
+    return await _dio.put(path, data: data, queryParameters: queryParameters);
+  }
 
-            await TokenStorageService().saveTokens(newAccessToken, newRefreshToken);
+  /// ✅ DELETE 요청 헬퍼 메서드
+  static Future<Response> delete(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    debugPrint('🗑️ [API_CLIENT] DELETE 요청: $path');
+    return await _dio.delete(path, queryParameters: queryParameters);
+  }
 
-            // 실패했던 요청에 토큰 다시 주입해서 재시도
-            final options = e.requestOptions;
-            options.headers['Authorization'] = 'Bearer $newAccessToken';
+  /// ✅ 토큰 상태 확인 (디버깅용)
+  static Future<bool> hasValidToken() async {
+    final accessToken = await TokenStorage.accessToken;
+    final refreshToken = await TokenStorage.refreshToken;
+    final userId = await TokenStorage.userId;
+    
+    final isValid = accessToken != null && 
+                   accessToken.isNotEmpty &&
+                   refreshToken != null && 
+                   refreshToken.isNotEmpty &&
+                   userId != null;
+                   
+    debugPrint('🔐 [API_CLIENT] 토큰 상태: ${isValid ? "유효" : "무효"}');
+    return isValid;
+  }
 
-            final response = await dio.fetch(options);
-            return handler.resolve(response);
-          } catch (e) {
-            // refresh 실패 시 로그아웃
-            await TokenStorageService().deleteTokens();
-            return handler.reject(e as DioException);
-          }
-        }
-
-        return handler.next(e);
-      },
-    ));
+  /// ✅ 로그아웃 처리 (토큰 정리)
+  static Future<void> logout() async {
+    debugPrint('🚪 [API_CLIENT] 로그아웃 - 토큰 정리 중...');
+    await TokenStorage.clear();
+    debugPrint('✅ [API_CLIENT] 로그아웃 완료');
   }
 }
