@@ -46,6 +46,7 @@ import 'features/aptitude/data/source/aptitude_api.dart';
 import 'features/aptitude/data/repository/aptitude_api_repository.dart';
 import 'features/aptitude/data/repository/aptitude_mock_repository.dart';
 import 'features/aptitude/presentation/provider/aptitude_provider.dart';
+import 'features/learning/presentation/provider/learning_progress_provider.dart';
 
 // 노트 기능 (subin 새 기능)
 import 'features/note/domain/repository/note_repository.dart';
@@ -57,7 +58,7 @@ import 'features/note/data/repository/note_mock_repository.dart';
 import 'app/core/network/dio.dart';
 
 /// ✅ 더미(mock) 여부 설정 (euimin 스타일 유지)
-const useMock = true; // 실제 API 사용시 false
+const useMock = false; // 실제 API 사용시 false
 
 void main() async {
   await initializeDateFormatting();
@@ -196,6 +197,14 @@ class StockerApp extends StatelessWidget {
         // Note Provider (subin 새 기능)
         ChangeNotifierProvider(
           create: (context) => NoteProvider(context.read<NoteRepository>()),
+        ),
+
+        // Learning Progress Provider (새로운 정보구조를 위한 진도 관리)
+        ChangeNotifierProvider(
+          create: (_) {
+            debugPrint('🎯 [PROVIDER] Creating LearningProgressProvider');
+            return LearningProgressProvider();
+          },
         ),
       ],
       child: ScreenUtilInit(

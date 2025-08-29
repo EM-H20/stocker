@@ -6,52 +6,63 @@ import '../../../../app/config/app_theme.dart';
 import '../../../../app/config/app_routes.dart';
 import '../../../auth/presentation/auth_provider.dart';
 
-/// 메인 대시보드 상단 날짜 헤더 위젯
+/// 📅 간단한 헤더 위젯 (인사말 + 사용자 메뉴)
 class DateHeaderWidget extends StatelessWidget {
   const DateHeaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    final weekday = weekdays[now.weekday - 1];
+    final hour = now.hour;
+    
+    // 시간대별 인사말
+    String greeting;
+    if (hour < 12) {
+      greeting = '좋은 아침이에요! ☀️';
+    } else if (hour < 18) {
+      greeting = '좋은 오후에요! 📚';  
+    } else {
+      greeting = '좋은 저녁이에요! 🌙';
+    }
     
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 날짜 정보
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                weekday,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 32.sp,
-                  fontWeight: FontWeight.w300,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white.withValues(alpha: 0.8)
-                      : AppTheme.grey900.withValues(alpha: 0.8),
+          // 인사말 + 간단한 날짜
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  greeting,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : AppTheme.grey900,
+                  ),
                 ),
-              ),
-              Text(
-                '${now.day}일',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontSize: 16.sp,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? AppTheme.grey400
-                      : AppTheme.grey600,
+                SizedBox(height: 2.h),
+                Text(
+                  '${now.month}월 ${now.day}일, 학습을 시작해볼까요?',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppTheme.grey400
+                        : AppTheme.grey600,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           
           // 로그인/사용자 정보 영역
           Consumer<AuthProvider>(
             builder: (context, authProvider, child) {
               if (authProvider.isInitializing) {
-                // 앱 시작 시 토큰 확인 중
                 return SizedBox(
                   width: 20.w,
                   height: 20.h,
@@ -63,10 +74,8 @@ class DateHeaderWidget extends StatelessWidget {
               }
               
               if (authProvider.isLoggedIn) {
-                // 로그인 상태: 사용자 정보 표시
                 return _buildUserInfo(context, authProvider);
               } else {
-                // 로그아웃 상태: 로그인 버튼 표시
                 return _buildLoginButton(context);
               }
             },
