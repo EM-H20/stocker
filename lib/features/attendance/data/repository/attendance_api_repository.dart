@@ -13,14 +13,16 @@ class AttendanceApiRepository implements AttendanceRepository {
 
   @override
   Future<List<AttendanceDay>> getAttendanceStatus(DateTime month) async {
-    final dto = await _api.getAttendanceStatus(month);
+    // API.md 명세: GET /api/attendance/history (당월 출석 이력 조회)
+    final dto = await _api.getAttendanceHistory();
     // DTO를 도메인 모델 리스트로 변환하여 반환
     return dto.attendance;
   }
 
   @override
   Future<List<AttendanceQuiz>> getTodaysQuiz() async {
-    final dto = await _api.getTodaysQuiz();
+    // API.md 명세: GET /api/attendance/quiz/start (출석 퀴즈 시작)
+    final dto = await _api.startAttendanceQuiz();
     // DTO를 도메인 모델 리스트로 변환하여 반환
     return dto.quizzes;
   }

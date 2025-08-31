@@ -16,10 +16,10 @@ class ChapterCardResponse {
   /// JSON에서 객체로 변환
   factory ChapterCardResponse.fromJson(Map<String, dynamic> json) {
     return ChapterCardResponse(
-      chapterId: json['chapterId'] as int,
+      chapterId: json['chapter_id'] as int,
       title: json['title'] as String,
-      isTheoryCompleted: json['isTheoryCompleted'] as bool,
-      isQuizCompleted: json['isQuizCompleted'] as bool,
+      isTheoryCompleted: json['is_theory_completed'] as bool,
+      isQuizCompleted: json['is_quiz_completed'] as bool,
     );
   }
 

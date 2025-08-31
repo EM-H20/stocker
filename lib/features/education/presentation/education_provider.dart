@@ -49,6 +49,10 @@ class EducationProvider extends ChangeNotifier {
   /// 챕터 에러 메시지
   String? get chaptersError => _chaptersError;
 
+  /// 인증 에러 여부 확인 (401 Unauthorized)
+  bool get isAuthenticationError => 
+      _chaptersError?.contains('로그인이 필요한 서비스입니다') ?? false;
+
   /// 현재 이론 세션 데이터
   TheorySession? get currentTheorySession => _currentTheorySession;
 
@@ -144,22 +148,42 @@ class EducationProvider extends ChangeNotifier {
       if (_useMock) {
         debugPrint('🎭 [EDU_PROVIDER] Mock Repository 사용');
         _chapters = await _mockRepository!.getChaptersForUser();
+        debugPrint('🎭 [EDU_PROVIDER] Mock 데이터 로드됨: ${_chapters.map((c) => c.title).toList()}');
       } else {
         debugPrint('🌐 [EDU_PROVIDER] Real API Repository 사용');
+        debugPrint('🌐 [EDU_PROVIDER] Repository instance: $_repository');
+        debugPrint('🌐 [EDU_PROVIDER] ForceRefresh: $forceRefresh');
         _chapters = await _repository!.getChapters(forceRefresh: forceRefresh);
+        debugPrint('🌐 [EDU_PROVIDER] Real API 데이터 로드됨: ${_chapters.map((c) => c.title).toList()}');
       }
       
       debugPrint('✅ [EDU_PROVIDER] 챕터 로드 성공 - 총 ${_chapters.length}개 챕터');
       _chaptersError = null;
     } catch (e) {
-      _chaptersError = e.toString();
       debugPrint('❌ [EDU_PROVIDER] 챕터 로드 실패: $e');
       
-      // 에러 타입별 상세 로깅
-      if (e.toString().contains('No host specified')) {
-        debugPrint('🚨 [EDU_PROVIDER] URL 설정 문제 감지!');
+      // 🔐 401 Unauthorized 에러 처리 (로그인 필요)
+      if (e.toString().contains('401') || e.toString().contains('Unauthorized') || 
+          e.toString().contains('토큰이 제공되지 않았습니다')) {
+        _chaptersError = '로그인이 필요한 서비스입니다. 로그인 후 다시 시도해주세요.';
+        debugPrint('🔐 [EDU_PROVIDER] 401 Unauthorized - 로그인 필요');
+      }
+      // 🌐 네트워크 관련 에러
+      else if (e.toString().contains('No host specified') || 
+               e.toString().contains('Connection refused') ||
+               e.toString().contains('timeout')) {
+        _chaptersError = '네트워크 연결에 문제가 있습니다. 연결 상태를 확인하고 다시 시도해주세요.';
+        debugPrint('🌐 [EDU_PROVIDER] 네트워크 연결 문제 감지');
         debugPrint('🔧 [EDU_PROVIDER] .env 파일과 dio 설정을 확인하세요');
       }
+      // 🚨 기타 에러
+      else {
+        _chaptersError = '챕터 정보를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.';
+        debugPrint('🚨 [EDU_PROVIDER] 예상치 못한 에러: $e');
+      }
+      
+      // 에러 발생시 챕터 리스트 비우기
+      _chapters.clear();
     } finally {
       _isLoadingChapters = false;
       debugPrint('🏁 [EDU_PROVIDER] 챕터 로드 프로세스 완료');
@@ -306,14 +330,19 @@ class EducationProvider extends ChangeNotifier {
 
   /// 전체 캐시 삭제
   Future<void> clearCache() async {
+    debugPrint('🧹 [EDU_PROVIDER] 캐시 삭제 시작 (useMock: $_useMock)');
     if (!_useMock) {
+      debugPrint('🧹 [EDU_PROVIDER] Real Repository 캐시 삭제 중...');
       await _repository!.clearCache();
+    } else {
+      debugPrint('🧹 [EDU_PROVIDER] Mock 모드에서는 캐시 삭제 기능 없음');
     }
-    // Mock에서는 캐시 삭제 기능 없음
+    // 메모리 상태 초기화
     _chapters.clear();
     _currentTheorySession = null;
     _chaptersError = null;
     _theoryError = null;
+    debugPrint('🧹 [EDU_PROVIDER] 메모리 상태 초기화 완료');
     notifyListeners();
   }
 

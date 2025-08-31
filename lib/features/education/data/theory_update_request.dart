@@ -12,16 +12,16 @@ class TheoryUpdateRequest {
   /// JSON에서 객체로 변환
   factory TheoryUpdateRequest.fromJson(Map<String, dynamic> json) {
     return TheoryUpdateRequest(
-      chapterId: json['chapterId'] as int,
-      currentTheoryId: json['currentTheoryId'] as int,
+      chapterId: json['chapter_id'] as int,
+      currentTheoryId: json['current_theory_id'] as int,
     );
   }
 
   /// 객체에서 JSON으로 변환
   Map<String, dynamic> toJson() {
     return {
-      'chapterId': chapterId,
-      'currentTheoryId': currentTheoryId,
+      'chapter_id': chapterId,
+      'current_theory_id': currentTheoryId,
     };
   }
 

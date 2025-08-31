@@ -239,11 +239,17 @@ class LearningProgressProvider extends ChangeNotifier {
     return _lastChapterId;
   }
 
-  /// 🎓 현재 챕터 제목 가져오기 (하드코딩 - 실제로는 API에서)
+  /// 🎓 현재 챕터 제목 가져오기 
+  /// 
+  /// 실제 EducationProvider에서 데이터를 가져오기 전까지는 fallback 데이터 사용
+  /// [chapterId]: 챕터 ID
+  /// Returns: 챕터 제목 (실제 데이터가 없으면 fallback 제목 반환)
   String getChapterTitle(int chapterId) {
-    const chapterTitles = {
+    // ⚠️ 현재는 fallback 데이터 사용 
+    // 실제로는 ContinueLearningWidget에서 EducationProvider를 통해 가져와야 함
+    const fallbackChapterTitles = {
       1: '주식의 기본 개념',
-      2: '투자의 기본 원리',
+      2: '투자의 기본 원리', 
       3: '리스크와 수익률',
       4: '포트폴리오 구성',
       5: '기술적 분석 입문',
@@ -254,6 +260,7 @@ class LearningProgressProvider extends ChangeNotifier {
       10: '장기 투자 계획',
     };
     
-    return chapterTitles[chapterId] ?? '알 수 없는 챕터';
+    debugPrint('⚠️ [LEARNING_PROGRESS] Fallback 챕터 제목 사용 - 실제 데이터 연동 필요');
+    return fallbackChapterTitles[chapterId] ?? 'Chapter $chapterId';
   }
 }

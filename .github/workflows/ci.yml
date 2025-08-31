@@ -1,0 +1,98 @@
+name: CI Pipeline
+on:
+  push:
+    branches: [ main, develop, euimin ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        flutter-version: ['3.24.x', 'stable']
+    
+    steps:
+    - name: 📚 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: ☕ Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: 🔧 Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ matrix.flutter-version }}
+        channel: 'stable'
+        cache: true
+
+    - name: 📦 Cache pub dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.pub-cache
+          .dart_tool
+        key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pub-
+
+    - name: 🔍 Verify Flutter installation
+      run: flutter doctor -v
+
+    - name: 🚀 Get dependencies
+      run: flutter pub get
+
+    - name: 📋 Analyze code
+      run: flutter analyze
+
+    - name: 🧪 Run tests
+      run: flutter test
+
+    - name: 🏗️ Build APK (debug)
+      run: flutter build apk --debug
+
+    - name: 📊 Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results-${{ matrix.flutter-version }}
+        path: test/
+
+    - name: 💾 Upload debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: debug-apk-${{ matrix.flutter-version }}
+        path: build/app/outputs/flutter-apk/app-debug.apk
+
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📚 Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'
+        channel: 'stable'
+        cache: true
+
+    - name: 🚀 Get dependencies
+      run: flutter pub get
+
+    - name: 🔍 Check formatting
+      run: dart format --set-exit-if-changed .
+
+    - name: 🕵️ Run linter
+      run: flutter analyze --fatal-infos
+
+    - name: 📝 Generate analysis report
+      run: |
+        flutter analyze --write=analysis_output.txt || true
+        echo "## 📊 Analysis Report" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        cat analysis_output.txt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY

@@ -7,11 +7,11 @@ class TheoryCompletedRequest {
 
   /// JSON에서 객체로 변환
   factory TheoryCompletedRequest.fromJson(Map<String, dynamic> json) {
-    return TheoryCompletedRequest(chapterId: json['chapterId'] as int);
+    return TheoryCompletedRequest(chapterId: json['chapter_id'] as int);
   }
 
   /// 객체에서 JSON으로 변환
-  Map<String, dynamic> toJson() => {'chapterId': chapterId};
+  Map<String, dynamic> toJson() => {'chapter_id': chapterId};
 
   /// 디버깅용 문자열 표현
   @override
