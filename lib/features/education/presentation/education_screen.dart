@@ -23,7 +23,13 @@ class _EducationScreenState extends State<EducationScreen> {
     super.initState();
     // 화면 로드 시 챕터 목록을 가져옴
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EducationProvider>().loadChapters();
+      final provider = context.read<EducationProvider>();
+      // 🧹 캐시 삭제 및 강제 새로고침으로 mock 데이터 제거
+      debugPrint('🧹 [EDUCATION_SCREEN] 캐시 삭제 및 강제 새로고침 시작');
+      provider.clearCache().then((_) {
+        debugPrint('🔄 [EDUCATION_SCREEN] 캐시 삭제 완료, 강제 새로고침 실행');
+        provider.loadChapters(forceRefresh: true);
+      });
     });
   }
 
@@ -112,9 +118,41 @@ class _EducationScreenState extends State<EducationScreen> {
 
                   if (provider.chaptersError != null) {
                     return Center(
-                      child: Text(
-                        '챕터 로드 실패: ${provider.chaptersError}',
-                        style: TextStyle(color: colorScheme.error),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 48.sp,
+                            color: colorScheme.error,
+                          ),
+                          SizedBox(height: 16.h),
+                          Text(
+                            '챕터 로드 실패',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: colorScheme.error,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            provider.chaptersError!,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurface.withValues(alpha: 0.7),
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                          ElevatedButton(
+                            onPressed: () {
+                              debugPrint('🔄 [EDUCATION_SCREEN] 재시도 버튼 클릭');
+                              provider.clearCache().then((_) {
+                                provider.loadChapters(forceRefresh: true);
+                              });
+                            },
+                            child: Text('다시 시도'),
+                          ),
+                        ],
                       ),
                     );
                   }

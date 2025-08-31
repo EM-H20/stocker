@@ -6,13 +6,15 @@ import '../../../../app/core/services/token_storage.dart';
 import '../../../auth/data/dto/login_request.dart';
 import '../../../auth/data/dto/signup_request.dart';
 import '../dto/auth_response.dart';
+import '../dto/profile_update_request.dart';
+import '../dto/profile_update_response.dart';
 class AuthApi {
   final Dio _dio;
   AuthApi(this._dio);
 
   // 로그인
   Future<AuthResponse> login(LoginRequest request) async {
-    final endpoint = dotenv.env['JWT_LOGIN_ENDPOINT'] ?? '/user/login';
+    final endpoint = dotenv.env['JWT_LOGIN_ENDPOINT'] ?? '/api/user/login';
     final res = await _dio.post(
       endpoint,
       data: request.toJson(),
@@ -32,7 +34,7 @@ class AuthApi {
 
   // 회원가입
   Future<void> signup(SignupRequest request) async {
-    final endpoint = dotenv.env['JWT_SIGNUP_ENDPOINT'] ?? '/user/signup';
+    final endpoint = dotenv.env['JWT_SIGNUP_ENDPOINT'] ?? '/api/user/signup';
     await _dio.post(
       endpoint,
       data: request.toJson(),
@@ -42,19 +44,42 @@ class AuthApi {
   // 로그아웃 - 이메일이 필요함
   Future<void> logout(String email) async {
     try {
-      final endpoint = dotenv.env['JWT_LOGOUT_ENDPOINT'] ?? '/user/logout';
+      final endpoint = dotenv.env['JWT_LOGOUT_ENDPOINT'] ?? '/api/user/logout';
       final access = await TokenStorage.accessToken;
+      final refresh = await TokenStorage.refreshToken;
       await _dio.post(
         endpoint,
         data: { 'email': email }, // 백엔드는 email을 기대함
         options: Options(headers: {
           if (access != null && access.isNotEmpty)
             'Authorization': 'Bearer $access',
+          if (refresh != null && refresh.isNotEmpty)
+            'x-refresh-token': refresh,
         }),
       );
     } finally {
       await TokenStorage.clear();
     }
+  }
+
+  // 프로필 수정
+  Future<ProfileUpdateResponse> updateProfile(ProfileUpdateRequest request) async {
+    final endpoint = dotenv.env['PROFILE_UPDATE_ENDPOINT'] ?? '/api/user/profile';
+    final access = await TokenStorage.accessToken;
+    final refresh = await TokenStorage.refreshToken;
+    
+    final response = await _dio.post(
+      endpoint,
+      data: request.toJson(),
+      options: Options(headers: {
+        if (access != null && access.isNotEmpty)
+          'Authorization': 'Bearer $access',
+        if (refresh != null && refresh.isNotEmpty)
+          'x-refresh-token': refresh,
+      }),
+    );
+
+    return ProfileUpdateResponse.fromJson(response.data);
   }
 
   // 백엔드는 미들웨어에서 자동으로 토큰 갱신을 처리하므로
