@@ -6,6 +6,7 @@ class ChapterInfo {
   final String? description; // 백엔드 데이터와 매칭
   final bool isTheoryCompleted;
   final bool isQuizCompleted;
+  final bool isChapterCompleted; // 챕터 전체 완료 상태
 
   const ChapterInfo({
     required this.id,
@@ -13,6 +14,7 @@ class ChapterInfo {
     this.description,
     required this.isTheoryCompleted,
     required this.isQuizCompleted,
+    required this.isChapterCompleted,
   });
 
   /// 백엔드 JSON에서 ChapterInfo 객체 생성
@@ -24,6 +26,7 @@ class ChapterInfo {
       description: json['description'] as String?,
       isTheoryCompleted: false, // 별도 API로 조회 필요
       isQuizCompleted: false, // 별도 API로 조회 필요
+      isChapterCompleted: false, // 별도 API로 조회 필요
     );
   }
 
@@ -44,6 +47,7 @@ class ChapterInfo {
     String? description,
     bool? isTheoryCompleted,
     bool? isQuizCompleted,
+    bool? isChapterCompleted,
   }) {
     return ChapterInfo(
       id: id ?? this.id,
@@ -51,16 +55,18 @@ class ChapterInfo {
       description: description ?? this.description,
       isTheoryCompleted: isTheoryCompleted ?? this.isTheoryCompleted,
       isQuizCompleted: isQuizCompleted ?? this.isQuizCompleted,
+      isChapterCompleted: isChapterCompleted ?? this.isChapterCompleted,
     );
   }
 
   @override
   String toString() {
     return 'ChapterInfo(id: $id, title: $title, description: $description, '
-        'isTheoryCompleted: $isTheoryCompleted, isQuizCompleted: $isQuizCompleted)';
+        'isTheoryCompleted: $isTheoryCompleted, isQuizCompleted: $isQuizCompleted, '
+        'isChapterCompleted: $isChapterCompleted)';
   }
 
-  // chapterInfo가 같은지 비교(id, title, description, isTheoryCompleted, isQuizCompleted)
+  // chapterInfo가 같은지 비교(id, title, description, isTheoryCompleted, isQuizCompleted, isChapterCompleted)
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -69,13 +75,14 @@ class ChapterInfo {
         other.title == title &&
         other.description == description &&
         other.isTheoryCompleted == isTheoryCompleted &&
-        other.isQuizCompleted == isQuizCompleted;
+        other.isQuizCompleted == isQuizCompleted &&
+        other.isChapterCompleted == isChapterCompleted;
   }
 
   // chapterInfo의 해시코드
   @override
   int get hashCode {
     return Object.hash(
-        id, title, description, isTheoryCompleted, isQuizCompleted);
+        id, title, description, isTheoryCompleted, isQuizCompleted, isChapterCompleted);
   }
 }

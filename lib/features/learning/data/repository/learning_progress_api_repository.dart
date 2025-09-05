@@ -189,9 +189,9 @@ class LearningProgressApiRepository implements LearningProgressRepository {
       }
       
       // EducationProvider에서 실제 챕터 데이터 가져오기
-      if (_educationProvider != null && _educationProvider!.chapters.isNotEmpty) {
+      if (_educationProvider != null && _educationProvider.chapters.isNotEmpty) {
         debugPrint('✅ [LearningProgressApiRepo] EducationProvider에서 실제 챕터 데이터 사용');
-        _cachedChapters = _educationProvider!.chapters.map((chapter) => {
+        _cachedChapters = _educationProvider.chapters.map((chapter) => {
           'id': chapter.id,
           'title': chapter.title,
           'description': chapter.description ?? '${chapter.title} 학습 내용',

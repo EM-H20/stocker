@@ -222,7 +222,7 @@ class StockerApp extends StatelessWidget {
         ),
 
         // Learning Progress Provider (Repository 패턴 적용)
-        ChangeNotifierProvider(
+        ChangeNotifierProxyProvider2<EducationProvider, QuizProvider, LearningProgressProvider>(
           create: (context) {
             debugPrint('🎯 [PROVIDER] Creating LearningProgressProvider (useMock: $useMock)');
             if (useMock) {
@@ -236,6 +236,28 @@ class StockerApp extends StatelessWidget {
               final apiRepository = LearningProgressApiRepository(learningProgressApi, educationProvider);
               return LearningProgressProvider(apiRepository);
             }
+          },
+          update: (context, educationProvider, quizProvider, learningProgressProvider) {
+            debugPrint('🔗 [PROVIDER] Connecting Provider callbacks...');
+            
+            // Provider 간 콜백 연결 설정
+            if (learningProgressProvider != null) {
+              // EducationProvider -> LearningProgressProvider 콜백 연결
+              educationProvider.addOnChapterCompletedCallback((chapterId) {
+                debugPrint('🎉 [CALLBACK] 챕터 $chapterId 완료 - LearningProgress에 알림');
+                learningProgressProvider.completeChapter(chapterId);
+              });
+              
+              // QuizProvider -> EducationProvider 콜백 연결 (퀴즈 완료 시 EducationProvider 업데이트)
+              quizProvider.addOnQuizCompletedCallback((chapterId, result) {
+                debugPrint('🎯 [CALLBACK] 퀴즈 $chapterId 완료 - Education에 알림 (${result.scorePercentage}%)');
+                educationProvider.updateQuizCompletion(chapterId, isPassed: result.isPassed);
+              });
+              
+              debugPrint('✅ [PROVIDER] Provider 간 콜백 연결 완료!');
+            }
+            
+            return learningProgressProvider ?? LearningProgressProvider(LearningProgressMockRepository());
           },
         ),
       ],

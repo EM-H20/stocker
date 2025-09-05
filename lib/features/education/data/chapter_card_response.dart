@@ -5,12 +5,14 @@ class ChapterCardResponse {
   final String title;
   final bool isTheoryCompleted;
   final bool isQuizCompleted;
+  final bool isChapterCompleted;
 
   const ChapterCardResponse({
     required this.chapterId,
     required this.title,
     required this.isTheoryCompleted,
     required this.isQuizCompleted,
+    required this.isChapterCompleted,
   });
 
   /// JSON에서 객체로 변환
@@ -18,8 +20,11 @@ class ChapterCardResponse {
     return ChapterCardResponse(
       chapterId: json['chapter_id'] as int,
       title: json['title'] as String,
-      isTheoryCompleted: json['is_theory_completed'] as bool,
-      isQuizCompleted: json['is_quiz_completed'] as bool,
+      isTheoryCompleted: json['is_theory_completed'] as bool? ?? false,
+      isQuizCompleted: json['is_quiz_completed'] as bool? ?? false,
+      // 백엔드에서 is_chapter_completed 필드가 없는 경우 false로 기본값 설정
+      // 실제로는 이론+퀴즈 완료 시 Flutter에서 자동으로 true로 업데이트됨
+      isChapterCompleted: json['is_chapter_completed'] as bool? ?? false,
     );
   }
 
@@ -30,6 +35,7 @@ class ChapterCardResponse {
       'title': title,
       'isTheoryCompleted': isTheoryCompleted,
       'isQuizCompleted': isQuizCompleted,
+      'isChapterCompleted': isChapterCompleted,
     };
   }
 
@@ -37,7 +43,8 @@ class ChapterCardResponse {
   @override
   String toString() {
     return 'ChapterCardResponse(chapterId: $chapterId, title: $title, '
-        'isTheoryCompleted: $isTheoryCompleted, isQuizCompleted: $isQuizCompleted)';
+        'isTheoryCompleted: $isTheoryCompleted, isQuizCompleted: $isQuizCompleted, '
+        'isChapterCompleted: $isChapterCompleted)';
   }
 
   /// 동등성 비교
@@ -48,12 +55,13 @@ class ChapterCardResponse {
         other.chapterId == chapterId &&
         other.title == title &&
         other.isTheoryCompleted == isTheoryCompleted &&
-        other.isQuizCompleted == isQuizCompleted;
+        other.isQuizCompleted == isQuizCompleted &&
+        other.isChapterCompleted == isChapterCompleted;
   }
 
   @override
   int get hashCode {
-    return Object.hash(chapterId, title, isTheoryCompleted, isQuizCompleted);
+    return Object.hash(chapterId, title, isTheoryCompleted, isQuizCompleted, isChapterCompleted);
   }
 
   /// 복사본 생성 (일부 필드만 변경)
@@ -62,12 +70,14 @@ class ChapterCardResponse {
     String? title,
     bool? isTheoryCompleted,
     bool? isQuizCompleted,
+    bool? isChapterCompleted,
   }) {
     return ChapterCardResponse(
       chapterId: chapterId ?? this.chapterId,
       title: title ?? this.title,
       isTheoryCompleted: isTheoryCompleted ?? this.isTheoryCompleted,
       isQuizCompleted: isQuizCompleted ?? this.isQuizCompleted,
+      isChapterCompleted: isChapterCompleted ?? this.isChapterCompleted,
     );
   }
 }

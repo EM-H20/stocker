@@ -159,14 +159,31 @@ class _EducationScreenState extends State<EducationScreen> {
 
                   return Column(
                     children: provider.chapters.map((chapter) {
+                      // 챕터 상태에 따른 설명과 아이콘 결정
+                      String description;
+                      IconData icon;
+                      
+                      if (chapter.isChapterCompleted) {
+                        description = '챕터 완료! 🎉 (이론 ✓, 퀴즈 ✓)';
+                        icon = Icons.stars;
+                      } else if (chapter.isTheoryCompleted && chapter.isQuizCompleted) {
+                        description = '챕터 완료 처리 중... ⏳';
+                        icon = Icons.hourglass_empty;
+                      } else if (chapter.isTheoryCompleted) {
+                        description = '이론 완료 ✓ (퀴즈 진행 필요)';
+                        icon = Icons.quiz_outlined;
+                      } else if (chapter.isQuizCompleted) {
+                        description = '퀴즈 완료 ✓ (이론 진행 필요)';
+                        icon = Icons.school_outlined;
+                      } else {
+                        description = '이론 학습을 시작하세요';
+                        icon = Icons.play_circle_outline;
+                      }
+                      
                       return RecommendedChapterCard(
                         title: chapter.title,
-                        description: chapter.isTheoryCompleted
-                            ? '이론 학습 완료 ✓'
-                            : '이론 학습을 시작하세요',
-                        icon: chapter.isTheoryCompleted
-                            ? Icons.check_circle
-                            : Icons.play_circle_outline,
+                        description: description,
+                        icon: icon,
                         onTap: () {
                           provider.enterTheory(chapter.id);
                           context.go(AppRoutes.theory);

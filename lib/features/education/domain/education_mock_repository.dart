@@ -20,6 +20,7 @@ class EducationMockRepository {
         description: '주식 투자의 기본 개념과 원리를 학습합니다.',
         isTheoryCompleted: true, // 이론 완료, 퀴즈 미완료
         isQuizCompleted: false,
+        isChapterCompleted: false, // 챕터 미완료
       ),
       const ChapterInfo(
         id: 2,
@@ -27,6 +28,7 @@ class EducationMockRepository {
         description: '차트 분석과 기술적 지표 활용법을 배웁니다.',
         isTheoryCompleted: false, // 이론, 퀴즈 모두 미완료
         isQuizCompleted: false,
+        isChapterCompleted: false, // 챕터 미완료
       ),
       const ChapterInfo(
         id: 3,
@@ -34,6 +36,7 @@ class EducationMockRepository {
         description: '기업의 재무 상태와 성과를 분석하는 방법을 학습합니다.',
         isTheoryCompleted: true, // 이론, 퀴즈 모두 완료
         isQuizCompleted: true,
+        isChapterCompleted: true, // 챕터 완료! ✅
       ),
       const ChapterInfo(
         id: 4,
@@ -41,6 +44,7 @@ class EducationMockRepository {
         description: '효과적인 자산 배분과 위험 관리 전략을 학습합니다.',
         isTheoryCompleted: false, // 이론, 퀴즈 모두 미완료
         isQuizCompleted: false,
+        isChapterCompleted: false, // 챕터 미완료
       ),
     ];
     // 예상 진행률: (이론 2개 + 퀴즈 1개) / (4 챕터 × 2) = 3/8 = 37.5%

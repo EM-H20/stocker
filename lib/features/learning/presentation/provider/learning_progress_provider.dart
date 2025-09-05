@@ -236,7 +236,7 @@ class LearningProgressProvider extends ChangeNotifier {
       // Repository에서 가져온 실제 챕터 데이터 검색
       final chapter = _availableChapters.firstWhere(
         (chapter) => chapter['id'] == chapterId,
-        orElse: () => {},
+        orElse: () => <String, Object>{},
       );
 
       if (chapter.isNotEmpty) {
@@ -257,7 +257,7 @@ class LearningProgressProvider extends ChangeNotifier {
     try {
       final chapter = _availableChapters.firstWhere(
         (chapter) => chapter['id'] == chapterId,
-        orElse: () => {},
+        orElse: () => <String, Object>{},
       );
 
       if (chapter.isNotEmpty) {
