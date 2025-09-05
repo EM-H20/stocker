@@ -67,13 +67,28 @@ class TheoryEnterResponse {
 
   /// JSON에서 객체로 변환
   factory TheoryEnterResponse.fromJson(Map<String, dynamic> json) {
+    // 이론 페이지 목록 파싱
+    final theoryPagesList = (json['theory_pages'] as List<dynamic>)
+        .map((pageJson) =>
+            TheoryPage.fromJson(pageJson as Map<String, dynamic>))
+        .toList();
+    
+    // 🔧 수정: current_page는 이론 ID이므로 페이지 번호로 변환
+    final currentTheoryId = json['current_page'];
+    int currentPageNumber = 1; // 기본값
+    
+    if (currentTheoryId != null && theoryPagesList.isNotEmpty) {
+      // 해당 이론 ID의 페이지 번호 찾기
+      final pageIndex = theoryPagesList.indexWhere((page) => page.id == currentTheoryId);
+      if (pageIndex != -1) {
+        currentPageNumber = pageIndex + 1; // 페이지는 1부터 시작
+      }
+    }
+    
     return TheoryEnterResponse(
-      theoryPages: (json['theory_pages'] as List<dynamic>)
-          .map((pageJson) =>
-              TheoryPage.fromJson(pageJson as Map<String, dynamic>))
-          .toList(),
+      theoryPages: theoryPagesList,
       totalPages: json['total_pages'] ?? 0,
-      currentPage: json['current_page'] ?? 1,
+      currentPage: currentPageNumber,
     );
   }
 
