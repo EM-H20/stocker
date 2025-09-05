@@ -230,7 +230,7 @@ class QuizProvider extends ChangeNotifier {
     try {
       final chapterId = _currentQuizSession!.chapterId;
       
-      // 사용자 답안을 API 형식으로 변환: [{"quiz_id": 1, "answer": 2}]
+      // 사용자 답안을 API 형식으로 변환: [{"quiz_id": 1, "selected_option": 2}]
       final answers = <Map<String, int>>[];
       for (int i = 0; i < _currentQuizSession!.quizList.length; i++) {
         final quiz = _currentQuizSession!.quizList[i];
@@ -238,7 +238,7 @@ class QuizProvider extends ChangeNotifier {
         if (userAnswer != null) {
           answers.add({
             'quiz_id': quiz.id,
-            'answer': userAnswer + 1, // 0-based → 1-based 변환
+            'selected_option': userAnswer + 1, // 0-based → 1-based 변환
           });
         }
       }
