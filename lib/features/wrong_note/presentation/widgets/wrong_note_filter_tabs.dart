@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
-import '../../../../app/config/app_theme.dart';// 
+import '../../../../app/config/app_theme.dart'; //
 
 /// 챕터별로 오답을 필터링할 수 있는 탭 위젯
 class WrongNoteFilterTabs extends StatelessWidget {
@@ -36,26 +35,24 @@ class WrongNoteFilterTabs extends StatelessWidget {
               margin: EdgeInsets.only(right: 12.w),
               padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
               decoration: BoxDecoration(
-                color:
-                  isSelected
-                      ? AppTheme.successColor
-                      : (theme.brightness == Brightness.dark 
-                          ? AppTheme.darkSurface 
-                          : Colors.grey[50]),
+                color: isSelected
+                    ? AppTheme.successColor
+                    : (theme.brightness == Brightness.dark
+                        ? AppTheme.darkSurface
+                        : Colors.grey[50]),
                 borderRadius: BorderRadius.circular(25.r),
                 border: Border.all(
-                  color:
-                      isSelected 
-                          ? AppTheme.successColor 
-                          : (theme.brightness == Brightness.dark 
-                              ? AppTheme.grey600.withValues(alpha: 0.5) 
-                              : AppTheme.grey300.withValues(alpha: 0.7)),
+                  color: isSelected
+                      ? AppTheme.successColor
+                      : (theme.brightness == Brightness.dark
+                          ? AppTheme.grey600.withValues(alpha: 0.5)
+                          : AppTheme.grey300.withValues(alpha: 0.7)),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: theme.brightness == Brightness.dark 
-                        ? Colors.black.withValues(alpha: 0.2) 
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.black.withValues(alpha: 0.2)
                         : Colors.grey.withValues(alpha: 0.15),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
@@ -66,10 +63,10 @@ class WrongNoteFilterTabs extends StatelessWidget {
               child: Text(
                 filter,
                 style: TextStyle(
-                  color: isSelected 
-                      ? Colors.white 
-                      : (theme.brightness == Brightness.dark 
-                          ? AppTheme.grey300 
+                  color: isSelected
+                      ? Colors.white
+                      : (theme.brightness == Brightness.dark
+                          ? AppTheme.grey300
                           : AppTheme.grey700),
                   fontSize: 14.sp,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,

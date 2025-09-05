@@ -14,7 +14,7 @@ enum AppThemeMode {
 /// 앱 테마 상태 관리 Provider
 class ThemeProvider extends ChangeNotifier {
   static const String _themeKey = 'theme_mode';
-  
+
   AppThemeMode _currentThemeMode = AppThemeMode.system;
   SharedPreferences? _prefs;
 
@@ -36,8 +36,9 @@ class ThemeProvider extends ChangeNotifier {
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
     final savedThemeIndex = _prefs?.getInt(_themeKey);
-    
-    if (savedThemeIndex != null && savedThemeIndex < AppThemeMode.values.length) {
+
+    if (savedThemeIndex != null &&
+        savedThemeIndex < AppThemeMode.values.length) {
       _currentThemeMode = AppThemeMode.values[savedThemeIndex];
       notifyListeners();
     }
@@ -46,12 +47,12 @@ class ThemeProvider extends ChangeNotifier {
   /// 테마 모드 변경
   Future<void> setThemeMode(AppThemeMode themeMode) async {
     if (_currentThemeMode == themeMode) return;
-    
+
     _currentThemeMode = themeMode;
-    
+
     // SharedPreferences에 저장
     await _prefs?.setInt(_themeKey, themeMode.index);
-    
+
     notifyListeners();
   }
 

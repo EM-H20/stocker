@@ -1,4 +1,4 @@
-/// 프로필 수정 응답 모델  
+/// 프로필 수정 응답 모델
 /// API.md 명세: POST /api/user/profile 응답
 class ProfileUpdateResponse {
   final String message;

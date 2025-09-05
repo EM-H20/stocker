@@ -1,4 +1,3 @@
-
 // lib/features/auth/data/source/auth_api.dart
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -8,6 +7,7 @@ import '../../../auth/data/dto/signup_request.dart';
 import '../dto/auth_response.dart';
 import '../dto/profile_update_request.dart';
 import '../dto/profile_update_response.dart';
+
 class AuthApi {
   final Dio _dio;
   AuthApi(this._dio);
@@ -49,12 +49,11 @@ class AuthApi {
       final refresh = await TokenStorage.refreshToken;
       await _dio.post(
         endpoint,
-        data: { 'email': email }, // 백엔드는 email을 기대함
+        data: {'email': email}, // 백엔드는 email을 기대함
         options: Options(headers: {
           if (access != null && access.isNotEmpty)
             'Authorization': 'Bearer $access',
-          if (refresh != null && refresh.isNotEmpty)
-            'x-refresh-token': refresh,
+          if (refresh != null && refresh.isNotEmpty) 'x-refresh-token': refresh,
         }),
       );
     } finally {
@@ -63,19 +62,20 @@ class AuthApi {
   }
 
   // 프로필 수정
-  Future<ProfileUpdateResponse> updateProfile(ProfileUpdateRequest request) async {
-    final endpoint = dotenv.env['PROFILE_UPDATE_ENDPOINT'] ?? '/api/user/profile';
+  Future<ProfileUpdateResponse> updateProfile(
+      ProfileUpdateRequest request) async {
+    final endpoint =
+        dotenv.env['PROFILE_UPDATE_ENDPOINT'] ?? '/api/user/profile';
     final access = await TokenStorage.accessToken;
     final refresh = await TokenStorage.refreshToken;
-    
+
     final response = await _dio.post(
       endpoint,
       data: request.toJson(),
       options: Options(headers: {
         if (access != null && access.isNotEmpty)
           'Authorization': 'Bearer $access',
-        if (refresh != null && refresh.isNotEmpty)
-          'x-refresh-token': refresh,
+        if (refresh != null && refresh.isNotEmpty) 'x-refresh-token': refresh,
       }),
     );
 
@@ -90,4 +90,3 @@ class AuthApi {
     throw UnimplementedError('백엔드 미들웨어에서 자동 토큰 갱신 처리됨');
   }
 }
-

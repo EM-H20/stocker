@@ -23,7 +23,7 @@ class ChapterInfo {
       title: json['title'] as String,
       description: json['description'] as String?,
       isTheoryCompleted: false, // 별도 API로 조회 필요
-      isQuizCompleted: false,   // 별도 API로 조회 필요
+      isQuizCompleted: false, // 별도 API로 조회 필요
     );
   }
 
@@ -75,6 +75,7 @@ class ChapterInfo {
   // chapterInfo의 해시코드
   @override
   int get hashCode {
-    return Object.hash(id, title, description, isTheoryCompleted, isQuizCompleted);
+    return Object.hash(
+        id, title, description, isTheoryCompleted, isQuizCompleted);
   }
 }

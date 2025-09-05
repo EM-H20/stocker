@@ -27,7 +27,8 @@ class InvestmentResultResponse {
           .map((m) => InvestmentMaster.fromJson(m as Map<String, dynamic>))
           .toList(),
       computed: json['computed'] != null
-          ? InvestmentComputed.fromJson(json['computed'] as Map<String, dynamic>)
+          ? InvestmentComputed.fromJson(
+              json['computed'] as Map<String, dynamic>)
           : null,
     );
   }
@@ -112,7 +113,7 @@ class InvestmentComputed {
 
   factory InvestmentComputed.fromJson(Map<String, dynamic> json) {
     final dimensionsData = json['dimensions'] as Map<String, dynamic>? ?? {};
-    
+
     return InvestmentComputed(
       version: json['version'] ?? 'v1.1',
       typeCode: json['type_code'] ?? '',

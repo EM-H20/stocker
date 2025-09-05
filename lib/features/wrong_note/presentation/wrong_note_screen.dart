@@ -74,7 +74,7 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
                       child: Text(
                         '다시 시도',
                         style: TextStyle(
-                          color: Colors.white, 
+                          color: Colors.white,
                           fontSize: 14.sp,
                         ),
                       ),
@@ -109,8 +109,8 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
                       Text(
                         '오답노트',
                         style: TextStyle(
-                          color: Theme.of(context).brightness == Brightness.dark 
-                              ? Colors.white 
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
                               : AppTheme.grey900,
                           fontSize: 28.sp,
                           fontWeight: FontWeight.bold,
@@ -150,11 +150,12 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
                         padding: EdgeInsets.only(bottom: 12.h),
                         child: WrongAnswerCard(
                           wrongNote: wrongNote,
-                          isRetried: provider.retriedQuizIds.contains(wrongNote.quizId),
-                          onRetry:
-                              () => provider.markAsRetried(wrongNote.quizId),
-                          onRemove:
-                              () => provider.removeWrongNote(wrongNote.quizId),
+                          isRetried: provider.retriedQuizIds
+                              .contains(wrongNote.quizId),
+                          onRetry: () =>
+                              provider.markAsRetried(wrongNote.quizId),
+                          onRemove: () =>
+                              provider.removeWrongNote(wrongNote.quizId),
                         ),
                       );
                     },

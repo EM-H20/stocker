@@ -14,15 +14,15 @@ class EducationProvider extends ChangeNotifier {
 
   /// 실제 API Repository를 사용하는 생성자
   EducationProvider(EducationRepository repository)
-    : _repository = repository,
-      _mockRepository = null,
-      _useMock = false;
+      : _repository = repository,
+        _mockRepository = null,
+        _useMock = false;
 
   /// Mock Repository를 사용하는 생성자 (UI 개발/테스트용)
   EducationProvider.withMock(EducationMockRepository mockRepository)
-    : _repository = null,
-      _mockRepository = mockRepository,
-      _useMock = true;
+      : _repository = null,
+        _mockRepository = mockRepository,
+        _useMock = true;
 
   // === 챕터 관련 상태 ===
   List<ChapterInfo> _chapters = [];
@@ -50,7 +50,7 @@ class EducationProvider extends ChangeNotifier {
   String? get chaptersError => _chaptersError;
 
   /// 인증 에러 여부 확인 (401 Unauthorized)
-  bool get isAuthenticationError => 
+  bool get isAuthenticationError =>
       _chaptersError?.contains('로그인이 필요한 서비스입니다') ?? false;
 
   /// 현재 이론 세션 데이터
@@ -90,10 +90,10 @@ class EducationProvider extends ChangeNotifier {
   /// 진행률 = (이론 완료 챕터 수 + 퀴즈 완료 챕터 수) / (전체 챕터 수 × 2)
   double get globalProgressRatio {
     if (_chapters.isEmpty) return 0.0;
-    
+
     final totalTasks = _chapters.length * 2; // 각 챕터당 이론 + 퀴즈 = 2개 작업
     final completedTasks = getCompletedTaskCount();
-    
+
     if (totalTasks == 0) return 0.0;
     return completedTasks / totalTasks;
   }
@@ -105,8 +105,10 @@ class EducationProvider extends ChangeNotifier {
 
   /// 완료된 작업 개수 조회 (완료된 이론 + 완료된 퀴즈)
   int getCompletedTaskCount() {
-    int completedTheories = _chapters.where((chapter) => chapter.isTheoryCompleted).length;
-    int completedQuizzes = _chapters.where((chapter) => chapter.isQuizCompleted).length;
+    int completedTheories =
+        _chapters.where((chapter) => chapter.isTheoryCompleted).length;
+    int completedQuizzes =
+        _chapters.where((chapter) => chapter.isQuizCompleted).length;
     return completedTheories + completedQuizzes;
   }
 
@@ -122,8 +124,10 @@ class EducationProvider extends ChangeNotifier {
 
   /// 상세 진행 상황 요약
   String get detailedProgressSummary {
-    final completedTheories = _chapters.where((chapter) => chapter.isTheoryCompleted).length;
-    final completedQuizzes = _chapters.where((chapter) => chapter.isQuizCompleted).length;
+    final completedTheories =
+        _chapters.where((chapter) => chapter.isTheoryCompleted).length;
+    final completedQuizzes =
+        _chapters.where((chapter) => chapter.isQuizCompleted).length;
     final totalChapters = _chapters.length;
     return '이론: $completedTheories/$totalChapters, 퀴즈: $completedQuizzes/$totalChapters';
   }
@@ -139,7 +143,8 @@ class EducationProvider extends ChangeNotifier {
       return;
     }
 
-    debugPrint('🔄 [EDU_PROVIDER] 챕터 목록 로드 시작 (useMock: $_useMock, forceRefresh: $forceRefresh)');
+    debugPrint(
+        '🔄 [EDU_PROVIDER] 챕터 목록 로드 시작 (useMock: $_useMock, forceRefresh: $forceRefresh)');
     _isLoadingChapters = true;
     _chaptersError = null;
     notifyListeners();
@@ -148,30 +153,33 @@ class EducationProvider extends ChangeNotifier {
       if (_useMock) {
         debugPrint('🎭 [EDU_PROVIDER] Mock Repository 사용');
         _chapters = await _mockRepository!.getChaptersForUser();
-        debugPrint('🎭 [EDU_PROVIDER] Mock 데이터 로드됨: ${_chapters.map((c) => c.title).toList()}');
+        debugPrint(
+            '🎭 [EDU_PROVIDER] Mock 데이터 로드됨: ${_chapters.map((c) => c.title).toList()}');
       } else {
         debugPrint('🌐 [EDU_PROVIDER] Real API Repository 사용');
         debugPrint('🌐 [EDU_PROVIDER] Repository instance: $_repository');
         debugPrint('🌐 [EDU_PROVIDER] ForceRefresh: $forceRefresh');
         _chapters = await _repository!.getChapters(forceRefresh: forceRefresh);
-        debugPrint('🌐 [EDU_PROVIDER] Real API 데이터 로드됨: ${_chapters.map((c) => c.title).toList()}');
+        debugPrint(
+            '🌐 [EDU_PROVIDER] Real API 데이터 로드됨: ${_chapters.map((c) => c.title).toList()}');
       }
-      
+
       debugPrint('✅ [EDU_PROVIDER] 챕터 로드 성공 - 총 ${_chapters.length}개 챕터');
       _chaptersError = null;
     } catch (e) {
       debugPrint('❌ [EDU_PROVIDER] 챕터 로드 실패: $e');
-      
+
       // 🔐 401 Unauthorized 에러 처리 (로그인 필요)
-      if (e.toString().contains('401') || e.toString().contains('Unauthorized') || 
+      if (e.toString().contains('401') ||
+          e.toString().contains('Unauthorized') ||
           e.toString().contains('토큰이 제공되지 않았습니다')) {
         _chaptersError = '로그인이 필요한 서비스입니다. 로그인 후 다시 시도해주세요.';
         debugPrint('🔐 [EDU_PROVIDER] 401 Unauthorized - 로그인 필요');
       }
       // 🌐 네트워크 관련 에러
-      else if (e.toString().contains('No host specified') || 
-               e.toString().contains('Connection refused') ||
-               e.toString().contains('timeout')) {
+      else if (e.toString().contains('No host specified') ||
+          e.toString().contains('Connection refused') ||
+          e.toString().contains('timeout')) {
         _chaptersError = '네트워크 연결에 문제가 있습니다. 연결 상태를 확인하고 다시 시도해주세요.';
         debugPrint('🌐 [EDU_PROVIDER] 네트워크 연결 문제 감지');
         debugPrint('🔧 [EDU_PROVIDER] .env 파일과 dio 설정을 확인하세요');
@@ -181,7 +189,7 @@ class EducationProvider extends ChangeNotifier {
         _chaptersError = '챕터 정보를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.';
         debugPrint('🚨 [EDU_PROVIDER] 예상치 못한 에러: $e');
       }
-      
+
       // 에러 발생시 챕터 리스트 비우기
       _chapters.clear();
     } finally {

@@ -37,8 +37,10 @@ class NoteDto {
       id: json['id'] as int? ?? 0,
       title: json['title'] as String? ?? '제목 없음',
       content: contentString, // 안전하게 변환된 문자열 사용
-      createdAt: json['created_at'] as String? ?? DateTime.now().toIso8601String(),
-      updatedAt: json['updated_at'] as String? ?? DateTime.now().toIso8601String(),
+      createdAt:
+          json['created_at'] as String? ?? DateTime.now().toIso8601String(),
+      updatedAt:
+          json['updated_at'] as String? ?? DateTime.now().toIso8601String(),
     );
   }
 

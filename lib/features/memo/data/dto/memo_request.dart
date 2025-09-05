@@ -1,8 +1,10 @@
+import '../../domain/model/memo_template_type.dart';
+
 /// 메모 저장/갱신 요청 모델
 /// API.md 명세: PUT /api/memo/
 class MemoRequest {
   final int? id; // 갱신 시에만 필요
-  final String templateType;
+  final MemoTemplateType templateType;
   final Map<String, dynamic> content;
 
   MemoRequest({
@@ -26,28 +28,30 @@ class MemoRequest {
 
   Map<String, dynamic> toJson() {
     final data = {
-      'template_type': templateType,
+      'template_type': templateType.serverValue, // enum을 서버 값으로 변환
       'content': content,
     };
-    
+
     if (id != null) {
       data['id'] = id!;
     }
-    
+
     return data;
   }
 
   factory MemoRequest.fromJson(Map<String, dynamic> json) {
     return MemoRequest(
       id: json['id'],
-      templateType: json['template_type'] ?? '',
+      templateType: MemoTemplateType.fromServerValue(
+        json['template_type'] ?? '자유',
+      ),
       content: json['content'] as Map<String, dynamic>? ?? {},
     );
   }
 
   /// 신규 저장인지 확인
   bool get isCreate => id == null;
-  
+
   /// 갱신인지 확인
   bool get isUpdate => id != null;
 
@@ -70,7 +74,7 @@ class MemoRequest {
   /// 복사본 생성
   MemoRequest copyWith({
     int? id,
-    String? templateType,
+    MemoTemplateType? templateType,
     Map<String, dynamic>? content,
   }) {
     return MemoRequest(

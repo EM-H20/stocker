@@ -34,14 +34,16 @@ class EducationRepository {
   /// Returns: List ChapterInfo
   /// Throws: Exception on error
   Future<List<ChapterInfo>> getChapters({bool forceRefresh = false}) async {
-    debugPrint('🔥 [EDU_REPOSITORY] getChapters 시작 - forceRefresh: $forceRefresh');
+    debugPrint(
+        '🔥 [EDU_REPOSITORY] getChapters 시작 - forceRefresh: $forceRefresh');
     try {
       // 강제 새로고침이 아닌 경우 로컬 캐시 확인
       if (!forceRefresh) {
         debugPrint('💾 [EDU_REPOSITORY] 로컬 캐시 확인 중...');
         final cachedChapters = await _getCachedChapters();
         if (cachedChapters != null && cachedChapters.isNotEmpty) {
-          debugPrint('💾 [EDU_REPOSITORY] 캐시된 데이터 발견 - ${cachedChapters.length}개 챕터');
+          debugPrint(
+              '💾 [EDU_REPOSITORY] 캐시된 데이터 발견 - ${cachedChapters.length}개 챕터');
           return cachedChapters.map(_mapToChapterInfo).toList();
         } else {
           debugPrint('💾 [EDU_REPOSITORY] 캐시된 데이터 없음, API 호출 진행');
@@ -63,12 +65,13 @@ class EducationRepository {
     } catch (e) {
       debugPrint('❌ [EDU_REPOSITORY] API 호출 실패: $e');
       debugPrint('❌ [EDU_REPOSITORY] Error type: ${e.runtimeType}');
-      
+
       // API 호출 실패 시 캐시된 데이터라도 반환 시도
       debugPrint('🔄 [EDU_REPOSITORY] API 실패로 캐시 데이터 확인 중...');
       final cachedChapters = await _getCachedChapters();
       if (cachedChapters != null && cachedChapters.isNotEmpty) {
-        debugPrint('💾 [EDU_REPOSITORY] 캐시 데이터로 폴백 - ${cachedChapters.length}개 챕터');
+        debugPrint(
+            '💾 [EDU_REPOSITORY] 캐시 데이터로 폴백 - ${cachedChapters.length}개 챕터');
         return cachedChapters.map(_mapToChapterInfo).toList();
       }
 
@@ -261,13 +264,12 @@ class EducationRepository {
     try {
       final cachedChapters = await _getCachedChapters();
       if (cachedChapters != null) {
-        final updatedChapters =
-            cachedChapters.map((chapter) {
-              if (chapter.chapterId == chapterId) {
-                return chapter.copyWith(isTheoryCompleted: isCompleted);
-              }
-              return chapter;
-            }).toList();
+        final updatedChapters = cachedChapters.map((chapter) {
+          if (chapter.chapterId == chapterId) {
+            return chapter.copyWith(isTheoryCompleted: isCompleted);
+          }
+          return chapter;
+        }).toList();
 
         await _cacheChapters(updatedChapters);
       }
@@ -291,14 +293,14 @@ class EducationRepository {
   /// TheoryEnterResponse를 TheorySession으로 변환
   TheorySession _mapToTheorySession(TheoryEnterResponse response) {
     // API.md 명세: theory_pages를 theories로 변환
-    final theories = response.theoryPages.map((page) => 
-      TheoryInfo(
-        id: page.id,
-        word: page.word,
-        content: page.content,
-        chapterId: null, // API.md 명세에서 chapter 정보가 개별 페이지에 없음
-      )
-    ).toList();
+    final theories = response.theoryPages
+        .map((page) => TheoryInfo(
+              id: page.id,
+              word: page.word,
+              content: page.content,
+              chapterId: null, // API.md 명세에서 chapter 정보가 개별 페이지에 없음
+            ))
+        .toList();
 
     // currentPage를 인덱스로 변환 (페이지는 1부터 시작, 인덱스는 0부터)
     final currentIndex = response.currentPage - 1;

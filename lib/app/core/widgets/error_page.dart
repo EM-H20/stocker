@@ -44,7 +44,8 @@ class ErrorPage extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () {
-                debugPrint('🏠 [ERROR_PAGE] 홈으로 돌아가기 버튼 클릭 - MainDashboardScreen으로 이동');
+                debugPrint(
+                    '🏠 [ERROR_PAGE] 홈으로 돌아가기 버튼 클릭 - MainDashboardScreen으로 이동');
                 debugPrint('📍 [ERROR_PAGE] 이동 경로: ${AppRoutes.home}');
                 context.go(AppRoutes.home);
               },

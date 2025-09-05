@@ -29,7 +29,7 @@ class ApiClient {
     return await _dio.post(path, data: data, queryParameters: queryParameters);
   }
 
-  /// ✅ PUT 요청 헬퍼 메서드  
+  /// ✅ PUT 요청 헬퍼 메서드
   static Future<Response> put(
     String path, {
     dynamic data,
@@ -53,13 +53,13 @@ class ApiClient {
     final accessToken = await TokenStorage.accessToken;
     final refreshToken = await TokenStorage.refreshToken;
     final userId = await TokenStorage.userId;
-    
-    final isValid = accessToken != null && 
-                   accessToken.isNotEmpty &&
-                   refreshToken != null && 
-                   refreshToken.isNotEmpty &&
-                   userId != null;
-                   
+
+    final isValid = accessToken != null &&
+        accessToken.isNotEmpty &&
+        refreshToken != null &&
+        refreshToken.isNotEmpty &&
+        userId != null;
+
     debugPrint('🔐 [API_CLIENT] 토큰 상태: ${isValid ? "유효" : "무효"}');
     return isValid;
   }

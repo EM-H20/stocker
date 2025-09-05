@@ -47,6 +47,9 @@ import 'features/aptitude/data/repository/aptitude_api_repository.dart';
 import 'features/aptitude/data/repository/aptitude_mock_repository.dart';
 import 'features/aptitude/presentation/provider/aptitude_provider.dart';
 import 'features/learning/presentation/provider/learning_progress_provider.dart';
+import 'features/learning/data/repository/learning_progress_mock_repository.dart';
+import 'features/learning/data/repository/learning_progress_api_repository.dart';
+import 'features/learning/data/source/learning_progress_api.dart';
 
 // 노트 기능 (subin 새 기능)
 import 'features/note/domain/repository/note_repository.dart';
@@ -56,9 +59,13 @@ import 'features/note/data/repository/note_mock_repository.dart';
 
 // Network (subin에서 개선)
 import 'app/core/network/dio.dart';
+import 'app/core/services/token_storage.dart';
 
 /// ✅ 더미(mock) 여부 설정 (euimin 스타일 유지)
-const useMock = false; // 실제 API 사용시 false
+const useMock = false; // 백엔드 서버 없이 테스트용 - 실제 API 사용시 false
+
+/// 🧪 테스트용 유저 자동 생성 (Mock 모드에서만)
+const createTestUserOnStart = false;
 
 void main() async {
   await initializeDateFormatting();
@@ -71,6 +78,13 @@ void main() async {
       '✅ [INIT] Environment loaded - API_BASE_URL: ${dotenv.env['API_BASE_URL']}');
 
   await setupDio();
+
+  // 🧪 Mock 모드에서 테스트 유저 자동 생성
+  if (useMock && createTestUserOnStart) {
+    debugPrint('🧪 [INIT] Mock 모드 - 테스트 유저 자동 생성...');
+    await TokenStorage.createTestUser();
+  }
+
   runApp(const StockerApp());
 }
 
@@ -119,7 +133,15 @@ class StockerApp extends StatelessWidget {
 
             // Mock/Real 환경 모두에서 초기화 실행
             debugPrint('🔄 [PROVIDER] AuthProvider 초기화 시작...');
-            authProvider.initialize();
+            authProvider.initialize().then((_) {
+              // 🔧 [수정] 강제 자동 로그인 비활성화 - 첫 화면을 로그인 화면으로 복원
+              // 나중에 사용자 설정에 따른 선택적 자동 로그인 구현 가능
+              // if (!authProvider.isLoggedIn && !useMock) {
+              //   debugPrint('🚨 [PROVIDER] 로그인되지 않음 - 테스트 로그인 수행');
+              //   authProvider.quickTestLogin();
+              // }
+              debugPrint('ℹ️ [PROVIDER] 초기화 완료 - 로그인 화면부터 시작');
+            });
 
             return authProvider;
           },
@@ -199,11 +221,21 @@ class StockerApp extends StatelessWidget {
           create: (context) => NoteProvider(context.read<NoteRepository>()),
         ),
 
-        // Learning Progress Provider (새로운 정보구조를 위한 진도 관리)
+        // Learning Progress Provider (Repository 패턴 적용)
         ChangeNotifierProvider(
-          create: (_) {
-            debugPrint('🎯 [PROVIDER] Creating LearningProgressProvider');
-            return LearningProgressProvider();
+          create: (context) {
+            debugPrint('🎯 [PROVIDER] Creating LearningProgressProvider (useMock: $useMock)');
+            if (useMock) {
+              // Mock 환경: Mock Repository 사용
+              final mockRepository = LearningProgressMockRepository();
+              return LearningProgressProvider(mockRepository);
+            } else {
+              // Real 환경: API Repository 사용
+              final learningProgressApi = LearningProgressApi(dio);
+              final educationProvider = context.read<EducationProvider>();
+              final apiRepository = LearningProgressApiRepository(learningProgressApi, educationProvider);
+              return LearningProgressProvider(apiRepository);
+            }
           },
         ),
       ],

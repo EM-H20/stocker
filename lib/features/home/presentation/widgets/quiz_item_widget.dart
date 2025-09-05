@@ -8,7 +8,7 @@ class QuizItemWidget extends StatelessWidget {
   final String question;
   final VoidCallback? onAnswerO;
   final VoidCallback? onAnswerX;
-  
+
   const QuizItemWidget({
     super.key,
     required this.number,
@@ -54,27 +54,27 @@ class QuizItemWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               SizedBox(width: 16.w),
-              
+
               // 질문 텍스트
               Expanded(
                 child: Text(
                   question,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize: 14.sp,
-                    height: 1.4,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white.withValues(alpha: 0.9)
-                        : AppTheme.grey900,
-                  ),
+                        fontSize: 14.sp,
+                        height: 1.4,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white.withValues(alpha: 0.9)
+                            : AppTheme.grey900,
+                      ),
                 ),
               ),
             ],
           ),
-          
+
           SizedBox(height: 16.h),
-          
+
           // O/X 버튼들
           Row(
             children: [
@@ -97,7 +97,9 @@ class QuizItemWidget extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context).shadowColor.withValues(alpha: 0.05),
+                          color: Theme.of(context)
+                              .shadowColor
+                              .withValues(alpha: 0.05),
                           blurRadius: 4,
                           offset: const Offset(0, 1),
                         ),
@@ -116,9 +118,9 @@ class QuizItemWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               SizedBox(width: 16.w),
-              
+
               // X 버튼
               Expanded(
                 child: GestureDetector(
@@ -138,7 +140,9 @@ class QuizItemWidget extends StatelessWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context).shadowColor.withValues(alpha: 0.05),
+                          color: Theme.of(context)
+                              .shadowColor
+                              .withValues(alpha: 0.05),
                           blurRadius: 4,
                           offset: const Offset(0, 1),
                         ),

@@ -6,8 +6,6 @@ import '../data/dto/login_request.dart';
 import '../data/dto/signup_request.dart';
 import 'package:logger/logger.dart';
 
-
-
 class AuthProvider with ChangeNotifier {
   final AuthRepository _repository;
   final Logger _logger = Logger();
@@ -35,28 +33,43 @@ class AuthProvider with ChangeNotifier {
   /// 앱 시작 시 저장된 토큰을 확인하여 자동 로그인 처리
   Future<void> initialize() async {
     debugPrint('🔄 [AUTH_PROVIDER] 초기화 시작...');
-    
+
     try {
+      // 🔍 전체 저장소 데이터 확인 (디버그용)
+      await TokenStorage.debugPrintAllData();
+      
+      // 📋 인증 상태 요약
+      await TokenStorage.debugAuthStatus();
       final token = await TokenStorage.accessToken;
       final userId = await TokenStorage.userId;
-      
-      debugPrint('🔍 [AUTH_PROVIDER] 저장된 토큰 확인 - Token: ${token != null ? "존재" : "없음"}');
-      
+      final refreshToken = await TokenStorage.refreshToken;
+
+      // 🔍 상세 디버그 정보 출력
+      debugPrint('📊 [AUTH_PROVIDER] === 저장된 데이터 상세 확인 ===');
+      debugPrint('🔑 AccessToken: ${token != null ? "${token.substring(0, 20)}..." : "null"}');
+      debugPrint('👤 UserId: $userId');  
+      debugPrint('🔄 RefreshToken: ${refreshToken != null ? "${refreshToken.substring(0, 20)}..." : "null"}');
+      debugPrint('📊 [AUTH_PROVIDER] ================================');
+
+      debugPrint(
+          '🔍 [AUTH_PROVIDER] 저장된 토큰 확인 - Token: ${token != null ? "존재" : "없음"}');
+
       if (token != null && userId != null) {
         // 저장된 토큰이 있으면 사용자 복원
         final refreshToken = await TokenStorage.refreshToken ?? '';
-        
+
         _user = User(
-          id: int.tryParse(userId) ?? 0,
-          email: 'tester@example.com', // Mock 환경에서는 고정 이메일 
-          nickname: '목테스터', // Mock 환경에서는 고정 닉네임
-          accessToken: token, 
-          refreshToken: refreshToken
-        );
-        
-        debugPrint('✅ [AUTH_PROVIDER] 사용자 자동 로그인 성공 - User: ${_user!.nickname}');
+            id: int.tryParse(userId) ?? 0,
+            email: 'tester@example.com', // Mock 환경에서는 고정 이메일
+            nickname: '목테스터', // Mock 환경에서는 고정 닉네임
+            accessToken: token,
+            refreshToken: refreshToken);
+
+        debugPrint(
+            '✅ [AUTH_PROVIDER] 사용자 자동 로그인 성공 - User: ${_user!.nickname}');
       } else {
         debugPrint('ℹ️ [AUTH_PROVIDER] 저장된 토큰 없음 - 로그아웃 상태');
+        debugPrint('🔍 [AUTH_PROVIDER] 로그인이 필요한 상태입니다');
       }
     } catch (e) {
       debugPrint('❌ [AUTH_PROVIDER] 초기화 중 오류 발생: $e');
@@ -64,6 +77,10 @@ class AuthProvider with ChangeNotifier {
     } finally {
       _isInitializing = false;
       debugPrint('🏁 [AUTH_PROVIDER] 초기화 완료 - isLoggedIn: $isLoggedIn');
+      if (!isLoggedIn) {
+        debugPrint('🚨 [AUTH_PROVIDER] 로그인되지 않음: API 호출 시 401 에러 예상');
+        debugPrint('💡 [AUTH_PROVIDER] 해결방법: 로그인 화면에서 로그인 진행');
+      }
       notifyListeners();
     }
   }
@@ -75,7 +92,7 @@ class AuthProvider with ChangeNotifier {
       final request = LoginRequest(email: email, password: password);
       _user = await _repository.login(request);
       _errorMessage = null;
-      
+
       // 로그인 성공 상태를 알림
       loginSuccessNotifier.value = true;
       // 잠시 후 다시 false로 초기화하여, 다음 이벤트를 위해 준비
@@ -94,11 +111,30 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  /// 🧪 테스트용 빠른 로그인 (개발자 전용)
+  /// 백엔드에 생성된 테스트 계정으로 자동 로그인
+  Future<bool> quickTestLogin() async {
+    debugPrint('🧪 [AUTH_PROVIDER] 테스트용 빠른 로그인 시작...');
+    debugPrint('📧 [AUTH_PROVIDER] 계정: test@example.com');
+    
+    final result = await login('test@example.com', 'test123');
+    
+    if (result) {
+      debugPrint('✅ [AUTH_PROVIDER] 테스트 로그인 성공!');
+      debugPrint('🔑 [AUTH_PROVIDER] JWT 토큰 발급됨 - API 호출 가능');
+    } else {
+      debugPrint('❌ [AUTH_PROVIDER] 테스트 로그인 실패: $_errorMessage');
+    }
+    
+    return result;
+  }
+
   /// 회원가입
   Future<bool> signup(String email, String password, String nickname) async {
     _setLoading(true);
     try {
-      final request = SignupRequest(email: email, password: password, nickname: nickname);
+      final request =
+          SignupRequest(email: email, password: password, nickname: nickname);
       await _repository.signup(request);
       _errorMessage = null;
       return true;
@@ -117,7 +153,8 @@ class AuthProvider with ChangeNotifier {
       await _repository.logout(_user!.email);
     } catch (e) {
       // 로그아웃 API 실패 시에도 로컬에서는 로그아웃 처리
-      _logger.e('Logout API failed: $e');    //print와 같은 역할, _logger는 로그를 남기는 역할을 합니다.
+      _logger
+          .e('Logout API failed: $e'); //print와 같은 역할, _logger는 로그를 남기는 역할을 합니다.
     } finally {
       _user = null;
       await TokenStorage.clear(); // 로컬 토큰 삭제

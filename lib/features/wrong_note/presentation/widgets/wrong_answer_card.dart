@@ -15,8 +15,8 @@ class WrongAnswerCard extends StatelessWidget {
   final bool isRetried; // 재시도 상태를 외부에서 받아옴
 
   const WrongAnswerCard({
-    super.key, 
-    required this.wrongNote, 
+    super.key,
+    required this.wrongNote,
     required this.onRetry,
     required this.isRetried,
     this.onRemove,
@@ -29,20 +29,20 @@ class WrongAnswerCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark 
-            ? AppTheme.darkSurface 
+        color: theme.brightness == Brightness.dark
+            ? AppTheme.darkSurface
             : Colors.grey[50],
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: theme.brightness == Brightness.dark 
-              ? AppTheme.grey600.withValues(alpha: 0.3) 
+          color: theme.brightness == Brightness.dark
+              ? AppTheme.grey600.withValues(alpha: 0.3)
               : AppTheme.grey300.withValues(alpha: 0.5),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: theme.brightness == Brightness.dark 
-                ? Colors.black.withValues(alpha: 0.3) 
+            color: theme.brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
                 : Colors.grey.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
@@ -75,19 +75,16 @@ class WrongAnswerCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color:
-                      isRetried
-                          ? AppTheme.infoColor.withValues(alpha: 0.2)
-                          : AppTheme.warningColor.withValues(alpha: 0.2),
+                  color: isRetried
+                      ? AppTheme.infoColor.withValues(alpha: 0.2)
+                      : AppTheme.warningColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Text(
                   isRetried ? '재시도 완료' : '미완료',
                   style: TextStyle(
                     color:
-                        isRetried
-                            ? AppTheme.infoColor
-                            : AppTheme.warningColor,
+                        isRetried ? AppTheme.infoColor : AppTheme.warningColor,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -102,8 +99,8 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             '문제',
             style: TextStyle(
-              color: theme.brightness == Brightness.dark 
-                  ? AppTheme.grey400 
+              color: theme.brightness == Brightness.dark
+                  ? AppTheme.grey400
                   : AppTheme.grey600,
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
@@ -113,10 +110,10 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             wrongNote.question ?? '문제 정보 없음',
             style: TextStyle(
-              color: theme.brightness == Brightness.dark 
-                  ? Colors.white 
-                  : AppTheme.grey900, 
-              fontSize: 14.sp, 
+              color: theme.brightness == Brightness.dark
+                  ? Colors.white
+                  : AppTheme.grey900,
+              fontSize: 14.sp,
               height: 1.4,
             ),
           ),
@@ -184,8 +181,8 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             '해설',
             style: TextStyle(
-              color: theme.brightness == Brightness.dark 
-                  ? AppTheme.grey400 
+              color: theme.brightness == Brightness.dark
+                  ? AppTheme.grey400
                   : AppTheme.grey600,
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
@@ -195,8 +192,8 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             wrongNote.explanation ?? '해설 정보 없음',
             style: TextStyle(
-              color: theme.brightness == Brightness.dark 
-                  ? AppTheme.grey300 
+              color: theme.brightness == Brightness.dark
+                  ? AppTheme.grey300
                   : AppTheme.grey700,
               fontSize: 13.sp,
               height: 1.4,
@@ -211,9 +208,9 @@ class WrongAnswerCard extends StatelessWidget {
               Text(
                 '${wrongNote.createdDate.month}/${wrongNote.createdDate.day}',
                 style: TextStyle(
-                  color: theme.brightness == Brightness.dark 
-                      ? AppTheme.grey500 
-                      : AppTheme.grey600, 
+                  color: theme.brightness == Brightness.dark
+                      ? AppTheme.grey500
+                      : AppTheme.grey600,
                   fontSize: 12.sp,
                 ),
               ),

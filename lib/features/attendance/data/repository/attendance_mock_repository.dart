@@ -14,9 +14,12 @@ class AttendanceMockRepository implements AttendanceRepository {
 
     // 현재 월의 1일, 5일, 10일에 출석한 것으로 가정
     return [
-      AttendanceDay(date: DateTime(month.year, month.month, 1), isPresent: true),
-      AttendanceDay(date: DateTime(month.year, month.month, 5), isPresent: true),
-      AttendanceDay(date: DateTime(month.year, month.month, 10), isPresent: true),
+      AttendanceDay(
+          date: DateTime(month.year, month.month, 1), isPresent: true),
+      AttendanceDay(
+          date: DateTime(month.year, month.month, 5), isPresent: true),
+      AttendanceDay(
+          date: DateTime(month.year, month.month, 10), isPresent: true),
     ];
   }
 
@@ -26,8 +29,10 @@ class AttendanceMockRepository implements AttendanceRepository {
     await Future.delayed(const Duration(milliseconds: 300));
     return [
       AttendanceQuiz(id: 1, question: '코스피는 대한민국을 대표하는 주가 지수이다.', answer: true),
-      AttendanceQuiz(id: 2, question: '배당금은 주식을 보유만 해도 항상 지급된다.', answer: false),
-      AttendanceQuiz(id: 3, question: '상한가, 하한가 제도는 모든 국가에 존재한다.', answer: false),
+      AttendanceQuiz(
+          id: 2, question: '배당금은 주식을 보유만 해도 항상 지급된다.', answer: false),
+      AttendanceQuiz(
+          id: 3, question: '상한가, 하한가 제도는 모든 국가에 존재한다.', answer: false),
     ];
   }
 

@@ -17,7 +17,8 @@ class WrongNoteMockRepository {
       chapterTitle: '주식 기초 이론',
       question: '주식의 기본 개념에서 주주가 갖는 권리가 아닌 것은?',
       options: ['의결권', '배당수익권', '잔여재산분배권', '채권자 우선변제권'],
-      explanation: '주주는 기업의 소유자로서 의결권, 배당수익권, 잔여재산분배권을 가지지만, 채권자 우선변제권은 채권자의 권리입니다.',
+      explanation:
+          '주주는 기업의 소유자로서 의결권, 배당수익권, 잔여재산분배권을 가지지만, 채권자 우선변제권은 채권자의 권리입니다.',
     ),
     WrongNoteItem(
       id: 2,

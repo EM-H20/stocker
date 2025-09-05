@@ -27,7 +27,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   Future<void> _onStartQuizPressed() async {
     final provider = context.read<AttendanceProvider>();
-    
+
     await provider.setQuizLoading(true);
 
     final success = await provider.fetchTodaysQuiz();
@@ -62,7 +62,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Widget build(BuildContext context) {
     return Consumer<AttendanceProvider>(
       builder: (context, provider, child) {
-        final today = DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        final today = DateTime.utc(
+            DateTime.now().year, DateTime.now().month, DateTime.now().day);
         final isAlreadyAttended = provider.attendanceStatus[today] ?? false;
 
         return Scaffold(
@@ -83,11 +84,12 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   )
                 else
                   ActionButton(
-                    text: isAlreadyAttended ? '오늘은 이미 출석했습니다' : '오늘의 퀴즈 풀고 출석하기',
+                    text:
+                        isAlreadyAttended ? '오늘은 이미 출석했습니다' : '오늘의 퀴즈 풀고 출석하기',
                     icon: isAlreadyAttended ? Icons.check_circle : Icons.quiz,
-                    color: isAlreadyAttended 
-                        ? (Theme.of(context).brightness == Brightness.dark 
-                            ? AppTheme.grey600 
+                    color: isAlreadyAttended
+                        ? (Theme.of(context).brightness == Brightness.dark
+                            ? AppTheme.grey600
                             : AppTheme.grey400)
                         : Theme.of(context).primaryColor,
                     onPressed: isAlreadyAttended ? null : _onStartQuizPressed,

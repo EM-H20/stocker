@@ -64,17 +64,22 @@ class NoteCard extends StatelessWidget {
                     child: Text(
                       note.title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18.sp,
-                        color: Theme.of(context).textTheme.titleMedium?.color,
-                      ),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18.sp,
+                            color:
+                                Theme.of(context).textTheme.titleMedium?.color,
+                          ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   IconButton(
                     icon: Icon(
                       Icons.delete_outline,
-                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withValues(alpha: 0.6),
                       size: 22.sp,
                     ),
                     onPressed: onDelete,
@@ -88,10 +93,14 @@ class NoteCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontSize: 14.sp,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-                  height: 1.4,
-                ),
+                      fontSize: 14.sp,
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withValues(alpha: 0.7),
+                      height: 1.4,
+                    ),
               ),
               SizedBox(height: 12.h),
               Row(
@@ -100,23 +109,29 @@ class NoteCard extends StatelessWidget {
                   Text(
                     '최종 수정: ${DateFormat('yyyy년 MM월 dd일').format(note.updatedAt)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontSize: 12.sp,
-                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
-                    ),
+                          fontSize: 12.sp,
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.color
+                              ?.withValues(alpha: 0.5),
+                        ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      color:
+                          Theme.of(context).primaryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12.r),
                     ),
                     child: Text(
                       '노트',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontSize: 10.sp,
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
+                            fontSize: 10.sp,
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
                     ),
                   ),
                 ],

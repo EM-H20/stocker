@@ -23,18 +23,14 @@ class TheoryNavigationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: isDarkMode 
-            ? AppTheme.darkSurface 
-            : Colors.white,
+        color: isDarkMode ? AppTheme.darkSurface : Colors.white,
         border: Border(
           top: BorderSide(
-            color: isDarkMode 
-                ? AppTheme.grey800 
-                : AppTheme.grey200,
+            color: isDarkMode ? AppTheme.grey800 : AppTheme.grey200,
             width: 1,
           ),
         ),
@@ -47,9 +43,7 @@ class TheoryNavigationWidget extends StatelessWidget {
               child: ActionButton(
                 text: '이전',
                 icon: Icons.arrow_back,
-                color: isDarkMode 
-                    ? AppTheme.grey600 
-                    : AppTheme.grey500,
+                color: isDarkMode ? AppTheme.grey600 : AppTheme.grey500,
                 onPressed: onPrevious ?? () {},
               ),
             ),

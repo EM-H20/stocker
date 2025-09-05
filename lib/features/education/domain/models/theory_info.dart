@@ -55,7 +55,8 @@ class TheoryInfo {
 
   /// 복사본 생성
   /// 이유 : Provider에서 이론 정보를 업데이트할 때 사용
-  TheoryInfo copyWith({int? id, int? chapterId, String? word, String? content}) {
+  TheoryInfo copyWith(
+      {int? id, int? chapterId, String? word, String? content}) {
     return TheoryInfo(
       id: id ?? this.id,
       chapterId: chapterId ?? this.chapterId,

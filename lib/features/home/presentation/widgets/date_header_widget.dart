@@ -14,17 +14,17 @@ class DateHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final hour = now.hour;
-    
+
     // 시간대별 인사말
     String greeting;
     if (hour < 12) {
       greeting = '좋은 아침이에요! ☀️';
     } else if (hour < 18) {
-      greeting = '좋은 오후에요! 📚';  
+      greeting = '좋은 오후에요! 📚';
     } else {
       greeting = '좋은 저녁이에요! 🌙';
     }
-    
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       child: Row(
@@ -38,12 +38,12 @@ class DateHeaderWidget extends StatelessWidget {
                 Text(
                   greeting,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontSize: 22.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : AppTheme.grey900,
-                  ),
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : AppTheme.grey900,
+                      ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
@@ -58,7 +58,7 @@ class DateHeaderWidget extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // 로그인/사용자 정보 영역
           Consumer<AuthProvider>(
             builder: (context, authProvider, child) {
@@ -72,7 +72,7 @@ class DateHeaderWidget extends StatelessWidget {
                   ),
                 );
               }
-              
+
               if (authProvider.isLoggedIn) {
                 return _buildUserInfo(context, authProvider);
               } else {
@@ -257,7 +257,7 @@ class DateHeaderWidget extends StatelessWidget {
       ],
       onSelected: (value) async {
         debugPrint('🎯 [AUTH_MENU] 메뉴 선택: $value');
-        
+
         switch (value) {
           case 'profile':
             // 프로필 페이지로 이동 (구현되면)

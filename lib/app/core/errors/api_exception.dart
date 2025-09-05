@@ -26,7 +26,7 @@ class ApiException implements Exception {
     // DioException의 경우
     try {
       statusCode = error.response?.statusCode;
-      
+
       // 백엔드 에러 응답 구조 파싱
       if (error.response?.data is Map<String, dynamic>) {
         final data = error.response!.data as Map<String, dynamic>;
@@ -39,7 +39,6 @@ class ApiException implements Exception {
 
       // 상태 코드별 기본 메시지
       userMessage ??= _getDefaultUserMessage(statusCode);
-      
     } catch (e) {
       // 파싱 실패 시 기본 처리
     }

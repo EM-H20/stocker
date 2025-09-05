@@ -80,7 +80,7 @@ class _QuizResultScreenState extends State<QuizResultScreen>
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -155,10 +155,4 @@ class _QuizResultScreenState extends State<QuizResultScreen>
       ),
     );
   }
-
-
-
-
-
-
 }
