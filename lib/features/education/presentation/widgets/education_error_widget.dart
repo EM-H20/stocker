@@ -16,13 +16,13 @@ class EducationErrorWidget extends StatelessWidget {
 
   /// 에러 제목 (예: '이론을 불러오는데 실패했습니다', '퀴즈를 불러오는데 실패했습니다')
   final String title;
-  
+
   /// 에러 상세 메시지
   final String errorMessage;
-  
+
   /// 재시도 버튼 콜백
   final VoidCallback onRetry;
-  
+
   /// 재시도 버튼 텍스트 (기본값: '다시 시도')
   final String retryButtonText;
 
@@ -41,7 +41,7 @@ class EducationErrorWidget extends StatelessWidget {
               color: Colors.red,
             ),
             SizedBox(height: 16.h),
-            
+
             // 에러 제목
             Text(
               title,
@@ -53,7 +53,7 @@ class EducationErrorWidget extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 8.h),
-            
+
             // 에러 상세 메시지
             Text(
               errorMessage,
@@ -64,7 +64,7 @@ class EducationErrorWidget extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 24.h),
-            
+
             // 재시도 버튼
             ActionButton(
               text: retryButtonText,

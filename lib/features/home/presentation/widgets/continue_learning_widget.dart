@@ -32,9 +32,9 @@ class ContinueLearningWidget extends StatelessWidget {
           // 로딩 중일 때 스켈레톤 UI
           return _buildLoadingSkeleton(context);
         }
-        
+
         // 🚨 Education API 에러 상태 처리
-        if (educationProvider.chaptersError != null && 
+        if (educationProvider.chaptersError != null &&
             educationProvider.isAuthenticationError) {
           // 인증 에러인 경우는 이미 위에서 처리되므로 여기는 다른 에러들
           debugPrint('🔐 [CONTINUE_LEARNING] 인증 에러로 로그인 필요 UI 표시');
@@ -45,11 +45,10 @@ class ContinueLearningWidget extends StatelessWidget {
         final lastStep = progressProvider.lastStep;
         final progress = progressProvider.getCurrentChapterProgress();
 
-        // 🔗 실제 Education 데이터와 연결 (로그인 상태일 때만)
-        final realChapterTitle = authProvider.isLoggedIn 
-            ? _getRealChapterTitle(educationProvider, lastChapterId) ??
-              progressProvider.getChapterTitle(lastChapterId)
-            : '로그인 후 이용 가능'; // 비로그인시에는 의미 없는 제목
+        // ✅ Repository 패턴으로 실제 데이터 사용
+        final chapterTitle = authProvider.isLoggedIn
+            ? progressProvider.getChapterTitle(lastChapterId)
+            : '로그인 후 이용 가능';
 
         return Container(
           margin: EdgeInsets.symmetric(horizontal: 20.w),
@@ -83,7 +82,7 @@ class ContinueLearningWidget extends StatelessWidget {
 
               // 📊 진도 정보
               _buildProgressInfo(
-                  context, lastChapterId, lastStep, progress, realChapterTitle),
+                  context, lastChapterId, lastStep, progress, chapterTitle),
 
               SizedBox(height: 20.h),
 
@@ -424,44 +423,7 @@ class ContinueLearningWidget extends StatelessWidget {
     }
   }
 
-  /// 🔗 실제 Education 데이터에서 챕터 제목 가져오기
-  String? _getRealChapterTitle(
-      EducationProvider educationProvider, int chapterId) {
-    try {
-      // 로딩 중인 경우
-      if (educationProvider.isLoadingChapters) {
-        debugPrint('🔄 [CONTINUE_LEARNING] EducationProvider 로딩 중...');
-        return null;
-      }
-      
-      // 인증 에러인 경우
-      if (educationProvider.isAuthenticationError) {
-        debugPrint('🔐 [CONTINUE_LEARNING] 인증 에러로 인해 챕터 데이터 없음');
-        return null;
-      }
-      
-      // 기타 에러가 있는 경우
-      if (educationProvider.chaptersError != null) {
-        debugPrint('❌ [CONTINUE_LEARNING] 챕터 로드 에러: ${educationProvider.chaptersError}');
-        return null;
-      }
-      
-      // 정상적으로 챕터 데이터가 있는 경우
-      if (educationProvider.chapters.isNotEmpty) {
-        final chapter = educationProvider.chapters.firstWhere(
-          (chapter) => chapter.id == chapterId,
-          orElse: () => educationProvider.chapters.first,
-        );
-        debugPrint('✅ [CONTINUE_LEARNING] 실제 챕터 데이터 사용: ${chapter.title}');
-        return chapter.title;
-      }
-      
-      debugPrint('📭 [CONTINUE_LEARNING] 챕터 데이터가 비어있음');
-    } catch (e) {
-      debugPrint('🚨 [CONTINUE_LEARNING] 실제 챕터 데이터 접근 중 에러: $e');
-    }
-    return null;
-  }
+  // 🔗 실제 데이터는 이제 LearningProgressProvider의 Repository 패턴을 통해 자동으로 처리됨
 
   /// 🔐 "계속하기" 버튼 처리 (로그인 체크 포함)
   void _handleContinueLearning(BuildContext context, AuthProvider authProvider,

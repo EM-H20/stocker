@@ -56,8 +56,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
               SizedBox(height: 20.h),
 
-              // 📊 PRIORITY 2: 통합된 학습 대시보드
-              const LearningOverviewWidget(),
+              // 📊 PRIORITY 2: 통합된 학습 대시보드 (아직 구현되지 않음)
+              // const LearningOverviewWidget(),
 
               SizedBox(height: 20.h),
 

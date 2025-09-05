@@ -19,16 +19,15 @@ class QuizQuestionWidget extends StatelessWidget {
         color: isDarkMode ? AppTheme.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: isDarkMode ? null : Border.all(color: AppTheme.grey200),
-        boxShadow:
-            isDarkMode
-                ? null
-                : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+        boxShadow: isDarkMode
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Text(
         question,

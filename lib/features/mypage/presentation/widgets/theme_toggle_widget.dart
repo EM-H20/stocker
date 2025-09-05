@@ -41,65 +41,64 @@ class ThemeToggleWidget extends StatelessWidget {
                     Text(
                       '화면 테마',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                     SizedBox(height: 12.h),
                     Row(
-                      children:
-                          AppThemeMode.values.map((mode) {
-                            final isSelected =
-                                themeProvider.currentThemeMode == mode;
+                      children: AppThemeMode.values.map((mode) {
+                        final isSelected =
+                            themeProvider.currentThemeMode == mode;
 
-                            return Expanded(
-                              child: GestureDetector(
-                                onTap: () => themeProvider.setThemeMode(mode),
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 2.w),
-                                  padding: EdgeInsets.symmetric(vertical: 12.h),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        isSelected
-                                            ? AppTheme.primaryColor
-                                            : Theme.of(context).cardColor,
-                                    borderRadius: BorderRadius.circular(8.r),
-                                    border: Border.all(
-                                      color:
-                                          isSelected
-                                              ? AppTheme.primaryColor
-                                              : Theme.of(context).dividerColor,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    mode.displayName,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color:
-                                          isSelected
-                                              ? Colors.white
-                                              : Theme.of(
-                                                context,
-                                              ).textTheme.bodyMedium?.color,
-                                      fontSize: 12.sp,
-                                      fontWeight:
-                                          isSelected
-                                              ? FontWeight.w600
-                                              : FontWeight.w500,
-                                    ),
-                                  ),
+                        return Expanded(
+                          child: GestureDetector(
+                            onTap: () => themeProvider.setThemeMode(mode),
+                            child: Container(
+                              margin: EdgeInsets.symmetric(horizontal: 2.w),
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppTheme.primaryColor
+                                    : Theme.of(context).cardColor,
+                                borderRadius: BorderRadius.circular(8.r),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? AppTheme.primaryColor
+                                      : Theme.of(context).dividerColor,
                                 ),
                               ),
-                            );
-                          }).toList(),
+                              child: Text(
+                                mode.displayName,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium?.color,
+                                  fontSize: 12.sp,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
                     SizedBox(height: 8.h),
                     Text(
                       _getThemeDescription(themeProvider.currentThemeMode),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(
-                          context,
-                        ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
-                      ),
+                            color: Theme.of(
+                              context,
+                            )
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withValues(alpha: 0.7),
+                          ),
                     ),
                   ],
                 ),

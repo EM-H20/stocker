@@ -8,61 +8,61 @@ class QuizMockRepository {
   // Mock API 지연 시간 시뮬레이션
   static const Duration _mockDelay = Duration(milliseconds: 500);
 
-  /// 더미 퀴즈 세션 시작
+  /// 퀴즈 진입 (API.md 스펙 준수)
   ///
   /// UI 개발을 위한 샘플 퀴즈 데이터 제공
   /// Returns: QuizSession
-  Future<QuizSession> startQuiz(int chapterId) async {
+  Future<QuizSession> enterQuiz(int chapterId) async {
     await Future.delayed(_mockDelay);
 
-    final quizzes = _generateMockQuizzes(chapterId);
-    final userAnswers = List<int?>.filled(quizzes.length, null);
+    final quizList = _generateMockQuizzes(chapterId);
+    final userAnswers = List<int?>.filled(quizList.length, null);
 
     return QuizSession(
       chapterId: chapterId,
-      chapterTitle: '챕터 $chapterId 퀴즈',
-      quizzes: quizzes,
-      currentQuizIndex: 0,
+      quizList: quizList,
+      currentQuizId: quizList.isNotEmpty ? quizList.first.id : 1,
       userAnswers: userAnswers,
-      timeLimit: 600, // 10분
       startedAt: DateTime.now(),
     );
   }
 
-  /// 더미 퀴즈 답안 제출
+  /// 퀴즈 진도 업데이트 (API.md 스펙 준수)
   ///
-  /// 퀴즈 답안 제출 시뮬레이션
-  Future<void> submitAnswer(
+  /// 퀴즈 진행 상황 업데이트 시뮬레이션
+  Future<void> updateQuizProgress(
     int chapterId,
-    int quizIndex,
-    int selectedAnswer,
+    int currentQuizId,
   ) async {
     await Future.delayed(const Duration(milliseconds: 200));
     // Mock에서는 별도 처리 없음 (로컬 상태로 관리)
   }
 
-  /// 더미 퀴즈 완료 처리
+  /// 퀴즈 완료 처리 (API.md 스펙 준수)
   ///
   /// 퀴즈 완료 및 결과 저장 시뮬레이션
   /// Returns: QuizResult
   Future<QuizResult> completeQuiz(
     int chapterId,
-    List<QuizInfo> quizzes,
-    List<int?> userAnswers,
-    int timeSpentSeconds,
+    List<Map<String, int>> answers,
   ) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
-    // 정답 개수 계산
+    // 더미 퀴즈 데이터 생성
+    final quizList = _generateMockQuizzes(chapterId);
+
+    // 정답 개수 계산 (answers 기반)
     int correctCount = 0;
-    for (int i = 0; i < quizzes.length && i < userAnswers.length; i++) {
-      if (userAnswers[i] != null &&
-          userAnswers[i] == quizzes[i].correctAnswerIndex) {
+    for (final answer in answers) {
+      final quizId = answer['quiz_id']!;
+      final selectedAnswer = answer['answer']!;
+      final quiz = quizList.firstWhere((q) => q.id == quizId, orElse: () => quizList.first);
+      if (selectedAnswer == quiz.correctAnswerIndex + 1) { // API에서는 1-based
         correctCount++;
       }
     }
 
-    final totalQuestions = quizzes.length;
+    final totalQuestions = answers.length;
     final wrongAnswers = totalQuestions - correctCount;
     final scorePercentage = ((correctCount / totalQuestions) * 100).round();
     final grade = QuizResult.calculateGrade(scorePercentage);
@@ -77,7 +77,7 @@ class QuizMockRepository {
       scorePercentage: scorePercentage,
       grade: grade,
       isPassed: isPassed,
-      timeSpentSeconds: timeSpentSeconds,
+      timeSpentSeconds: 300 + (correctCount * 30), // Mock: 기본 300초 + 정답당 30초
       completedAt: DateTime.now(),
     );
   }
@@ -114,31 +114,13 @@ class QuizMockRepository {
     return results;
   }
 
-  /// 더미 현재 진행 중인 퀴즈 조회
+  /// 현재 진행 중인 퀴즈 세션 조회 (로컬 전용)
   ///
-  /// 진행 중인 퀴즈 세션 정보 제공
-  /// Returns: QuizSession? (null이면 진행 중인 퀴즈 없음)
+  /// Mock에서는 사용하지 않음 (Repository에서 로컬 저장소만 사용)
+  /// Returns: null (Mock에서는 항상 null 반환)
   Future<QuizSession?> getCurrentQuizSession() async {
     await Future.delayed(const Duration(milliseconds: 200));
-
-    // 30% 확률로 진행 중인 세션 반환 (테스트용)
-    if (DateTime.now().millisecondsSinceEpoch % 3 == 0) {
-      final quizzes = _generateMockQuizzes(1);
-      final userAnswers = List<int?>.filled(quizzes.length, null);
-      userAnswers[0] = 1; // 첫 번째 문제는 답변 완료
-
-      return QuizSession(
-        chapterId: 1,
-        chapterTitle: '진행 중인 퀴즈',
-        quizzes: quizzes,
-        currentQuizIndex: 1,
-        userAnswers: userAnswers,
-        timeLimit: 600,
-        startedAt: DateTime.now().subtract(const Duration(minutes: 2)),
-      );
-    }
-
-    return null; // 진행 중인 세션 없음
+    return null; // Mock에서는 로컬 저장소만 사용
   }
 
   /// 챕터별 더미 퀴즈 데이터 생성

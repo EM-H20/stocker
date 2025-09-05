@@ -20,16 +20,15 @@ class QuizResultStatsWidget extends StatelessWidget {
         color: isDarkMode ? AppTheme.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: isDarkMode ? null : Border.all(color: AppTheme.grey200),
-        boxShadow:
-            isDarkMode
-                ? null
-                : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+        boxShadow: isDarkMode
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,9 +41,7 @@ class QuizResultStatsWidget extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-
           SizedBox(height: 16.h),
-
           _buildStatRow(context, '전체 문제', '${result.totalQuestions}문제'),
           _buildStatRow(
             context,

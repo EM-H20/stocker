@@ -20,16 +20,15 @@ class QuizResultHistoryWidget extends StatelessWidget {
         color: isDarkMode ? AppTheme.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: isDarkMode ? null : Border.all(color: AppTheme.grey200),
-        boxShadow:
-            isDarkMode
-                ? null
-                : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+        boxShadow: isDarkMode
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,9 +41,7 @@ class QuizResultHistoryWidget extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-
           SizedBox(height: 16.h),
-
           ...previousResults
               .take(5)
               .map((result) => _buildHistoryItem(context, result)),
@@ -104,19 +101,17 @@ class QuizResultHistoryWidget extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color:
-                      result.isPassed
-                          ? AppTheme.successColor.withValues(alpha: 0.2)
-                          : AppTheme.errorColor.withValues(alpha: 0.2),
+                  color: result.isPassed
+                      ? AppTheme.successColor.withValues(alpha: 0.2)
+                      : AppTheme.errorColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Text(
                   result.isPassed ? '합격' : '불합격',
                   style: TextStyle(
-                    color:
-                        result.isPassed
-                            ? AppTheme.successColor
-                            : AppTheme.errorColor,
+                    color: result.isPassed
+                        ? AppTheme.successColor
+                        : AppTheme.errorColor,
                     fontSize: 10.sp,
                     fontWeight: FontWeight.bold,
                   ),

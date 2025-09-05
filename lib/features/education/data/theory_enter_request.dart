@@ -10,14 +10,14 @@ class TheoryEnterRequest {
   /// JSON에서 객체로 변환
   factory TheoryEnterRequest.fromJson(Map<String, dynamic> json) {
     return TheoryEnterRequest(
-      chapterId: json['chapter_id'] as int,
+      chapterId: json['chpater_id'] as int, // API.md 스펙에 맞춤 (오타 포함)
     );
   }
 
-  /// 객체에서 JSON으로 변환
+  /// 객체에서 JSON으로 변환 (API.md 스펙 준수)
   Map<String, dynamic> toJson() {
     return {
-      'chapter_id': chapterId,
+      'chpater_id': chapterId, // API.md 스펙: chpater_id (오타 있지만 백엔드 스펙)
     };
   }
 

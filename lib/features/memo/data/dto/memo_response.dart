@@ -1,3 +1,5 @@
+import '../../domain/model/memo_template_type.dart';
+
 /// 메모 조회 응답 모델
 /// API.md 명세: GET /api/memo/
 class MemoListResponse {
@@ -44,7 +46,7 @@ class MemoSingleResponse {
 class MemoDto {
   final int id;
   final int userId;
-  final String templateType;
+  final MemoTemplateType templateType;
   final Map<String, dynamic> content;
   final String createdAt;
 
@@ -60,7 +62,9 @@ class MemoDto {
     return MemoDto(
       id: json['id'] ?? 0,
       userId: json['user_id'] ?? 0,
-      templateType: json['template_type'] ?? '',
+      templateType: MemoTemplateType.fromServerValue(
+        json['template_type'] ?? '자유',
+      ),
       content: json['content'] as Map<String, dynamic>? ?? {},
       createdAt: json['created_at'] ?? '',
     );
@@ -70,7 +74,7 @@ class MemoDto {
     return {
       'id': id,
       'user_id': userId,
-      'template_type': templateType,
+      'template_type': templateType.serverValue,
       'content': content,
       'created_at': createdAt,
     };
@@ -96,7 +100,7 @@ class MemoDto {
   MemoDto copyWith({
     int? id,
     int? userId,
-    String? templateType,
+    MemoTemplateType? templateType,
     Map<String, dynamic>? content,
     String? createdAt,
   }) {

@@ -28,12 +28,16 @@ class QuizOptionButton extends StatelessWidget {
         minimumSize: Size(double.infinity, 50.h), // 버튼의 최소 크기
         padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
         // isSelected 값에 따라 배경색을 다르게 표시
-        backgroundColor: isSelected ? theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+        backgroundColor: isSelected
+            ? theme.colorScheme.primary.withValues(alpha: 0.1)
+            : Colors.transparent,
         // isSelected 값에 따라 테두리 스타일을 다르게 표시
         side: BorderSide(
-          color: isSelected 
-              ? theme.colorScheme.primary 
-              : (theme.brightness == Brightness.light ? Colors.grey[400]! : Colors.grey[600]!),
+          color: isSelected
+              ? theme.colorScheme.primary
+              : (theme.brightness == Brightness.light
+                  ? Colors.grey[400]!
+                  : Colors.grey[600]!),
           width: isSelected ? 2.0 : 1.0,
         ),
         shape: RoundedRectangleBorder(
@@ -47,8 +51,8 @@ class QuizOptionButton extends StatelessWidget {
           // isSelected 값에 따라 글자 두께를 다르게 표시
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           // isSelected 값에 따라 글자 색상을 다르게 표시
-          color: isSelected 
-              ? theme.colorScheme.primary 
+          color: isSelected
+              ? theme.colorScheme.primary
               : theme.textTheme.bodyLarge?.color,
         ),
       ),

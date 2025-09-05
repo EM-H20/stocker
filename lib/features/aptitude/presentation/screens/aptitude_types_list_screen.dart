@@ -12,7 +12,8 @@ class AptitudeTypesListScreen extends StatefulWidget {
   const AptitudeTypesListScreen({super.key});
 
   @override
-  State<AptitudeTypesListScreen> createState() => _AptitudeTypesListScreenState();
+  State<AptitudeTypesListScreen> createState() =>
+      _AptitudeTypesListScreenState();
 }
 
 class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
@@ -51,7 +52,9 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
         title: const Text('모든 투자 성향 둘러보기'),
       ),
       body: provider.isLoading
-          ? Center(child: SpinKitFadingCircle(color: Theme.of(context).colorScheme.primary))
+          ? Center(
+              child: SpinKitFadingCircle(
+                  color: Theme.of(context).colorScheme.primary))
           : ListView.builder(
               padding: EdgeInsets.all(16.w),
               itemCount: allTypes.length,
@@ -64,10 +67,12 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
                     leading: CircleAvatar(
                       radius: 24.r,
-                      backgroundColor: Theme.of(context).colorScheme.primary.withAlpha(25),
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primary.withAlpha(25),
                       child: Icon(
                         _getIconForType(type.typeCode),
                         color: Theme.of(context).colorScheme.primary,
@@ -76,16 +81,25 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                     ),
                     title: Text(
                       type.typeName,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.sp),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18.sp),
                     ),
                     subtitle: Text(
                       type.description,
-                      style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7)),
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.color
+                              ?.withValues(alpha: 0.7)),
                     ),
-                    trailing: Icon(Icons.arrow_forward_ios, size: 16.r, color: Theme.of(context).iconTheme.color),
+                    trailing: Icon(Icons.arrow_forward_ios,
+                        size: 16.r, color: Theme.of(context).iconTheme.color),
                     onTap: () async {
-                      final success = await provider.fetchResultByType(type.typeCode);
-                      if (mounted && success) {
+                      final success =
+                          await provider.fetchResultByType(type.typeCode);
+                      if (!context.mounted) return;
+                      if (success) {
                         // 상세 결과 화면으로 이동할 때, '나의 결과'가 아님을 알림 (extra: false)
                         context.push(AppRoutes.aptitudeResult, extra: false);
                       }

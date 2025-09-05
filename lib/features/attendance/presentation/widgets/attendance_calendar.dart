@@ -24,7 +24,7 @@ class AttendanceCalendar extends StatelessWidget {
         formatButtonVisible: false, // '2 weeks' 버튼 숨기기
         titleCentered: true,
         titleTextStyle: TextStyle(
-          fontSize: 20.sp, 
+          fontSize: 20.sp,
           fontWeight: FontWeight.bold,
           color: Theme.of(context).textTheme.titleLarge?.color,
         ),
@@ -60,7 +60,11 @@ class AttendanceCalendar extends StatelessWidget {
           color: Theme.of(context).textTheme.bodyMedium?.color,
         ),
         outsideTextStyle: TextStyle(
-          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+          color: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.color
+              ?.withValues(alpha: 0.5),
         ),
         // 요일 헤더 스타일
         weekNumberTextStyle: TextStyle(

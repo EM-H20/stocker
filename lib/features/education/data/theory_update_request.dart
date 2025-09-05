@@ -9,18 +9,18 @@ class TheoryUpdateRequest {
     required this.currentTheoryId,
   });
 
-  /// JSON에서 객체로 변환
+  /// JSON에서 객체로 변환 (API.md 스펙 준수)
   factory TheoryUpdateRequest.fromJson(Map<String, dynamic> json) {
     return TheoryUpdateRequest(
-      chapterId: json['chapter_id'] as int,
+      chapterId: json['chpater_id'] as int, // API.md 스펙 (오타 포함)
       currentTheoryId: json['current_theory_id'] as int,
     );
   }
 
-  /// 객체에서 JSON으로 변환
+  /// 객체에서 JSON으로 변환 (API.md 스펙 준수)
   Map<String, dynamic> toJson() {
     return {
-      'chapter_id': chapterId,
+      'chpater_id': chapterId, // API.md 스펙: chpater_id
       'current_theory_id': currentTheoryId,
     };
   }

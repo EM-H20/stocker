@@ -7,19 +7,18 @@ import '../../../../app/core/services/token_storage.dart';
 /// API.md 명세 기반으로 구현
 class MemoApi {
   final Dio _dio;
-  
+
   MemoApi(this._dio);
 
   /// 인증 헤더를 추가하는 헬퍼 메서드
   Future<Options> _getAuthOptions() async {
     final access = await TokenStorage.accessToken;
     final refresh = await TokenStorage.refreshToken;
-    
+
     return Options(headers: {
       if (access != null && access.isNotEmpty)
         'Authorization': 'Bearer $access',
-      if (refresh != null && refresh.isNotEmpty)
-        'x-refresh-token': refresh,
+      if (refresh != null && refresh.isNotEmpty) 'x-refresh-token': refresh,
     });
   }
 
@@ -27,12 +26,12 @@ class MemoApi {
   /// API.md 명세: GET /api/memo/
   Future<MemoListResponse> getAllMemos() async {
     final options = await _getAuthOptions();
-    
+
     final response = await _dio.get(
       '/api/memo/',
       options: options,
     );
-    
+
     return MemoListResponse.fromJson(response.data);
   }
 
@@ -40,13 +39,13 @@ class MemoApi {
   /// API.md 명세: PUT /api/memo/
   Future<MemoSingleResponse> saveMemo(MemoRequest request) async {
     final options = await _getAuthOptions();
-    
+
     final response = await _dio.put(
       '/api/memo/',
       data: request.toJson(),
       options: options,
     );
-    
+
     return MemoSingleResponse.fromJson(response.data);
   }
 
@@ -54,12 +53,12 @@ class MemoApi {
   /// API.md 명세: DELETE /api/memo/{id}
   Future<MemoDeleteResponse> deleteMemo(int memoId) async {
     final options = await _getAuthOptions();
-    
+
     final response = await _dio.delete(
       '/api/memo/$memoId',
       options: options,
     );
-    
+
     return MemoDeleteResponse.fromJson(response.data);
   }
 }
@@ -67,7 +66,7 @@ class MemoApi {
 /// 메모 템플릿 타입 열거형
 enum MemoTemplateType {
   diary('일기'),
-  journal('일지'), 
+  journal('일지'),
   checklist('체크리스트');
 
   const MemoTemplateType(this.displayName);

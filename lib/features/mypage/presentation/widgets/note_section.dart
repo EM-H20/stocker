@@ -19,7 +19,7 @@ class NoteSection extends StatelessWidget {
         builder: (context, noteProvider, child) {
           // 최대 3개까지만 표시
           final displayNotes = noteProvider.notes.take(3).toList();
-          
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -29,8 +29,8 @@ class NoteSection extends StatelessWidget {
                   Text(
                     '노트',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                   Row(
                     children: [
@@ -39,13 +39,13 @@ class NoteSection extends StatelessWidget {
                           onTap: () => context.go(AppRoutes.noteList),
                           child: Text(
                             '더보기',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).primaryColor,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
                           ),
                         ),
-                      if (noteProvider.notes.length > 3)
-                        SizedBox(width: 12.w),
+                      if (noteProvider.notes.length > 3) SizedBox(width: 12.w),
                       GestureDetector(
                         onTap: () => context.go(AppRoutes.noteEditor),
                         child: Icon(
@@ -102,15 +102,19 @@ class NoteSection extends StatelessWidget {
             Text(
               note.title,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             SizedBox(height: 4.h),
             Text(
               _generatePreview(note.content),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-              ),
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withValues(alpha: 0.7),
+                  ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -119,6 +123,7 @@ class NoteSection extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildEmptyState(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -136,14 +141,22 @@ class NoteSection extends StatelessWidget {
           Icon(
             Icons.note_add_outlined,
             size: 48.sp,
-            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+            color: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.color
+                ?.withValues(alpha: 0.5),
           ),
           SizedBox(height: 12.h),
           Text(
             '아직 작성된 노트가 없어요',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-            ),
+                  color: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.color
+                      ?.withValues(alpha: 0.7),
+                ),
           ),
           SizedBox(height: 8.h),
           TextButton(
@@ -160,33 +173,39 @@ class NoteSection extends StatelessWidget {
     try {
       // 빈 내용인 경우
       if (content.isEmpty) return '내용 없음';
-      
+
       // Quill Delta JSON 파싱 시도
       if (content.startsWith('{') && content.contains('ops')) {
         try {
           // JSON 파싱해서 텍스트만 추출
           final jsonData = content.replaceAll(RegExp(r'\s+'), ' ').trim();
-          
+
           // 간단한 정규식으로 "insert" 값들 추출
-          final insertMatches = RegExp(r'"insert":\s*"([^"]*)"').allMatches(jsonData);
-          final textParts = insertMatches.map((match) => match.group(1) ?? '').toList();
-          
+          final insertMatches =
+              RegExp(r'"insert":\s*"([^"]*)"').allMatches(jsonData);
+          final textParts =
+              insertMatches.map((match) => match.group(1) ?? '').toList();
+
           if (textParts.isNotEmpty) {
             final plainText = textParts.join(' ').trim();
             if (plainText.isNotEmpty) {
-              return plainText.length > 100 ? '${plainText.substring(0, 100)}...' : plainText;
+              return plainText.length > 100
+                  ? '${plainText.substring(0, 100)}...'
+                  : plainText;
             }
           }
         } catch (e) {
           // JSON 파싱 실패시 fallback
         }
       }
-      
+
       // 일반 텍스트로 처리 (fallback)
       final plainText = content.replaceAll(RegExp(r'[{}"\\]'), '').trim();
       if (plainText.isEmpty) return '내용 없음';
-      
-      return plainText.length > 100 ? '${plainText.substring(0, 100)}...' : plainText;
+
+      return plainText.length > 100
+          ? '${plainText.substring(0, 100)}...'
+          : plainText;
     } catch (e) {
       return '미리보기 생성 실패';
     }

@@ -29,29 +29,38 @@ class SearchBarWidget extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+          color: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.color
+              ?.withValues(alpha: 0.6),
         ),
         prefixIcon: Icon(
           Icons.search,
-          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+          color: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.color
+              ?.withValues(alpha: 0.6),
           size: 20.sp,
         ),
         filled: true,
         fillColor: Theme.of(context).cardColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: isDarkTheme 
-              ? BorderSide.none 
+          borderSide: isDarkTheme
+              ? BorderSide.none
               : BorderSide(color: AppTheme.grey300, width: 1.w),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.w),
+          borderSide:
+              BorderSide(color: Theme.of(context).primaryColor, width: 2.w),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
-          borderSide: isDarkTheme 
-              ? BorderSide.none 
+          borderSide: isDarkTheme
+              ? BorderSide.none
               : BorderSide(color: AppTheme.grey300, width: 1.w),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),

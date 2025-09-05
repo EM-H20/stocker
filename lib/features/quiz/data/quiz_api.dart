@@ -1,24 +1,39 @@
 import 'package:dio/dio.dart';
 import '../domain/models/quiz_session.dart';
 import '../domain/models/quiz_result.dart';
+import '../../../app/core/services/token_storage.dart';
 
-/// 퀴즈 API 클라이언트
-/// 서버와의 HTTP 통신을 담당
+/// 퀴즈 API 클라이언트 (API.md 스펙 준수)
+/// 백엔드와의 HTTP 통신을 담당
 class QuizApi {
   final Dio _dio;
 
   QuizApi(this._dio);
 
-  /// 퀴즈 시작
+  /// 인증 헤더를 추가하는 헬퍼 메서드
+  Future<Options> _getAuthOptions() async {
+    final access = await TokenStorage.accessToken;
+    final refresh = await TokenStorage.refreshToken;
+
+    return Options(headers: {
+      if (access != null && access.isNotEmpty)
+        'Authorization': 'Bearer $access',
+      if (refresh != null && refresh.isNotEmpty) 'x-refresh-token': refresh,
+    });
+  }
+
+  /// 퀴즈 진입 API.md 스펙: POST /api/quiz/enter
   ///
   /// [chapterId]: 시작할 챕터 ID
-  /// Returns: QuizSession
+  /// Returns: QuizSession (퀴즈 목록 및 현재 상태)
   /// Throws: DioException on HTTP error
-  Future<QuizSession> startQuiz(int chapterId) async {
+  Future<QuizSession> enterQuiz(int chapterId) async {
     try {
+      final options = await _getAuthOptions();
       final response = await _dio.post(
-        '/api/quiz/start',
-        data: {'chapterId': chapterId},
+        '/api/quiz/enter',
+        data: {'chpater_id': chapterId}, // API.md 스펙: chpater_id
+        options: options,
       );
 
       if (response.statusCode == 200) {
@@ -28,66 +43,73 @@ class QuizApi {
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
-          message: '퀴즈 시작 실패: ${response.statusCode}',
+          message: '퀴즈 진입 실패: ${response.statusCode}',
         );
       }
     } catch (e) {
       if (e is DioException) rethrow;
       throw DioException(
-        requestOptions: RequestOptions(path: '/api/quiz/start'),
-        message: '퀴즈 시작 중 오류 발생: $e',
+        requestOptions: RequestOptions(path: '/api/quiz/enter'),
+        message: '퀴즈 진입 중 오류 발생: $e',
       );
     }
   }
 
-  /// 답안 제출
+  /// 퀴즈 진도 업데이트 API.md 스펙: PATCH /api/quiz/progress
   ///
   /// [chapterId]: 챕터 ID
-  /// [quizIndex]: 퀴즈 인덱스
-  /// [selectedAnswer]: 선택한 답안 인덱스
+  /// [currentQuizId]: 현재 퀴즈 ID
   /// Throws: DioException on HTTP error
-  Future<void> submitAnswer(
+  Future<void> updateQuizProgress(
     int chapterId,
-    int quizIndex,
-    int selectedAnswer,
+    int currentQuizId,
   ) async {
     try {
-      final response = await _dio.post(
-        '/api/quiz/submit-answer',
+      final options = await _getAuthOptions();
+      final response = await _dio.patch(
+        '/api/quiz/progress',
         data: {
-          'chapterId': chapterId,
-          'quizIndex': quizIndex,
-          'selectedAnswer': selectedAnswer,
+          'chpater_id': chapterId, // API.md 스펙: chpater_id
+          'curent_quiz_id': currentQuizId, // API.md 스펙: curent_quiz_id (오타)
         },
+        options: options,
       );
 
       if (response.statusCode != 200) {
         throw DioException(
           requestOptions: response.requestOptions,
           response: response,
-          message: '답안 제출 실패: ${response.statusCode}',
+          message: '퀴즈 진도 업데이트 실패: ${response.statusCode}',
         );
       }
     } catch (e) {
       if (e is DioException) rethrow;
       throw DioException(
-        requestOptions: RequestOptions(path: '/api/quiz/submit-answer'),
-        message: '답안 제출 중 오류 발생: $e',
+        requestOptions: RequestOptions(path: '/api/quiz/progress'),
+        message: '퀴즈 진도 업데이트 중 오류 발생: $e',
       );
     }
   }
 
-  /// 퀴즈 완료
+  /// 퀴즈 완료 처리 API.md 스펙: POST /api/quiz/complete
   ///
   /// [chapterId]: 챕터 ID
-  /// [timeSpentSeconds]: 소요 시간 (초)
-  /// Returns: QuizResult
+  /// [answers]: 답안 목록 [{"quiz_id": 1, "answer": 2}, ...]
+  /// Returns: QuizResult (점수 결과)
   /// Throws: DioException on HTTP error
-  Future<QuizResult> completeQuiz(int chapterId, int timeSpentSeconds) async {
+  Future<QuizResult> completeQuiz(
+    int chapterId,
+    List<Map<String, int>> answers,
+  ) async {
     try {
+      final options = await _getAuthOptions();
       final response = await _dio.post(
         '/api/quiz/complete',
-        data: {'chapterId': chapterId, 'timeSpentSeconds': timeSpentSeconds},
+        data: {
+          'chapter_id': chapterId, // Quiz complete는 chapter_id를 사용
+          'answers': answers,
+        },
+        options: options,
       );
 
       if (response.statusCode == 200) {
@@ -109,72 +131,4 @@ class QuizApi {
     }
   }
 
-  /// 퀴즈 결과 조회
-  ///
-  /// [chapterId]: 조회할 챕터 ID
-  /// Returns: List QuizResult
-  /// Throws: DioException on HTTP error
-  Future<List<QuizResult>> getQuizResults(int chapterId) async {
-    try {
-      final response = await _dio.get(
-        '/api/quiz/results',
-        queryParameters: {'chapterId': chapterId},
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is List) {
-          return data
-              .map((item) => QuizResult.fromJson(item as Map<String, dynamic>))
-              .toList();
-        } else {
-          return [];
-        }
-      } else {
-        throw DioException(
-          requestOptions: response.requestOptions,
-          response: response,
-          message: '퀴즈 결과 조회 실패: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      if (e is DioException) rethrow;
-      throw DioException(
-        requestOptions: RequestOptions(path: '/api/quiz/results'),
-        message: '퀴즈 결과 조회 중 오류 발생: $e',
-      );
-    }
-  }
-
-  /// 현재 진행 중인 퀴즈 세션 조회
-  ///
-  /// Returns: QuizSession? (null이면 진행 중인 퀴즈 없음)
-  /// Throws: DioException on HTTP error
-  Future<QuizSession?> getCurrentQuizSession() async {
-    try {
-      final response = await _dio.get('/api/quiz/current-session');
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data == null) return null;
-
-        return QuizSession.fromJson(data as Map<String, dynamic>);
-      } else if (response.statusCode == 404) {
-        // 진행 중인 세션 없음
-        return null;
-      } else {
-        throw DioException(
-          requestOptions: response.requestOptions,
-          response: response,
-          message: '현재 퀴즈 세션 조회 실패: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      if (e is DioException) rethrow;
-      throw DioException(
-        requestOptions: RequestOptions(path: '/api/quiz/current-session'),
-        message: '현재 퀴즈 세션 조회 중 오류 발생: $e',
-      );
-    }
-  }
 }

@@ -25,35 +25,33 @@ class QuizResultCardWidget extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors:
-              result.isPassed
-                  ? [
-                    AppTheme.successColor.withValues(alpha: 0.2),
-                    AppTheme.successColor.withValues(alpha: 0.1),
-                  ]
-                  : [
-                    AppTheme.errorColor.withValues(alpha: 0.2),
-                    AppTheme.errorColor.withValues(alpha: 0.1),
-                  ],
+          colors: result.isPassed
+              ? [
+                  AppTheme.successColor.withValues(alpha: 0.2),
+                  AppTheme.successColor.withValues(alpha: 0.1),
+                ]
+              : [
+                  AppTheme.errorColor.withValues(alpha: 0.2),
+                  AppTheme.errorColor.withValues(alpha: 0.1),
+                ],
         ),
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           color: result.isPassed ? AppTheme.successColor : AppTheme.errorColor,
           width: 2,
         ),
-        boxShadow:
-            isDarkMode
-                ? null
-                : [
-                  BoxShadow(
-                    color: (result.isPassed
-                            ? AppTheme.successColor
-                            : AppTheme.errorColor)
-                        .withValues(alpha: 0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+        boxShadow: isDarkMode
+            ? null
+            : [
+                BoxShadow(
+                  color: (result.isPassed
+                          ? AppTheme.successColor
+                          : AppTheme.errorColor)
+                      .withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         children: [

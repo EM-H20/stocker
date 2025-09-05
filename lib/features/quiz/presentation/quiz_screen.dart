@@ -174,14 +174,13 @@ class _QuizScreenState extends State<QuizScreen> {
                     hasAnswered: hasAnswered,
                     userAnswer: userAnswer,
                     correctAnswerIndex: currentQuiz.correctAnswerIndex,
-                    onTap:
-                        hasAnswered
-                            ? null
-                            : () {
-                              setState(() {
-                                _selectedAnswer = index;
-                              });
-                            },
+                    onTap: hasAnswered
+                        ? null
+                        : () {
+                            setState(() {
+                              _selectedAnswer = index;
+                            });
+                          },
                   );
                 }),
 
@@ -218,17 +217,15 @@ class _QuizScreenState extends State<QuizScreen> {
 
     if (!hasAnswered) {
       // 답안 제출 버튼
-      final canSubmit =
-          _selectedAnswer != null &&
+      final canSubmit = _selectedAnswer != null &&
           !_isSubmitting &&
           !provider.isSubmittingAnswer;
       return ActionButton(
         text:
             _isSubmitting || provider.isSubmittingAnswer ? '제출 중...' : '답안 제출',
-        icon:
-            _isSubmitting || provider.isSubmittingAnswer
-                ? Icons.hourglass_empty
-                : Icons.send,
+        icon: _isSubmitting || provider.isSubmittingAnswer
+            ? Icons.hourglass_empty
+            : Icons.send,
         color: canSubmit ? AppTheme.successColor : Colors.grey,
         onPressed: canSubmit ? () => _submitAnswer(provider) : () {},
       );
@@ -257,8 +254,9 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   Future<void> _submitAnswer(QuizProvider provider) async {
-    if (_selectedAnswer == null || _isSubmitting || provider.isSubmittingAnswer)
+    if (_selectedAnswer == null || _isSubmitting || provider.isSubmittingAnswer) {
       return;
+    }
 
     setState(() {
       _isSubmitting = true;

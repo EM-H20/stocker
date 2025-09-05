@@ -14,7 +14,8 @@ class AuthApiRepository implements AuthRepository {
   Future<User> login(LoginRequest request) async {
     final AuthResponse res = await _api.login(request);
     // 응답 DTO -> 도메인 모델 변환
-    return res.toUser(); // toUser()는 (id, nickname, accessToken?, refreshToken?) 중 네가 정의한대로
+    return res
+        .toUser(); // toUser()는 (id, nickname, accessToken?, refreshToken?) 중 네가 정의한대로
   }
 
   @override
@@ -23,7 +24,7 @@ class AuthApiRepository implements AuthRepository {
   }
 
   @override
-  Future<void> logout(String email){
+  Future<void> logout(String email) {
     return _api.logout(email);
   }
 
@@ -32,4 +33,3 @@ class AuthApiRepository implements AuthRepository {
     return _api.refreshToken().then((_) => null);
   }
 }
- 

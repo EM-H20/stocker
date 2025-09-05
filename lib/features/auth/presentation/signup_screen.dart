@@ -48,7 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
     // `build` 메서드 밖에서는 context.read를 사용하는 것이 안전합니다.
     final authProvider = context.read<AuthProvider>();
 
-    if (!context.mounted) return;
+    if (!mounted) return;
 
     final success = await authProvider.signup(
       emailController.text.trim(),
@@ -56,23 +56,23 @@ class _SignupScreenState extends State<SignupScreen> {
       nicknameController.text.trim(),
     );
 
-    if (context.mounted) {
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('회원가입이 완료되었습니다. 로그인 해주세요.'),
-          ),
-        );
-        // 회원가입 후 로그인 화면으로 이동하되, 뒤로가기로 다시 돌아올 수 없도록 go를 사용합니다.
-        context.go(AppRoutes.login);
-      } else {
-        // ✅ [수정] 실패 시 authProvider에 저장된 구체적인 에러 메시지를 보여줍니다.
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.errorMessage ?? '회원가입에 실패했습니다.'),
-          ),
-        );
-      }
+    if (!mounted) return;
+    
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('회원가입이 완료되었습니다. 로그인 해주세요.'),
+        ),
+      );
+      // 회원가입 후 로그인 화면으로 이동하되, 뒤로가기로 다시 돌아올 수 없도록 go를 사용합니다.
+      context.go(AppRoutes.login);
+    } else {
+      // ✅ [수정] 실패 시 authProvider에 저장된 구체적인 에러 메시지를 보여줍니다.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? '회원가입에 실패했습니다.'),
+        ),
+      );
     }
   }
 
@@ -135,7 +135,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   labelText: '🔒 비밀번호 확인',
                   border: const OutlineInputBorder(),
                   // ✅ [개선] 비밀번호 불일치 시 에러 텍스트를 표시하여 사용자 경험을 향상시킵니다.
-                  errorText: confirmPasswordController.text.isNotEmpty && !isPasswordMatch
+                  errorText: confirmPasswordController.text.isNotEmpty &&
+                          !isPasswordMatch
                       ? '비밀번호가 일치하지 않습니다.'
                       : null,
                 ),

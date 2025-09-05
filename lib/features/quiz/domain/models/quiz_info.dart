@@ -28,11 +28,11 @@ class QuizInfo {
       json['option_3'] as String? ?? '',
       json['option_4'] as String? ?? '',
     ];
-    
+
     // correct_option(1~4)을 correctAnswerIndex(0~3)로 변환
     final correctOption = json['correct_option'] as int? ?? 1;
     final correctAnswerIndex = correctOption - 1; // 1-based → 0-based
-    
+
     return QuizInfo(
       id: json['id'] as int,
       chapterId: json['chapter_id'] as int,

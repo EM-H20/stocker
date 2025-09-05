@@ -52,7 +52,7 @@ class TheoryPage {
   }
 }
 
-/// 이론 진입 응답 모델  
+/// 이론 진입 응답 모델
 /// API.md 명세: POST /api/theory/enter
 class TheoryEnterResponse {
   final List<TheoryPage> theoryPages;
@@ -69,7 +69,8 @@ class TheoryEnterResponse {
   factory TheoryEnterResponse.fromJson(Map<String, dynamic> json) {
     return TheoryEnterResponse(
       theoryPages: (json['theory_pages'] as List<dynamic>)
-          .map((pageJson) => TheoryPage.fromJson(pageJson as Map<String, dynamic>))
+          .map((pageJson) =>
+              TheoryPage.fromJson(pageJson as Map<String, dynamic>))
           .toList(),
       totalPages: json['total_pages'] ?? 0,
       currentPage: json['current_page'] ?? 1,

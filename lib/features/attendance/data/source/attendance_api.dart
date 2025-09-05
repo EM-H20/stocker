@@ -13,12 +13,11 @@ class AttendanceApi {
   Future<Options> _getAuthOptions() async {
     final access = await TokenStorage.accessToken;
     final refresh = await TokenStorage.refreshToken;
-    
+
     return Options(headers: {
       if (access != null && access.isNotEmpty)
         'Authorization': 'Bearer $access',
-      if (refresh != null && refresh.isNotEmpty)
-        'x-refresh-token': refresh,
+      if (refresh != null && refresh.isNotEmpty) 'x-refresh-token': refresh,
     });
   }
 

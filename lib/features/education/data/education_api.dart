@@ -19,27 +19,28 @@ class EducationApi {
   Future<Options> _getAuthOptions() async {
     final access = await TokenStorage.accessToken;
     final refresh = await TokenStorage.refreshToken;
-    
+
     return Options(headers: {
       if (access != null && access.isNotEmpty)
         'Authorization': 'Bearer $access',
-      if (refresh != null && refresh.isNotEmpty)
-        'x-refresh-token': refresh,
+      if (refresh != null && refresh.isNotEmpty) 'x-refresh-token': refresh,
     });
   }
 
   /// 챕터 목록 조회
   /// GET /api/chapters
   ///
-  /// Returns: List ChapterCardResponse  
+  /// Returns: List ChapterCardResponse
   /// Throws: DioException on network error
   Future<List<ChapterCardResponse>> getChapters() async {
     debugPrint('🚀 [EDU_API] 챕터 목록 조회 시작');
-    debugPrint('📍 [EDU_API] URL: ${_dio.options.baseUrl}$_baseUrl/api/chapters');
-    
+    debugPrint(
+        '📍 [EDU_API] URL: ${_dio.options.baseUrl}$_baseUrl/api/chapters');
+
     try {
       final options = await _getAuthOptions();
-      final response = await _dio.get('$_baseUrl/api/chapters', options: options);
+      final response =
+          await _dio.get('$_baseUrl/api/chapters', options: options);
       debugPrint('✅ [EDU_API] 챕터 목록 조회 성공 - Status: ${response.statusCode}');
 
       // 성공 응답 확인
@@ -87,9 +88,10 @@ class EducationApi {
   /// Throws: DioException on network error
   Future<TheoryEnterResponse> enterTheory(TheoryEnterRequest request) async {
     debugPrint('🚀 [EDU_API] 이론 진입 시작 - ChapterId: ${request.chapterId}');
-    debugPrint('📍 [EDU_API] URL: ${_dio.options.baseUrl}$_baseUrl/api/theory/enter');
+    debugPrint(
+        '📍 [EDU_API] URL: ${_dio.options.baseUrl}$_baseUrl/api/theory/enter');
     debugPrint('📦 [EDU_API] Request Data: ${request.toJson()}');
-    
+
     try {
       final options = await _getAuthOptions();
       final response = await _dio.post(

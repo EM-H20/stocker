@@ -71,14 +71,13 @@ class _EducationScreenState extends State<EducationScreen> {
                   }
 
                   // 현재 진행 중인 챕터 찾기 (미완료 챕터 중 첫 번째)
-                  final currentChapter =
-                      provider.chapters
-                              .where((chapter) => !chapter.isTheoryCompleted)
-                              .isNotEmpty
-                          ? provider.chapters
-                              .where((chapter) => !chapter.isTheoryCompleted)
-                              .first
-                          : provider.chapters.first;
+                  final currentChapter = provider.chapters
+                          .where((chapter) => !chapter.isTheoryCompleted)
+                          .isNotEmpty
+                      ? provider.chapters
+                          .where((chapter) => !chapter.isTheoryCompleted)
+                          .first
+                      : provider.chapters.first;
 
                   return CurrentLearningCard(
                     title: currentChapter.title,
@@ -139,7 +138,8 @@ class _EducationScreenState extends State<EducationScreen> {
                             provider.chaptersError!,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurface.withValues(alpha: 0.7),
+                              color:
+                                  colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                           SizedBox(height: 16.h),
@@ -158,24 +158,21 @@ class _EducationScreenState extends State<EducationScreen> {
                   }
 
                   return Column(
-                    children:
-                        provider.chapters.map((chapter) {
-                          return RecommendedChapterCard(
-                            title: chapter.title,
-                            description:
-                                chapter.isTheoryCompleted
-                                    ? '이론 학습 완료 ✓'
-                                    : '이론 학습을 시작하세요',
-                            icon:
-                                chapter.isTheoryCompleted
-                                    ? Icons.check_circle
-                                    : Icons.play_circle_outline,
-                            onTap: () {
-                              provider.enterTheory(chapter.id);
-                              context.go(AppRoutes.theory);
-                            },
-                          );
-                        }).toList(),
+                    children: provider.chapters.map((chapter) {
+                      return RecommendedChapterCard(
+                        title: chapter.title,
+                        description: chapter.isTheoryCompleted
+                            ? '이론 학습 완료 ✓'
+                            : '이론 학습을 시작하세요',
+                        icon: chapter.isTheoryCompleted
+                            ? Icons.check_circle
+                            : Icons.play_circle_outline,
+                        onTap: () {
+                          provider.enterTheory(chapter.id);
+                          context.go(AppRoutes.theory);
+                        },
+                      );
+                    }).toList(),
                   );
                 },
               ),

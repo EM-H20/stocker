@@ -12,15 +12,15 @@ class QuizProvider extends ChangeNotifier {
 
   /// 실제 API Repository를 사용하는 생성자
   QuizProvider(QuizRepository repository)
-    : _repository = repository,
-      _mockRepository = null,
-      _useMock = false;
+      : _repository = repository,
+        _mockRepository = null,
+        _useMock = false;
 
   /// Mock Repository를 사용하는 생성자 (UI 개발/테스트용)
   QuizProvider.withMock(QuizMockRepository mockRepository)
-    : _repository = null,
-      _mockRepository = mockRepository,
-      _useMock = true;
+      : _repository = null,
+        _mockRepository = mockRepository,
+        _useMock = true;
 
   // === 퀴즈 세션 관련 상태 ===
   QuizSession? _currentQuizSession;
@@ -99,7 +99,7 @@ class QuizProvider extends ChangeNotifier {
 
   // === 퀴즈 세션 관련 메서드 ===
 
-  /// 퀴즈 시작
+  /// 퀴즈 진입 (API.md 스펙 준수)
   ///
   /// [chapterId]: 시작할 챕터 ID
   Future<bool> startQuiz(int chapterId) async {
@@ -111,21 +111,19 @@ class QuizProvider extends ChangeNotifier {
 
     try {
       if (_useMock) {
-        _currentQuizSession = await _mockRepository!.startQuiz(chapterId);
+        _currentQuizSession = await _mockRepository!.enterQuiz(chapterId);
       } else {
-        _currentQuizSession = await _repository!.startQuiz(chapterId);
+        _currentQuizSession = await _repository!.enterQuiz(chapterId);
       }
 
-      // 타이머 시작 (시간 제한이 있는 경우)
-      if (_currentQuizSession?.timeLimit != null) {
-        _startTimer(_currentQuizSession!.timeLimit!);
-      }
+      // 기본 10분 타이머 시작 (API.md 스펙에서 timeLimit 제거됨)
+      _startTimer(600); // 10분
 
       _quizError = null;
       return true;
     } catch (e) {
       _quizError = e.toString();
-      debugPrint('퀴즈 시작 실패: $e');
+      debugPrint('퀴즈 진입 실패: $e');
       return false;
     } finally {
       _isLoadingQuiz = false;
@@ -133,9 +131,9 @@ class QuizProvider extends ChangeNotifier {
     }
   }
 
-  /// 답안 제출
+  /// 답안 제출 및 진행 상황 업데이트 (API.md 스펙)
   ///
-  /// [selectedAnswer]: 선택한 답안 인덱스
+  /// [selectedAnswer]: 선택한 답안 인덱스 (0-based)
   Future<bool> submitAnswer(int selectedAnswer) async {
     if (_isSubmittingAnswer || _currentQuizSession == null) return false;
 
@@ -144,25 +142,27 @@ class QuizProvider extends ChangeNotifier {
 
     try {
       final chapterId = _currentQuizSession!.chapterId;
-      final quizIndex = _currentQuizSession!.currentQuizIndex;
+      final currentQuizIndex = _currentQuizSession!.currentQuizIndex;
+      final currentQuizId = _currentQuizSession!.currentQuizId;
 
+      // 1. 로컬 답안 저장 (즉시 UI 업데이트용)
+      _updateLocalAnswer(currentQuizIndex, selectedAnswer);
+
+      // 2. Mock에서는 진행상황 업데이트만, Real에서는 서버와 통신
       if (_useMock) {
-        await _mockRepository!.submitAnswer(
-          chapterId,
-          quizIndex,
-          selectedAnswer,
-        );
+        await _mockRepository!.updateQuizProgress(chapterId, currentQuizId);
+        // Mock에서는 로컬 Repository를 통해 답안도 업데이트
+        await _repository?.updateLocalAnswer(chapterId, currentQuizIndex, selectedAnswer);
       } else {
-        await _repository!.submitAnswer(chapterId, quizIndex, selectedAnswer);
+        // Real API: 서버에 진행상황 업데이트 + 로컬 답안 저장
+        await _repository!.updateQuizProgress(chapterId, currentQuizId);
+        await _repository.updateLocalAnswer(chapterId, currentQuizIndex, selectedAnswer);
       }
-
-      // 로컬 상태 업데이트
-      _updateLocalAnswer(quizIndex, selectedAnswer);
 
       return true;
     } catch (e) {
       _quizError = e.toString();
-      debugPrint('답안 제출 실패: $e');
+      debugPrint('답안 제출 및 진행상황 업데이트 실패: $e');
       return false;
     } finally {
       _isSubmittingAnswer = false;
@@ -170,42 +170,54 @@ class QuizProvider extends ChangeNotifier {
     }
   }
 
-  /// 다음 퀴즈로 이동
+  /// 다음 퀴즈로 이동 (currentQuizId 기반)
   void moveToNextQuiz() {
     if (_currentQuizSession?.hasNext ?? false) {
-      _currentQuizSession = _currentQuizSession!.copyWith(
-        currentQuizIndex: _currentQuizSession!.currentQuizIndex + 1,
-      );
-      notifyListeners();
+      final currentIndex = _currentQuizSession!.currentQuizIndex;
+      final nextIndex = currentIndex + 1;
+      if (nextIndex < _currentQuizSession!.quizList.length) {
+        final nextQuizId = _currentQuizSession!.quizList[nextIndex].id;
+        _currentQuizSession = _currentQuizSession!.copyWith(
+          currentQuizId: nextQuizId,
+        );
+        notifyListeners();
+      }
     }
   }
 
-  /// 이전 퀴즈로 이동
+  /// 이전 퀴즈로 이동 (currentQuizId 기반)
   void moveToPreviousQuiz() {
     if (_currentQuizSession?.hasPrevious ?? false) {
-      _currentQuizSession = _currentQuizSession!.copyWith(
-        currentQuizIndex: _currentQuizSession!.currentQuizIndex - 1,
-      );
-      notifyListeners();
+      final currentIndex = _currentQuizSession!.currentQuizIndex;
+      final prevIndex = currentIndex - 1;
+      if (prevIndex >= 0) {
+        final prevQuizId = _currentQuizSession!.quizList[prevIndex].id;
+        _currentQuizSession = _currentQuizSession!.copyWith(
+          currentQuizId: prevQuizId,
+        );
+        notifyListeners();
+      }
     }
   }
 
-  /// 특정 퀴즈로 이동
+  /// 특정 퀴즈로 이동 (currentQuizId 기반)
   ///
   /// [index]: 이동할 퀴즈 인덱스
   void moveToQuiz(int index) {
     if (_currentQuizSession == null ||
         index < 0 ||
-        index >= _currentQuizSession!.totalCount)
+        index >= _currentQuizSession!.totalCount) {
       return;
+    }
 
+    final targetQuizId = _currentQuizSession!.quizList[index].id;
     _currentQuizSession = _currentQuizSession!.copyWith(
-      currentQuizIndex: index,
+      currentQuizId: targetQuizId,
     );
     notifyListeners();
   }
 
-  /// 퀴즈 완료
+  /// 퀴즈 완료 (API.md 스펙)
   ///
   /// Returns: QuizResult?
   Future<QuizResult?> completeQuiz() async {
@@ -216,24 +228,26 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final timeSpent =
-          _currentQuizSession!.timeLimit != null
-              ? _currentQuizSession!.timeLimit! - _remainingSeconds
-              : 0;
+      final chapterId = _currentQuizSession!.chapterId;
+      
+      // 사용자 답안을 API 형식으로 변환: [{"quiz_id": 1, "answer": 2}]
+      final answers = <Map<String, int>>[];
+      for (int i = 0; i < _currentQuizSession!.quizList.length; i++) {
+        final quiz = _currentQuizSession!.quizList[i];
+        final userAnswer = _currentQuizSession!.userAnswers[i];
+        if (userAnswer != null) {
+          answers.add({
+            'quiz_id': quiz.id,
+            'answer': userAnswer + 1, // 0-based → 1-based 변환
+          });
+        }
+      }
 
       QuizResult result;
       if (_useMock) {
-        result = await _mockRepository!.completeQuiz(
-          _currentQuizSession!.chapterId,
-          _currentQuizSession!.quizzes,
-          _currentQuizSession!.userAnswers,
-          timeSpent,
-        );
+        result = await _mockRepository!.completeQuiz(chapterId, answers);
       } else {
-        result = await _repository!.completeQuiz(
-          _currentQuizSession!.chapterId,
-          timeSpent,
-        );
+        result = await _repository!.completeQuiz(chapterId, answers);
       }
 
       // 결과 목록에 추가
@@ -311,16 +325,16 @@ class QuizProvider extends ChangeNotifier {
       if (session != null) {
         _currentQuizSession = session;
 
-        // 진행 중인 세션이 있고 시간 제한이 있다면 타이머 재시작
-        if (_currentQuizSession?.timeLimit != null) {
-          final elapsed =
-              DateTime.now()
-                  .difference(_currentQuizSession!.startedAt)
-                  .inSeconds;
-          final remaining = _currentQuizSession!.timeLimit! - elapsed;
-          if (remaining > 0) {
-            _startTimer(remaining);
-          }
+        // 진행 중인 세션이 있다면 기본 10분 타이머 시작
+        final elapsed = DateTime.now()
+            .difference(_currentQuizSession!.startedAt)
+            .inSeconds;
+        final defaultTimeLimit = 600; // 10분 고정
+        final remaining = defaultTimeLimit - elapsed;
+        if (remaining > 0) {
+          _startTimer(remaining);
+        } else {
+          _startTimer(defaultTimeLimit); // 새로운 10분 타이머
         }
 
         notifyListeners();

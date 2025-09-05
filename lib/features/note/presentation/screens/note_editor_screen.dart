@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // ✅ Provider에 데이터를 전달하기 위한 DTO import를 추가합니다.
-import '../../data/dto/note_update_request.dart'; 
+import '../../data/dto/note_update_request.dart';
 import '../../domain/model/note.dart';
 import '../constants/note_templates.dart';
 import '../provider/note_provider.dart';
@@ -24,7 +24,7 @@ class NoteEditorScreen extends StatefulWidget {
 
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
   quill.QuillController _controller = quill.QuillController.basic(); // ✅ 기본값
-  TextEditingController _titleController = TextEditingController();   // ✅ 기본값
+  TextEditingController _titleController = TextEditingController(); // ✅ 기본값
   bool _isNewNote = true;
   Note? _existingNote;
 
@@ -61,10 +61,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       contentJson = NoteTemplates.templates[0].content;
     }
 
-    _controller.readOnly = false;       // ✅ 11.4.2에선 여기서 편집모드
+    _controller.readOnly = false; // ✅ 11.4.2에선 여기서 편집모드
     _titleController = TextEditingController(text: title);
-    setState(() {});                    // ✅ 새 컨트롤러로 교체했으니 리빌드
-
+    setState(() {}); // ✅ 새 컨트롤러로 교체했으니 리빌드
 
     try {
       final doc = quill.Document.fromJson(jsonDecode(contentJson));
@@ -140,9 +139,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         title: Text(
           _isNewNote ? '새 노트 작성' : '노트 편집',
           style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w600,
-          ),
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w600,
+              ),
         ),
         actions: [
           IconButton(
@@ -165,17 +164,21 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               decoration: InputDecoration(
                 hintText: '제목을 입력하세요',
                 hintStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
-                ),
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withValues(alpha: 0.5),
+                    ),
                 border: InputBorder.none,
               ),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.titleLarge?.color,
-              ),
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
             ),
           ),
           Divider(
@@ -227,7 +230,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     // 내용이 변경되었는지 확인
     final hasTitle = _titleController.text.trim().isNotEmpty;
     final hasContent = _controller.document.toPlainText().trim().isNotEmpty;
-    
+
     if (hasTitle || hasContent) {
       showDialog(
         context: context,
@@ -239,16 +242,16 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           title: Text(
             '작성 중인 내용이 있습니다',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w600,
-            ),
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w600,
+                ),
           ),
           content: Text(
             '저장하지 않고 나가시겠습니까?\n작성 중인 내용은 모두 사라집니다.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontSize: 14.sp,
-              height: 1.4,
-            ),
+                  fontSize: 14.sp,
+                  height: 1.4,
+                ),
           ),
           actions: [
             TextButton(

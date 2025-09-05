@@ -19,6 +19,7 @@ import '../../features/aptitude/presentation/screens/aptitude_result_screen.dart
 import '../../features/note/presentation/screens/note_list_screen.dart';
 import '../../features/note/presentation/screens/note_editor_screen.dart';
 import '../../features/home/presentation/main_dashboard_screen.dart';
+
 /// 앱 전체의 라우팅을 관리하는 GoRouter 설정
 class AppRouter {
   static final GoRouter _router = GoRouter(
@@ -42,7 +43,8 @@ class AppRouter {
           return CustomTransitionPage(
             key: state.pageKey,
             child: const LoginScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               // 뒤로가기 포함 모든 애니메이션 완전 제거
               return child;
             },
@@ -58,7 +60,8 @@ class AppRouter {
           return CustomTransitionPage(
             key: state.pageKey,
             child: const SignupScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               // 뒤로가기 포함 모든 애니메이션 완전 제거
               return child;
             },
@@ -80,7 +83,8 @@ class AppRouter {
               return CustomTransitionPage(
                 key: state.pageKey,
                 child: const EducationScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
                   // 애니메이션 완전 제거: 항상 child를 그대로 반환
                   return child;
                 },
@@ -96,14 +100,15 @@ class AppRouter {
               return CustomTransitionPage(
                 key: state.pageKey,
                 child: const AttendanceScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
                   // 애니메이션 완전 제거: 항상 child를 그대로 반환
                   return child;
                 },
               );
             },
           ),
-          
+
           // 오답노트 탭 (완전한 애니메이션 제거)
           GoRoute(
             path: AppRoutes.wrongNote,
@@ -112,14 +117,15 @@ class AppRouter {
               return CustomTransitionPage(
                 key: state.pageKey,
                 child: const WrongNoteScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
                   // 애니메이션 완전 제거: 항상 child를 그대로 반환
                   return child;
                 },
               );
             },
           ),
-          
+
           // 마이페이지 탭 (완전한 애니메이션 제거)
           GoRoute(
             path: AppRoutes.mypage,
@@ -128,7 +134,8 @@ class AppRouter {
               return CustomTransitionPage(
                 key: state.pageKey,
                 child: const MypageScreen(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
                   // 애니메이션 완전 제거: 항상 child를 그대로 반환
                   return child;
                 },
@@ -144,7 +151,8 @@ class AppRouter {
         pageBuilder: (context, state) {
           final chapterIdStr = state.uri.queryParameters['chapterId'];
           final chapterId = int.tryParse(chapterIdStr ?? '') ?? 1;
-          debugPrint('📚 [ROUTER] 이론 학습 페이지 로드 (애니메이션 없음) - Chapter $chapterId');
+          debugPrint(
+              '📚 [ROUTER] 이론 학습 페이지 로드 (애니메이션 없음) - Chapter $chapterId');
           return NoTransitionPage(
             child: TheoryScreen(chapterId: chapterId),
           );
@@ -171,7 +179,8 @@ class AppRouter {
         pageBuilder: (context, state) {
           final chapterIdStr = state.uri.queryParameters['chapterId'];
           final chapterId = int.tryParse(chapterIdStr ?? '') ?? 1;
-          debugPrint('📊 [ROUTER] 퀴즈 결과 페이지 로드 (애니메이션 없음) - Chapter $chapterId');
+          debugPrint(
+              '📊 [ROUTER] 퀴즈 결과 페이지 로드 (애니메이션 없음) - Chapter $chapterId');
           return NoTransitionPage(
             child: QuizResultScreen(chapterId: chapterId),
           );
@@ -187,14 +196,15 @@ class AppRouter {
           return CustomTransitionPage(
             key: state.pageKey,
             child: const AptitudeInitialScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
               // 애니메이션 완전 제거: 항상 child를 그대로 반환
               return child;
             },
           );
         },
       ),
-      
+
       // 성향 분석 퀴즈 화면 (애니메이션 없음)
       GoRoute(
         path: AppRoutes.aptitudeQuiz,
@@ -248,11 +258,10 @@ class AppRouter {
         },
       ),
     ],
-  
 
     // 에러 페이지 처리
-    errorBuilder:
-        (context, state) => ErrorPage(errorPath: state.matchedLocation),
+    errorBuilder: (context, state) =>
+        ErrorPage(errorPath: state.matchedLocation),
   );
 
   static GoRouter get router => _router;

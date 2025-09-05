@@ -12,7 +12,7 @@ class WrongNoteApi {
   Future<WrongNoteResponse> getWrongNotes(String userId) async {
     try {
       final response = await _dio.get(
-        '/api/wrong-notes',
+        '/api/wrong_note/mypage',  // ✅ 백엔드 라우트와 일치
         queryParameters: {'user_id': userId},
       );
 

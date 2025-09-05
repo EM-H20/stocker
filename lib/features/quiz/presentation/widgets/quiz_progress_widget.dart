@@ -18,13 +18,11 @@ class QuizProgressWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16.w),
-      color: isDarkMode 
-          ? AppTheme.darkSurface 
-          : AppTheme.grey100,
+      color: isDarkMode ? AppTheme.darkSurface : AppTheme.grey100,
       child: Column(
         children: [
           Row(
@@ -51,9 +49,7 @@ class QuizProgressWidget extends StatelessWidget {
           SizedBox(height: 8.h),
           LinearProgressIndicator(
             value: progressRatio,
-            backgroundColor: isDarkMode 
-                ? AppTheme.grey800 
-                : AppTheme.grey300,
+            backgroundColor: isDarkMode ? AppTheme.grey800 : AppTheme.grey300,
             valueColor: const AlwaysStoppedAnimation<Color>(
               AppTheme.successColor,
             ),

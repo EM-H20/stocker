@@ -12,7 +12,4 @@ class User {
     required this.accessToken,
     required this.refreshToken,
   });
-
-  
 }
-

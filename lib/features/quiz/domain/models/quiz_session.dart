@@ -1,61 +1,83 @@
 import 'quiz_info.dart';
 
-/// 퀴즈 세션 정보 모델
+/// 퀴즈 세션 정보 모델 (API.md 스펙 준수)
 class QuizSession {
   final int chapterId;
-  final String chapterTitle;
-  final List<QuizInfo> quizzes;
-  final int currentQuizIndex;
-  final List<int?> userAnswers;
-  final int? timeLimit; // 제한 시간 (초)
-  final DateTime startedAt;
+  final List<QuizInfo> quizList;
+  final int currentQuizId;
+  final List<int?> userAnswers; // 로컬 저장용
+  final DateTime startedAt; // 로컬 저장용
 
   const QuizSession({
     required this.chapterId,
-    required this.chapterTitle,
-    required this.quizzes,
-    required this.currentQuizIndex,
+    required this.quizList,
+    required this.currentQuizId,
     required this.userAnswers,
-    this.timeLimit,
     required this.startedAt,
   });
 
-  /// JSON에서 QuizSession 객체 생성
+  /// JSON에서 QuizSession 객체 생성 (API.md 스펙)
   factory QuizSession.fromJson(Map<String, dynamic> json) {
+    final quizListData = json['quiz_list'] as List;
     return QuizSession(
-      chapterId: json['chapterId'] as int,
-      chapterTitle: json['chapterTitle'] as String,
-      quizzes: (json['quizzes'] as List)
+      chapterId: json['chapter_id'] as int,
+      quizList: quizListData
+          .map((quiz) => QuizInfo.fromBackendJson(quiz as Map<String, dynamic>))
+          .toList(),
+      currentQuizId: json['current_quiz_id'] as int,
+      userAnswers: (json['userAnswers'] as List<dynamic>?)?.cast<int?>() ?? 
+          List<int?>.filled(quizListData.length, null),
+      startedAt: json['startedAt'] != null 
+          ? DateTime.parse(json['startedAt'] as String)
+          : DateTime.now(),
+    );
+  }
+
+  /// 로컬 저장된 JSON에서 QuizSession 객체 생성
+  factory QuizSession.fromLocalJson(Map<String, dynamic> json) {
+    return QuizSession(
+      chapterId: json['chapter_id'] as int,
+      quizList: (json['quiz_list'] as List)
           .map((quiz) => QuizInfo.fromJson(quiz as Map<String, dynamic>))
           .toList(),
-      currentQuizIndex: json['currentQuizIndex'] as int,
-      userAnswers: (json['userAnswers'] as List).cast<int?>(),
-      timeLimit: json['timeLimit'] as int?,
+      currentQuizId: json['current_quiz_id'] as int,
+      userAnswers: (json['userAnswers'] as List<dynamic>?)?.cast<int?>() ??
+          List<int?>.filled((json['quiz_list'] as List).length, null),
       startedAt: DateTime.parse(json['startedAt'] as String),
     );
   }
 
-  /// QuizSession 객체를 JSON으로 변환
+  /// QuizSession 객체를 JSON으로 변환 (로컬 저장용)
   Map<String, dynamic> toJson() {
     return {
-      'chapterId': chapterId,
-      'chapterTitle': chapterTitle,
-      'quizzes': quizzes.map((quiz) => quiz.toJson()).toList(),
-      'currentQuizIndex': currentQuizIndex,
+      'chapter_id': chapterId,
+      'quiz_list': quizList.map((quiz) => quiz.toJson()).toList(),
+      'current_quiz_id': currentQuizId,
       'userAnswers': userAnswers,
-      'timeLimit': timeLimit,
       'startedAt': startedAt.toIso8601String(),
     };
   }
 
   /// 현재 퀴즈 정보 반환
-  QuizInfo get currentQuiz => quizzes[currentQuizIndex];
+  QuizInfo? get currentQuiz {
+    try {
+      return quizList.firstWhere((quiz) => quiz.id == currentQuizId);
+    } catch (e) {
+      return quizList.isNotEmpty ? quizList.first : null;
+    }
+  }
+
+  /// 현재 퀴즈 인덱스
+  int get currentQuizIndex {
+    final index = quizList.indexWhere((quiz) => quiz.id == currentQuizId);
+    return index >= 0 ? index : 0;
+  }
 
   /// 전체 퀴즈 개수
-  int get totalCount => quizzes.length;
+  int get totalCount => quizList.length;
 
   /// 다음 퀴즈가 있는지
-  bool get hasNext => currentQuizIndex < quizzes.length - 1;
+  bool get hasNext => currentQuizIndex < quizList.length - 1;
 
   /// 이전 퀴즈가 있는지
   bool get hasPrevious => currentQuizIndex > 0;
@@ -75,28 +97,22 @@ class QuizSession {
   /// 세션 복사 (불변성 유지)
   QuizSession copyWith({
     int? chapterId,
-    String? chapterTitle,
-    List<QuizInfo>? quizzes,
-    int? currentQuizIndex,
+    List<QuizInfo>? quizList,
+    int? currentQuizId,
     List<int?>? userAnswers,
-    int? timeLimit,
     DateTime? startedAt,
   }) {
     return QuizSession(
       chapterId: chapterId ?? this.chapterId,
-      chapterTitle: chapterTitle ?? this.chapterTitle,
-      quizzes: quizzes ?? this.quizzes,
-      currentQuizIndex: currentQuizIndex ?? this.currentQuizIndex,
+      quizList: quizList ?? this.quizList,
+      currentQuizId: currentQuizId ?? this.currentQuizId,
       userAnswers: userAnswers ?? this.userAnswers,
-      timeLimit: timeLimit ?? this.timeLimit,
       startedAt: startedAt ?? this.startedAt,
     );
   }
 
   @override
   String toString() {
-    return 'QuizSession(chapterId: $chapterId, currentQuizIndex: $currentQuizIndex, totalCount: $totalCount)';
+    return 'QuizSession(chapterId: $chapterId, currentQuizId: $currentQuizId, totalCount: $totalCount)';
   }
 }
-
-

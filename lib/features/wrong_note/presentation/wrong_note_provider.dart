@@ -13,7 +13,7 @@ class WrongNoteProvider extends ChangeNotifier {
   List<WrongNoteItem> _wrongNotes = [];
   bool _isLoading = false;
   String? _errorMessage;
-  
+
   // 재시도된 퀴즈 ID들을 추적 (isRetried 대체)
   Set<int> _retriedQuizIds = {};
 
@@ -37,7 +37,7 @@ class WrongNoteProvider extends ChangeNotifier {
 
     try {
       final WrongNoteResponse response;
-      
+
       if (_mockRepository != null) {
         // Mock 데이터 사용
         response = await _mockRepository.getWrongNotes('mock_user');
@@ -118,13 +118,17 @@ class WrongNoteProvider extends ChangeNotifier {
 
   /// 재시도 여부별 필터링
   List<WrongNoteItem> getWrongNotesByRetryStatus(bool isRetried) {
-    return _wrongNotes.where((item) => _retriedQuizIds.contains(item.quizId) == isRetried).toList();
+    return _wrongNotes
+        .where((item) => _retriedQuizIds.contains(item.quizId) == isRetried)
+        .toList();
   }
 
   /// 통계 정보 가져오기
   Map<String, int> getStatistics() {
     final totalCount = _wrongNotes.length;
-    final retriedCount = _wrongNotes.where((item) => _retriedQuizIds.contains(item.quizId)).length;
+    final retriedCount = _wrongNotes
+        .where((item) => _retriedQuizIds.contains(item.quizId))
+        .length;
     final pendingCount = totalCount - retriedCount;
 
     return {

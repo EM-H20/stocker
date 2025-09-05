@@ -56,9 +56,9 @@ class _NoteListScreenState extends State<NoteListScreen> {
         title: Text(
           '나의 투자 노트',
           style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.w600,
-          ),
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w600,
+              ),
         ),
       ),
       body: provider.isLoading
@@ -84,7 +84,8 @@ class _NoteListScreenState extends State<NoteListScreen> {
                           // 기존 노트를 편집하기 위해 에디터 화면으로 이동
                           context.push(AppRoutes.noteEditor, extra: note);
                         },
-                        onDelete: () => _showDeleteDialog(context, provider, note),
+                        onDelete: () =>
+                            _showDeleteDialog(context, provider, note),
                       );
                     },
                   ),
@@ -108,25 +109,37 @@ class _NoteListScreenState extends State<NoteListScreen> {
             Icon(
               Icons.note_add_outlined,
               size: 80.w,
-              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+              color: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.color
+                  ?.withValues(alpha: 0.5),
             ),
             SizedBox(height: 24.h),
             Text(
               '아직 작성된 노트가 없어요',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
-              ),
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withValues(alpha: 0.8),
+                  ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 8.h),
             Text(
               '아래 버튼을 눌러 첫 노트를 작성해보세요!',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontSize: 14.sp,
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
-              ),
+                    fontSize: 14.sp,
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withValues(alpha: 0.6),
+                  ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 32.h),
@@ -152,7 +165,8 @@ class _NoteListScreenState extends State<NoteListScreen> {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, NoteProvider provider, dynamic note) {
+  void _showDeleteDialog(
+      BuildContext context, NoteProvider provider, dynamic note) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -163,16 +177,16 @@ class _NoteListScreenState extends State<NoteListScreen> {
         title: Text(
           '노트 삭제',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-          ),
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+              ),
         ),
         content: Text(
           '정말로 이 노트를 삭제하시겠습니까?\n삭제된 노트는 복구할 수 없습니다.',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            fontSize: 14.sp,
-            height: 1.4,
-          ),
+                fontSize: 14.sp,
+                height: 1.4,
+              ),
         ),
         actions: [
           TextButton(

@@ -11,8 +11,9 @@ class AttendanceStatusDto {
   // API 응답 JSON을 파싱하여 DTO 객체로 변환
   factory AttendanceStatusDto.fromJson(Map<String, dynamic> json) {
     // API.md 명세: 'history' 키가 리스트 형태인지 확인
-    final List<dynamic> attendanceList = json['history'] as List<dynamic>? ?? [];
-    
+    final List<dynamic> attendanceList =
+        json['history'] as List<dynamic>? ?? [];
+
     return AttendanceStatusDto(
       attendance: attendanceList.map((item) {
         // 각 항목이 Map 형태인지 확인

@@ -16,7 +16,7 @@ class TheoryEmptyStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -24,17 +24,13 @@ class TheoryEmptyStateWidget extends StatelessWidget {
           Icon(
             icon,
             size: 64.sp,
-            color: isDarkMode 
-                ? AppTheme.grey600 
-                : AppTheme.grey400,
+            color: isDarkMode ? AppTheme.grey600 : AppTheme.grey400,
           ),
           SizedBox(height: 16.h),
           Text(
             message,
             style: TextStyle(
-              color: isDarkMode 
-                  ? AppTheme.grey400 
-                  : AppTheme.grey600,
+              color: isDarkMode ? AppTheme.grey400 : AppTheme.grey600,
               fontSize: 16.sp,
               fontWeight: FontWeight.w500,
             ),
