@@ -9,6 +9,9 @@ class QuizProvider extends ChangeNotifier {
   final QuizRepository? _repository;
   final QuizMockRepository? _mockRepository;
   final bool _useMock;
+  
+  // 퀴즈 완료 시 호출될 콜백 함수들
+  final List<Function(int chapterId, QuizResult result)> _onQuizCompletedCallbacks = [];
 
   /// 실제 API Repository를 사용하는 생성자
   QuizProvider(QuizRepository repository)
@@ -21,6 +24,16 @@ class QuizProvider extends ChangeNotifier {
       : _repository = null,
         _mockRepository = mockRepository,
         _useMock = true;
+
+  /// 퀴즈 완료 콜백 등록
+  void addOnQuizCompletedCallback(Function(int chapterId, QuizResult result) callback) {
+    _onQuizCompletedCallbacks.add(callback);
+  }
+
+  /// 퀴즈 완료 콜백 해제
+  void removeOnQuizCompletedCallback(Function(int chapterId, QuizResult result) callback) {
+    _onQuizCompletedCallbacks.remove(callback);
+  }
 
   // === 퀴즈 세션 관련 상태 ===
   QuizSession? _currentQuizSession;
@@ -253,10 +266,20 @@ class QuizProvider extends ChangeNotifier {
       // 결과 목록에 추가
       _quizResults.insert(0, result);
 
+      // 퀴즈 완료 콜백 호출 (다른 Provider들에게 알림)
+      for (final callback in _onQuizCompletedCallbacks) {
+        try {
+          callback(chapterId, result);
+        } catch (e) {
+          debugPrint('퀴즈 완료 콜백 실행 실패: $e');
+        }
+      }
+
       // 세션 정리
       _stopTimer();
       _currentQuizSession = null;
 
+      debugPrint('🎯 [QUIZ_PROVIDER] 퀴즈 완료 - 챕터 $chapterId, 점수: ${result.correctAnswers}/${result.totalQuestions} (${result.scorePercentage}%)');
       return result;
     } catch (e) {
       _quizError = e.toString();

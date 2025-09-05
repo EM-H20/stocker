@@ -266,17 +266,24 @@ class EducationRepository {
       if (cachedChapters != null) {
         final updatedChapters = cachedChapters.map((chapter) {
           if (chapter.chapterId == chapterId) {
-            return chapter.copyWith(isTheoryCompleted: isCompleted);
+            final updatedChapter = chapter.copyWith(isTheoryCompleted: isCompleted);
+            
+            // 이론과 퀴즈가 모두 완료된 경우 챕터도 완료로 설정
+            final shouldCompleteChapter = updatedChapter.isTheoryCompleted && updatedChapter.isQuizCompleted;
+            
+            return updatedChapter.copyWith(isChapterCompleted: shouldCompleteChapter);
           }
           return chapter;
         }).toList();
 
         await _cacheChapters(updatedChapters);
+        debugPrint('💾 [EDU_REPOSITORY] 챕터 $chapterId 이론 완료 상태 캐시 업데이트 완료');
       }
     } catch (e) {
-      // 캐시 업데이트 실패는 무시
+      debugPrint('❌ [EDU_REPOSITORY] 캐시 업데이트 실패: $e');
     }
   }
+
 
   // === Data to Domain Model Mappers ===
 
@@ -287,6 +294,7 @@ class EducationRepository {
       title: response.title,
       isTheoryCompleted: response.isTheoryCompleted,
       isQuizCompleted: response.isQuizCompleted,
+      isChapterCompleted: response.isChapterCompleted,
     );
   }
 

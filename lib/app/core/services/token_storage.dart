@@ -112,7 +112,6 @@ class TokenStorage {
     try {
       final token = await accessToken;
       final userIdValue = await userId;
-      final refresh = await refreshToken;
 
       debugPrint('📋 [TOKEN_STORAGE] === 현재 인증 상태 ===');
       if (token != null && userIdValue != null) {

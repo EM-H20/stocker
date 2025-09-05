@@ -11,6 +11,9 @@ class EducationProvider extends ChangeNotifier {
   final EducationRepository? _repository;
   final EducationMockRepository? _mockRepository;
   final bool _useMock;
+  
+  // 챕터 완료 시 호출될 콜백 함수들
+  final List<Function(int chapterId)> _onChapterCompletedCallbacks = [];
 
   /// 실제 API Repository를 사용하는 생성자
   EducationProvider(EducationRepository repository)
@@ -23,6 +26,16 @@ class EducationProvider extends ChangeNotifier {
       : _repository = null,
         _mockRepository = mockRepository,
         _useMock = true;
+
+  /// 챕터 완료 콜백 등록
+  void addOnChapterCompletedCallback(Function(int chapterId) callback) {
+    _onChapterCompletedCallbacks.add(callback);
+  }
+
+  /// 챕터 완료 콜백 해제
+  void removeOnChapterCompletedCallback(Function(int chapterId) callback) {
+    _onChapterCompletedCallbacks.remove(callback);
+  }
 
   // === 챕터 관련 상태 ===
   List<ChapterInfo> _chapters = [];
@@ -97,6 +110,21 @@ class EducationProvider extends ChangeNotifier {
     if (totalTasks == 0) return 0.0;
     return completedTasks / totalTasks;
   }
+
+  /// 완료된 챕터 수 조회
+  int getCompletedChapterCount() {
+    return _chapters.where((chapter) => chapter.isChapterCompleted).length;
+  }
+
+  /// 챕터별 완료율 (0.0 ~ 1.0)
+  /// 전체 챕터 중 완료된 챕터 비율
+  double get chapterCompletionRatio {
+    if (_chapters.isEmpty) return 0.0;
+    return getCompletedChapterCount() / _chapters.length;
+  }
+
+  /// 챕터 완료율을 백분율로 반환
+  double get chapterCompletionPercentage => chapterCompletionRatio * 100;
 
   /// 전체 작업 개수 조회 (챕터 수 × 2)
   int getTotalTaskCount() {
@@ -304,14 +332,19 @@ class EducationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final chapterId = _currentTheorySession!.chapterId;
+      
       if (_useMock) {
-        await _mockRepository!.completeTheory(_currentTheorySession!.chapterId);
+        await _mockRepository!.completeTheory(chapterId);
       } else {
-        await _repository!.completeTheory(_currentTheorySession!.chapterId);
+        await _repository!.completeTheory(chapterId);
       }
 
-      // 로컬 상태 업데이트
-      _updateLocalChapterCompletion(_currentTheorySession!.chapterId, true);
+      // 로컬 상태 업데이트: 이론 완료
+      _updateLocalChapterCompletion(chapterId, isTheoryCompleted: true);
+      
+      // 챕터 완료 상태 확인 및 업데이트
+      _checkAndUpdateChapterCompletion(chapterId);
 
       // 현재 이론 데이터 초기화
       _currentTheorySession = null;
@@ -409,12 +442,60 @@ class EducationProvider extends ChangeNotifier {
   }
 
   /// 로컬 챕터 완료 상태 업데이트
-  void _updateLocalChapterCompletion(int chapterId, bool isCompleted) {
+  void _updateLocalChapterCompletion(
+    int chapterId, {
+    bool? isTheoryCompleted,
+    bool? isQuizCompleted,
+    bool? isChapterCompleted,
+  }) {
     final chapterIndex = _chapters.indexWhere((c) => c.id == chapterId);
     if (chapterIndex >= 0) {
       _chapters[chapterIndex] = _chapters[chapterIndex].copyWith(
-        isTheoryCompleted: isCompleted,
+        isTheoryCompleted: isTheoryCompleted,
+        isQuizCompleted: isQuizCompleted,
+        isChapterCompleted: isChapterCompleted,
       );
+    }
+  }
+
+  /// 퀴즈 완료 상태 업데이트 (QuizProvider에서 호출됨)
+  void updateQuizCompletion(int chapterId, {required bool isPassed}) {
+    debugPrint('🎯 [EDU_PROVIDER] 퀴즈 완료 상태 업데이트 - 챕터 $chapterId (합격: $isPassed)');
+    
+    // 로컬 상태 업데이트
+    _updateLocalChapterCompletion(chapterId, isQuizCompleted: isPassed);
+    
+    // 챕터 완료 상태 확인 및 업데이트
+    _checkAndUpdateChapterCompletion(chapterId);
+    
+    notifyListeners();
+  }
+
+  /// 챕터 완료 상태 확인 및 업데이트
+  /// 이론과 퀴즈가 모두 완료된 경우 챕터를 완료 상태로 변경
+  void _checkAndUpdateChapterCompletion(int chapterId) {
+    final chapterIndex = _chapters.indexWhere((c) => c.id == chapterId);
+    if (chapterIndex >= 0) {
+      final chapter = _chapters[chapterIndex];
+      
+      // 이론과 퀴즈가 모두 완료된 경우에만 챕터 완료
+      if (chapter.isTheoryCompleted && chapter.isQuizCompleted) {
+        debugPrint('🎉 [EDU_PROVIDER] 챕터 완료! ID: $chapterId, Title: ${chapter.title}');
+        _updateLocalChapterCompletion(chapterId, isChapterCompleted: true);
+        
+        // 챕터 완료 콜백 호출 (LearningProgressProvider 등에 알림)
+        for (final callback in _onChapterCompletedCallbacks) {
+          try {
+            callback(chapterId);
+          } catch (e) {
+            debugPrint('❌ [EDU_PROVIDER] 챕터 완료 콜백 실행 실패: $e');
+          }
+        }
+        
+        debugPrint('✅ [EDU_PROVIDER] 챕터 완료 상태 백엔드 업데이트 요청 완료');
+      } else {
+        debugPrint('⏳ [EDU_PROVIDER] 챕터 미완료 - 이론: ${chapter.isTheoryCompleted}, 퀴즈: ${chapter.isQuizCompleted}');
+      }
     }
   }
 
