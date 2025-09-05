@@ -32,7 +32,7 @@ class QuizApi {
       final options = await _getAuthOptions();
       final response = await _dio.post(
         '/api/quiz/enter',
-        data: {'chpater_id': chapterId}, // API.md 스펙: chpater_id
+        data: {'chapter_id': chapterId}, // API.md 스펙: chapter_id
         options: options,
       );
 
@@ -69,8 +69,8 @@ class QuizApi {
       final response = await _dio.patch(
         '/api/quiz/progress',
         data: {
-          'chpater_id': chapterId, // API.md 스펙: chpater_id
-          'curent_quiz_id': currentQuizId, // API.md 스펙: curent_quiz_id (오타)
+          'chapter_id': chapterId, // API.md 스펙: chapter_id
+          'current_quiz_id': currentQuizId, // API.md 스펙: current_quiz_id
         },
         options: options,
       );
@@ -94,7 +94,7 @@ class QuizApi {
   /// 퀴즈 완료 처리 API.md 스펙: POST /api/quiz/complete
   ///
   /// [chapterId]: 챕터 ID
-  /// [answers]: 답안 목록 [{"quiz_id": 1, "answer": 2}, ...]
+  /// [answers]: 답안 목록 [{"quiz_id": 1, "selected_option": 2}, ...]
   /// Returns: QuizResult (점수 결과)
   /// Throws: DioException on HTTP error
   Future<QuizResult> completeQuiz(
