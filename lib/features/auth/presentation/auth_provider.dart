@@ -55,18 +55,27 @@ class AuthProvider with ChangeNotifier {
           '🔍 [AUTH_PROVIDER] 저장된 토큰 확인 - Token: ${token != null ? "존재" : "없음"}');
 
       if (token != null && userId != null) {
-        // 저장된 토큰이 있으면 사용자 복원
+        // 🔧 수정: 저장된 실제 사용자 정보 사용
         final refreshToken = await TokenStorage.refreshToken ?? '';
+        final email = await TokenStorage.userEmail;
+        final nickname = await TokenStorage.userNickname;
 
-        _user = User(
-            id: int.tryParse(userId) ?? 0,
-            email: 'tester@example.com', // Mock 환경에서는 고정 이메일
-            nickname: '목테스터', // Mock 환경에서는 고정 닉네임
-            accessToken: token,
-            refreshToken: refreshToken);
+        if (email != null) {
+          // 실제 사용자 정보가 있는 경우에만 사용자 복원
+          _user = User(
+              id: int.tryParse(userId) ?? 0,
+              email: email,
+              nickname: nickname ?? '', // 실제 저장된 닉네임 사용 (null인 경우 빈 문자열)
+              accessToken: token,
+              refreshToken: refreshToken);
 
-        debugPrint(
-            '✅ [AUTH_PROVIDER] 사용자 자동 로그인 성공 - User: ${_user!.nickname}');
+          debugPrint(
+              '✅ [AUTH_PROVIDER] 사용자 자동 로그인 성공 - User: ${_user!.email}');
+        } else {
+          // 사용자 정보가 불완전한 경우 토큰 정리
+          debugPrint('⚠️ [AUTH_PROVIDER] 저장된 사용자 정보 불완전 - 토큰 정리');
+          await TokenStorage.clear();
+        }
       } else {
         debugPrint('ℹ️ [AUTH_PROVIDER] 저장된 토큰 없음 - 로그아웃 상태');
         debugPrint('🔍 [AUTH_PROVIDER] 로그인이 필요한 상태입니다');

@@ -22,11 +22,13 @@ class AuthApi {
 
     final data = AuthResponse.fromJson(res.data);
 
-    // ✅ 토큰 + userId 저장 (static)
-    await TokenStorage.saveTokens(
-      data.accessToken,
-      data.refreshToken,
-      data.userId,
+    // 🔧 수정: 토큰과 사용자 정보 모두 저장
+    await TokenStorage.saveUserSession(
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      userId: data.userId,
+      email: data.email,
+      nickname: data.nickname.isNotEmpty ? data.nickname : null,
     );
 
     return data;
