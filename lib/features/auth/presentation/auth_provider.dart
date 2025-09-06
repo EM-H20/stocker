@@ -32,31 +32,15 @@ class AuthProvider with ChangeNotifier {
 
   /// 앱 시작 시 저장된 토큰을 확인하여 자동 로그인 처리
   Future<void> initialize() async {
-    debugPrint('🔄 [AUTH_PROVIDER] 초기화 시작...');
+    debugPrint('🔄 [AUTH_PROVIDER] Initializing auth state...');
 
     try {
-      // 🔍 전체 저장소 데이터 확인 (디버그용)
-      await TokenStorage.debugPrintAllData();
-      
-      // 📋 인증 상태 요약
-      await TokenStorage.debugAuthStatus();
       final token = await TokenStorage.accessToken;
       final userId = await TokenStorage.userId;
-      final refreshToken = await TokenStorage.refreshToken;
-
-      // 🔍 상세 디버그 정보 출력
-      debugPrint('📊 [AUTH_PROVIDER] === 저장된 데이터 상세 확인 ===');
-      debugPrint('🔑 AccessToken: ${token != null ? "${token.substring(0, 20)}..." : "null"}');
-      debugPrint('👤 UserId: $userId');  
-      debugPrint('🔄 RefreshToken: ${refreshToken != null ? "${refreshToken.substring(0, 20)}..." : "null"}');
-      debugPrint('📊 [AUTH_PROVIDER] ================================');
-
-      debugPrint(
-          '🔍 [AUTH_PROVIDER] 저장된 토큰 확인 - Token: ${token != null ? "존재" : "없음"}');
 
       if (token != null && userId != null) {
-        // 🔧 수정: 저장된 실제 사용자 정보 사용
-        final refreshToken = await TokenStorage.refreshToken ?? '';
+        // 저장된 실제 사용자 정보 사용
+        final storedRefreshToken = await TokenStorage.refreshToken ?? '';
         final email = await TokenStorage.userEmail;
         final nickname = await TokenStorage.userNickname;
 
@@ -67,29 +51,26 @@ class AuthProvider with ChangeNotifier {
               email: email,
               nickname: nickname ?? '', // 실제 저장된 닉네임 사용 (null인 경우 빈 문자열)
               accessToken: token,
-              refreshToken: refreshToken);
+              refreshToken: storedRefreshToken);
 
           debugPrint(
-              '✅ [AUTH_PROVIDER] 사용자 자동 로그인 성공 - User: ${_user!.email}');
+              '✅ [AUTH_PROVIDER] Auto-login successful for: ${_user!.email}');
         } else {
           // 사용자 정보가 불완전한 경우 토큰 정리
-          debugPrint('⚠️ [AUTH_PROVIDER] 저장된 사용자 정보 불완전 - 토큰 정리');
+          debugPrint(
+              '⚠️ [AUTH_PROVIDER] Incomplete user data - clearing tokens');
           await TokenStorage.clear();
         }
       } else {
-        debugPrint('ℹ️ [AUTH_PROVIDER] 저장된 토큰 없음 - 로그아웃 상태');
-        debugPrint('🔍 [AUTH_PROVIDER] 로그인이 필요한 상태입니다');
+        debugPrint('ℹ️ [AUTH_PROVIDER] No saved tokens - user needs to login');
       }
     } catch (e) {
-      debugPrint('❌ [AUTH_PROVIDER] 초기화 중 오류 발생: $e');
+      debugPrint('❌ [AUTH_PROVIDER] Initialization error: $e');
       _user = null;
     } finally {
       _isInitializing = false;
-      debugPrint('🏁 [AUTH_PROVIDER] 초기화 완료 - isLoggedIn: $isLoggedIn');
-      if (!isLoggedIn) {
-        debugPrint('🚨 [AUTH_PROVIDER] 로그인되지 않음: API 호출 시 401 에러 예상');
-        debugPrint('💡 [AUTH_PROVIDER] 해결방법: 로그인 화면에서 로그인 진행');
-      }
+      debugPrint(
+          '🏁 [AUTH_PROVIDER] Initialization complete - isLoggedIn: $isLoggedIn');
       notifyListeners();
     }
   }
@@ -123,18 +104,16 @@ class AuthProvider with ChangeNotifier {
   /// 🧪 테스트용 빠른 로그인 (개발자 전용)
   /// 백엔드에 생성된 테스트 계정으로 자동 로그인
   Future<bool> quickTestLogin() async {
-    debugPrint('🧪 [AUTH_PROVIDER] 테스트용 빠른 로그인 시작...');
-    debugPrint('📧 [AUTH_PROVIDER] 계정: test@example.com');
-    
+    debugPrint('🧪 [AUTH_PROVIDER] Quick test login started');
+
     final result = await login('test@example.com', 'test123');
-    
+
     if (result) {
-      debugPrint('✅ [AUTH_PROVIDER] 테스트 로그인 성공!');
-      debugPrint('🔑 [AUTH_PROVIDER] JWT 토큰 발급됨 - API 호출 가능');
+      debugPrint('✅ [AUTH_PROVIDER] Test login successful');
     } else {
-      debugPrint('❌ [AUTH_PROVIDER] 테스트 로그인 실패: $_errorMessage');
+      debugPrint('❌ [AUTH_PROVIDER] Test login failed: $_errorMessage');
     }
-    
+
     return result;
   }
 
@@ -175,8 +154,39 @@ class AuthProvider with ChangeNotifier {
   Future<void> refreshToken() async {
     try {
       await _repository.refreshToken();
+
+      // 토큰 갱신 성공 시 사용자 상태도 동기화
+      await _syncUserStateWithStorage();
     } catch (_) {
       // 토큰 갱신 실패 시, 로그인 화면으로 보내는 등의 처리가 필요할 수 있음
+      debugPrint('⚠️ [AUTH_PROVIDER] Token refresh failed - may need re-login');
+    }
+  }
+
+  /// 🔄 저장소의 토큰 정보와 사용자 상태 동기화
+  Future<void> _syncUserStateWithStorage() async {
+    try {
+      final token = await TokenStorage.accessToken;
+      final userId = await TokenStorage.userId;
+      final email = await TokenStorage.userEmail;
+      final nickname = await TokenStorage.userNickname;
+      final refreshToken = await TokenStorage.refreshToken;
+
+      if (token != null && userId != null && email != null && _user != null) {
+        // 기존 사용자 정보를 업데이트된 토큰으로 갱신
+        _user = User(
+          id: int.tryParse(userId) ?? _user!.id,
+          email: email,
+          nickname: nickname ?? _user!.nickname,
+          accessToken: token,
+          refreshToken: refreshToken ?? _user!.refreshToken,
+        );
+
+        debugPrint('🔄 [AUTH_PROVIDER] User state synced with updated tokens');
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('❌ [AUTH_PROVIDER] Failed to sync user state: $e');
     }
   }
 

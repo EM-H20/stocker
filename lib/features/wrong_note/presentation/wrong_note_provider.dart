@@ -31,7 +31,8 @@ class WrongNoteProvider extends ChangeNotifier {
   WrongNoteProvider.withMock(this._mockRepository) : _repository = null;
 
   /// 오답노트 목록 로드
-  Future<void> loadWrongNotes() async {
+  /// [chapterId]: 선택사항 - null이면 전체 챕터 조회
+  Future<void> loadWrongNotes({int? chapterId}) async {
     _setLoading(true);
     _clearError();
 
@@ -44,8 +45,8 @@ class WrongNoteProvider extends ChangeNotifier {
         // Mock Repository에서 재시도 상태 정보도 가져오기
         _retriedQuizIds = _mockRepository.retriedQuizIds;
       } else if (_repository != null) {
-        // 실제 API 사용
-        response = await _repository.getWrongNotes();
+        // 실제 API 사용 - chapterId 지원
+        response = await _repository.getWrongNotes(chapterId: chapterId);
         // 실제 API에서는 별도로 재시도 상태 정보를 가져와야 할 수 있음
         // TODO: 실제 API 구현 시 재시도 상태 로직 추가
       } else {
@@ -62,12 +63,27 @@ class WrongNoteProvider extends ChangeNotifier {
   }
 
   /// 퀴즈 결과 제출
-  Future<void> submitQuizResults(WrongNoteRequest request) async {
+  /// [chapterId]: 챕터 ID
+  /// [wrongItems]: 오답 항목 리스트
+  Future<void> submitQuizResults(
+      int chapterId, List<Map<String, dynamic>> wrongItems) async {
     try {
       if (_mockRepository != null) {
+        // Mock repository는 기존 방식 유지 - WrongNoteRequest 형식으로 변환
+        final request = WrongNoteRequest(
+          userId: 'mock_user',
+          chapterId: chapterId,
+          results: wrongItems
+              .map((item) => QuizResult(
+                    quizId: item['quiz_id'],
+                    isCorrect: false, // 오답이므로 false
+                  ))
+              .toList(),
+        );
         await _mockRepository.submitQuizResults(request);
       } else if (_repository != null) {
-        await _repository.submitQuizResults(request);
+        // 실제 API는 새로운 방식 사용
+        await _repository.submitQuizResults(chapterId, wrongItems);
       }
 
       // 제출 후 오답노트 다시 로드

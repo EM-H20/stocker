@@ -15,9 +15,10 @@ import 'widgets/quiz_navigation_widget.dart';
 import 'widgets/quiz_error_widget.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key, required this.chapterId});
+  const QuizScreen({super.key, required this.chapterId, this.singleQuizId});
 
   final int chapterId;
+  final int? singleQuizId; // 단일 퀴즈 모드용 quiz ID
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -26,23 +27,42 @@ class QuizScreen extends StatefulWidget {
 class _QuizScreenState extends State<QuizScreen> {
   int? _selectedAnswer;
   bool _isSubmitting = false;
+  bool _waitingForWrongNoteRemoval = false; // 오답 삭제 대기 상태
 
   @override
   void initState() {
     super.initState();
+    
+    // 단일 퀴즈 모드일 때 오답 삭제 완료 콜백 등록
+    if (widget.singleQuizId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final quizProvider = context.read<QuizProvider>();
+        quizProvider.addOnWrongNoteRemovedCallback(_onWrongNoteRemoved);
+      });
+    }
+    
     // 빌드 완료 후 다음 프레임에서 퀴즈 시작
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.microtask(() => _startQuiz());
     });
   }
 
-  /// 퀴즈를 바로 시작
+  /// 퀴즈를 바로 시작 (단일 퀴즈 모드 지원)
   Future<void> _startQuiz() async {
     final quizProvider = context.read<QuizProvider>();
 
     try {
-      await quizProvider.startQuiz(widget.chapterId);
+      if (widget.singleQuizId != null) {
+        // 단일 퀴즈 모드
+        debugPrint('🧠 [QUIZ_SCREEN] 단일 퀴즈 진입 - 챕터: ${widget.chapterId}, 퀴즈: ${widget.singleQuizId}');
+        await quizProvider.startSingleQuiz(widget.chapterId, widget.singleQuizId!);
+      } else {
+        // 일반 퀴즈 모드
+        debugPrint('🧠 [QUIZ_SCREEN] 일반 퀴즈 진입 - 챕터 ID: ${widget.chapterId}');
+        await quizProvider.startQuiz(widget.chapterId);
+      }
     } catch (e) {
+      debugPrint('❌ [QUIZ_SCREEN] 퀴즈 시작 실패 - 챕터: ${widget.chapterId}, 에러: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -51,6 +71,29 @@ class _QuizScreenState extends State<QuizScreen> {
           ),
         );
       }
+    }
+  }
+
+  @override
+  void dispose() {
+    // 단일 퀴즈 모드일 때 콜백 해제
+    if (widget.singleQuizId != null && mounted) {
+      try {
+        final quizProvider = context.read<QuizProvider>();
+        quizProvider.removeOnWrongNoteRemovedCallback(_onWrongNoteRemoved);
+      } catch (e) {
+        // dispose 중 에러는 무시
+      }
+    }
+    super.dispose();
+  }
+
+  /// 오답노트 삭제 완료 콜백
+  void _onWrongNoteRemoved(int quizId) {
+    if (widget.singleQuizId == quizId && mounted) {
+      debugPrint('🎯 [QUIZ_SCREEN] 오답노트 삭제 완료 알림 수신 - Quiz $quizId, 오답노트로 이동');
+      _waitingForWrongNoteRemoval = false;
+      context.go(AppRoutes.wrongNote);
     }
   }
 
@@ -245,10 +288,10 @@ class _QuizScreenState extends State<QuizScreen> {
     } else {
       // 퀴즈 완료 버튼
       return ActionButton(
-        text: '퀴즈 완료',
-        icon: Icons.check_circle,
-        color: AppTheme.successColor,
-        onPressed: () => _completeQuiz(provider),
+        text: _waitingForWrongNoteRemoval ? '처리 중...' : '퀴즈 완료',
+        icon: _waitingForWrongNoteRemoval ? Icons.hourglass_empty : Icons.check_circle,
+        color: _waitingForWrongNoteRemoval ? Colors.grey : AppTheme.successColor,
+        onPressed: _waitingForWrongNoteRemoval ? () {} : () => _completeQuiz(provider),
       );
     }
   }
@@ -287,8 +330,33 @@ class _QuizScreenState extends State<QuizScreen> {
     final result = await provider.completeQuiz();
 
     if (result != null && mounted) {
-      // 퀴즈 결과 화면으로 이동
-      context.go('${AppRoutes.quizResult}?chapterId=${widget.chapterId}');
+      if (widget.singleQuizId != null) {
+        // 단일 퀴즈 모드: 정답이면 오답 삭제 완료를 기다림, 오답이면 바로 이동
+        final session = provider.currentQuizSession;
+        if (session != null && session.quizList.isNotEmpty) {
+          final quiz = session.quizList.first;
+          final userAnswer = session.userAnswers.first;
+          final isCorrect = userAnswer == quiz.correctAnswerIndex;
+          
+          if (isCorrect) {
+            // 정답: 오답 삭제 완료를 기다림 (콜백에서 처리)
+            setState(() {
+              _waitingForWrongNoteRemoval = true;
+            });
+            debugPrint('🎯 [QUIZ_SCREEN] 단일 퀴즈 정답 완료, 오답 삭제 대기 중...');
+          } else {
+            // 오답: 바로 오답노트로 이동
+            debugPrint('🎯 [QUIZ_SCREEN] 단일 퀴즈 오답 완료, 바로 오답노트로 이동');
+            context.go(AppRoutes.wrongNote);
+          }
+        } else {
+          // 세션 정보 없으면 바로 이동
+          context.go(AppRoutes.wrongNote);
+        }
+      } else {
+        // 일반 퀴즈 모드: 퀴즈 결과 화면으로 이동
+        context.go('${AppRoutes.quizResult}?chapterId=${widget.chapterId}');
+      }
     }
   }
 }

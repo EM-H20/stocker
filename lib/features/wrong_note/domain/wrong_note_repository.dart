@@ -1,63 +1,47 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../data/wrong_note_api.dart';
-import '../data/models/wrong_note_request.dart';
 import '../data/models/wrong_note_response.dart';
 
 /// 오답노트 Repository
-/// 실제 API와 로컬 저장소를 사용하여 오답노트 데이터를 관리합니다.
+/// 실제 API를 사용하여 오답노트 데이터를 관리합니다. (JWT 토큰 자동 처리)
 class WrongNoteRepository {
   final WrongNoteApi _api;
-  final FlutterSecureStorage _storage;
 
-  WrongNoteRepository(this._api, this._storage);
+  WrongNoteRepository(this._api);
 
-  /// 사용자의 오답노트 목록 조회
-  Future<WrongNoteResponse> getWrongNotes() async {
+  /// 사용자의 오답노트 목록 조회 (JWT에서 userId 자동 추출)
+  /// [chapterId]: 선택사항 - null이면 전체 챕터 조회
+  Future<WrongNoteResponse> getWrongNotes({int? chapterId}) async {
     try {
-      // 저장된 사용자 ID 가져오기
-      final userId = await _storage.read(key: 'user_id');
-      if (userId == null) {
-        throw Exception('사용자 정보가 없습니다.');
-      }
-
-      return await _api.getWrongNotes(userId);
+      return await _api.getWrongNotes(chapterId: chapterId);
     } catch (e) {
       throw Exception('오답노트 조회 실패: $e');
     }
   }
 
-  /// 퀴즈 결과를 제출하여 오답노트 업데이트
-  Future<void> submitQuizResults(WrongNoteRequest request) async {
+  /// 퀴즈 결과를 제출하여 오답노트 업데이트 (새 API 방식)
+  /// [chapterId]: 챕터 ID
+  /// [wrongItems]: 오답 항목 리스트
+  Future<void> submitQuizResults(int chapterId, List<Map<String, dynamic>> wrongItems) async {
     try {
-      await _api.submitQuizResults(request);
+      await _api.submitQuizResults(chapterId, wrongItems);
     } catch (e) {
       throw Exception('퀴즈 결과 제출 실패: $e');
     }
   }
 
-  /// 특정 오답 문제 재시도 표시
+  /// 특정 오답 문제 재시도 표시 (JWT에서 userId 자동 추출)
   Future<void> markAsRetried(int quizId) async {
     try {
-      final userId = await _storage.read(key: 'user_id');
-      if (userId == null) {
-        throw Exception('사용자 정보가 없습니다.');
-      }
-
-      await _api.markAsRetried(userId, quizId);
+      await _api.markAsRetried(quizId);
     } catch (e) {
       throw Exception('재시도 표시 실패: $e');
     }
   }
 
-  /// 오답노트에서 문제 삭제 (정답 처리 시)
+  /// 오답노트에서 문제 삭제 (정답 처리 시, JWT에서 userId 자동 추출)
   Future<void> removeWrongNote(int quizId) async {
     try {
-      final userId = await _storage.read(key: 'user_id');
-      if (userId == null) {
-        throw Exception('사용자 정보가 없습니다.');
-      }
-
-      await _api.removeWrongNote(userId, quizId);
+      await _api.removeWrongNote(quizId);
     } catch (e) {
       throw Exception('오답노트 삭제 실패: $e');
     }

@@ -27,16 +27,19 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    // 에러 상세 로깅
-    debugPrint('🚨 [AUTH_INTERCEPTOR] HTTP 에러 발생');
-    debugPrint('🚨 [AUTH_INTERCEPTOR] Error Type: ${err.type}');
-    debugPrint('🚨 [AUTH_INTERCEPTOR] Message: ${err.message}');
-    debugPrint('🚨 [AUTH_INTERCEPTOR] Request URL: ${err.requestOptions.uri}');
-
-    if (err.response != null) {
-      debugPrint(
-          '🚨 [AUTH_INTERCEPTOR] Response Status: ${err.response!.statusCode}');
-      debugPrint('🚨 [AUTH_INTERCEPTOR] Response Data: ${err.response!.data}');
+    // 중요한 에러만 로깅 (개발 환경에서)
+    if (kDebugMode) {
+      debugPrint('🚨 [AUTH_INTERCEPTOR] HTTP Error - ${err.response?.statusCode ?? err.type}');
+      debugPrint('🚨 [AUTH_INTERCEPTOR] URL: ${err.requestOptions.uri}');
+      
+      // 상세 로그는 심각한 에러에만 표시
+      if (err.response?.statusCode != 401) {
+        debugPrint('🚨 [AUTH_INTERCEPTOR] Error Type: ${err.type}');
+        debugPrint('🚨 [AUTH_INTERCEPTOR] Message: ${err.message}');
+        if (err.response != null) {
+          debugPrint('🚨 [AUTH_INTERCEPTOR] Response Data: ${err.response!.data}');
+        }
+      }
     }
 
     // 네트워크 문제 및 백엔드 연결 오류 감지 (사용자 친화적 메시지)
@@ -62,38 +65,65 @@ class AuthInterceptor extends Interceptor {
 
     // access token 만료 (401) 시 처리
     if (err.response?.statusCode == 401) {
-      debugPrint(
-          '🔑 [AUTH_INTERCEPTOR] 401 Unauthorized - 백엔드 미들웨어가 토큰을 자동 갱신해줌');
+      if (kDebugMode) {
+        debugPrint('🔄 [AUTH_INTERCEPTOR] Token expired, attempting refresh...');
+      }
 
       // 백엔드 미들웨어가 x-access-token 헤더에 새로운 access token을 넣어줄 수 있음
       final newAccessToken = err.response?.headers['x-access-token']?.first;
 
       if (newAccessToken != null && newAccessToken.isNotEmpty) {
-        debugPrint('✨ [AUTH_INTERCEPTOR] 백엔드에서 새로운 access token 받음');
+        if (kDebugMode) {
+          debugPrint('✨ [AUTH_INTERCEPTOR] New token received, updating storage...');
+        }
 
-        // 새로운 access token 저장
-        final userId = await TokenStorage.userId;
-        final refreshToken = await TokenStorage.refreshToken;
+        try {
+          // 새로운 access token 저장 (사용자 정보 포함)
+          final userId = await TokenStorage.userId;
+          final refreshToken = await TokenStorage.refreshToken;
+          final userEmail = await TokenStorage.userEmail;
+          final userNickname = await TokenStorage.userNickname;
 
-        if (userId != null && refreshToken != null) {
-          await TokenStorage.saveTokens(newAccessToken, refreshToken, userId);
+          if (userId != null && refreshToken != null && userEmail != null) {
+            // 완전한 사용자 세션 정보 저장
+            await TokenStorage.saveUserSession(
+              accessToken: newAccessToken,
+              refreshToken: refreshToken,
+              userId: userId,
+              email: userEmail,
+              nickname: userNickname,
+            );
 
-          // 실패했던 요청을 새로운 토큰으로 재시도
-          final req = err.requestOptions;
-          final newHeaders = Map<String, dynamic>.from(req.headers);
-          newHeaders['Authorization'] = 'Bearer $newAccessToken';
+            // 실패했던 요청을 새로운 토큰으로 재시도
+            final req = err.requestOptions;
+            final newHeaders = Map<String, dynamic>.from(req.headers);
+            newHeaders['Authorization'] = 'Bearer $newAccessToken';
 
-          final retryResponse = await _dio.fetch(
-            req.copyWith(headers: newHeaders),
-          );
-          handler.resolve(retryResponse);
-          debugPrint('✅ [AUTH_INTERCEPTOR] 토큰 갱신 및 재요청 성공!');
-          return;
+            final retryResponse = await _dio.fetch(
+              req.copyWith(headers: newHeaders),
+            );
+            
+            if (kDebugMode) {
+              debugPrint('✅ [AUTH_INTERCEPTOR] Token refreshed and request retried successfully');
+            }
+            
+            handler.resolve(retryResponse);
+            return;
+          }
+        } catch (retryError) {
+          if (kDebugMode) {
+            debugPrint('❌ [AUTH_INTERCEPTOR] Failed to retry request: $retryError');
+          }
         }
       } else {
         // 백엔드에서 새로운 토큰을 주지 않았다면 refresh token도 만료된 것
-        debugPrint('🚪 [AUTH_INTERCEPTOR] Refresh 토큰도 만료됨 - 재로그인 필요');
+        if (kDebugMode) {
+          debugPrint('🚪 [AUTH_INTERCEPTOR] Refresh token expired - login required');
+        }
         await TokenStorage.clear(); // 만료된 토큰들 모두 정리
+        
+        // 사용자 친화적 메시지 설정
+        err.requestOptions.extra['userMessage'] = '로그인이 만료되었습니다. 다시 로그인해주세요.';
       }
     }
 

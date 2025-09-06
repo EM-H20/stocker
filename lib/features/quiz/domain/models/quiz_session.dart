@@ -7,6 +7,7 @@ class QuizSession {
   final int currentQuizId;
   final List<int?> userAnswers; // 로컬 저장용
   final DateTime startedAt; // 로컬 저장용
+  final bool isSingleQuizMode; // 단일 퀴즈 모드 여부
 
   const QuizSession({
     required this.chapterId,
@@ -14,6 +15,7 @@ class QuizSession {
     required this.currentQuizId,
     required this.userAnswers,
     required this.startedAt,
+    this.isSingleQuizMode = false,
   });
 
   /// JSON에서 QuizSession 객체 생성 (API.md 스펙)
@@ -30,6 +32,7 @@ class QuizSession {
       startedAt: json['startedAt'] != null 
           ? DateTime.parse(json['startedAt'] as String)
           : DateTime.now(),
+      isSingleQuizMode: json['isSingleQuizMode'] as bool? ?? false,
     );
   }
 
@@ -44,6 +47,7 @@ class QuizSession {
       userAnswers: (json['userAnswers'] as List<dynamic>?)?.cast<int?>() ??
           List<int?>.filled((json['quiz_list'] as List).length, null),
       startedAt: DateTime.parse(json['startedAt'] as String),
+      isSingleQuizMode: json['isSingleQuizMode'] as bool? ?? false,
     );
   }
 
@@ -55,6 +59,7 @@ class QuizSession {
       'current_quiz_id': currentQuizId,
       'userAnswers': userAnswers,
       'startedAt': startedAt.toIso8601String(),
+      'isSingleQuizMode': isSingleQuizMode,
     };
   }
 
@@ -101,6 +106,7 @@ class QuizSession {
     int? currentQuizId,
     List<int?>? userAnswers,
     DateTime? startedAt,
+    bool? isSingleQuizMode,
   }) {
     return QuizSession(
       chapterId: chapterId ?? this.chapterId,
@@ -108,6 +114,7 @@ class QuizSession {
       currentQuizId: currentQuizId ?? this.currentQuizId,
       userAnswers: userAnswers ?? this.userAnswers,
       startedAt: startedAt ?? this.startedAt,
+      isSingleQuizMode: isSingleQuizMode ?? this.isSingleQuizMode,
     );
   }
 

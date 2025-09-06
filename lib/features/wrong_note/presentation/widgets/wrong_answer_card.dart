@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/core/widgets/action_button.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/config/app_routes.dart';
 import '../../data/models/wrong_note_response.dart';
 
 /// 개별 오답 카드 위젯
@@ -220,7 +222,10 @@ class WrongAnswerCard extends StatelessWidget {
                   text: '다시 풀기',
                   icon: Icons.refresh,
                   color: AppTheme.successColor,
-                  onPressed: onRetry,
+                  onPressed: () {
+                    // 단일 퀴즈 모드로 해당 문제 재시도
+                    context.go('${AppRoutes.quiz}?chapterId=${wrongNote.chapterId}&quizId=${wrongNote.quizId}');
+                  },
                 ),
             ],
           ),
@@ -229,9 +234,22 @@ class WrongAnswerCard extends StatelessWidget {
     );
   }
 
-  /// 정답 텍스트 가져오기 (현재는 실제 정답 정보가 없으므로 placeholder)
+  /// 정답 텍스트 가져오기
   String _getCorrectAnswerText() {
-    // TODO: 실제 정답 정보가 필요한 경우 API에서 제공받아야 함
-    return '정답 정보 필요';
+    // correctAnswerText가 있으면 그것을 사용
+    if (wrongNote.correctAnswerText != null && wrongNote.correctAnswerText!.isNotEmpty) {
+      return wrongNote.correctAnswerText!;
+    }
+    
+    // correctAnswerIndex와 options로 정답 텍스트 구성
+    if (wrongNote.correctAnswerIndex != null && 
+        wrongNote.options != null && 
+        wrongNote.options!.isNotEmpty &&
+        wrongNote.correctAnswerIndex! < wrongNote.options!.length) {
+      final correctIndex = wrongNote.correctAnswerIndex!;
+      return '${correctIndex + 1}번. ${wrongNote.options![correctIndex]}';
+    }
+    
+    return '정답 정보 없음';
   }
 }

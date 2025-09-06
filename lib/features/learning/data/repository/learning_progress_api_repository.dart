@@ -99,7 +99,26 @@ class LearningProgressApiRepository implements LearningProgressRepository {
       
       debugPrint('✅ [LearningProgressApiRepo] 챕터 $chapterId 완료 표시');
     } catch (e) {
+      // 404 에러 처리: API 엔드포인트가 없는 경우 로컬에서만 처리
+      final errorStr = e.toString();
+      if (errorStr.contains('404') || errorStr.contains('Cannot POST')) {
+        debugPrint('⚠️ [LearningProgressApiRepo] API 엔드포인트 없음 - 로컬에서만 챕터 완료 처리: $chapterId');
+        
+        // 로컬 캐시에만 업데이트 (API 호출 없이)
+        if (_cachedProgress != null) {
+          final completedChapters = List<int>.from(_cachedProgress!['completedChapters'] ?? []);
+          if (!completedChapters.contains(chapterId)) {
+            completedChapters.add(chapterId);
+            _cachedProgress!['completedChapters'] = completedChapters;
+          }
+        }
+        
+        debugPrint('✅ [LearningProgressApiRepo] 로컬 캐시에서 챕터 $chapterId 완료 표시');
+        return; // 성공으로 처리하여 무한 재시도 방지
+      }
+      
       debugPrint('❌ [LearningProgressApiRepo] 챕터 완료 표시 실패: $e');
+      rethrow; // 404가 아닌 다른 에러는 다시 던짐
     }
   }
 

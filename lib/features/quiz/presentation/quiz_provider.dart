@@ -12,6 +12,12 @@ class QuizProvider extends ChangeNotifier {
   
   // 퀴즈 완료 시 호출될 콜백 함수들
   final List<Function(int chapterId, QuizResult result)> _onQuizCompletedCallbacks = [];
+  
+  // 단일 퀴즈 완료 시 호출될 콜백 함수들 (오답노트 삭제용)
+  final List<Function(int quizId, bool isCorrect)> _onSingleQuizCompletedCallbacks = [];
+  
+  // 단일 퀴즈 오답 삭제 완료 시 호출될 콜백 함수들 (네비게이션용)
+  final List<Function(int quizId)> _onWrongNoteRemovedCallbacks = [];
 
   /// 실제 API Repository를 사용하는 생성자
   QuizProvider(QuizRepository repository)
@@ -33,6 +39,37 @@ class QuizProvider extends ChangeNotifier {
   /// 퀴즈 완료 콜백 해제
   void removeOnQuizCompletedCallback(Function(int chapterId, QuizResult result) callback) {
     _onQuizCompletedCallbacks.remove(callback);
+  }
+
+  /// 단일 퀴즈 완료 콜백 등록
+  void addOnSingleQuizCompletedCallback(Function(int quizId, bool isCorrect) callback) {
+    _onSingleQuizCompletedCallbacks.add(callback);
+  }
+
+  /// 단일 퀴즈 완료 콜백 해제
+  void removeOnSingleQuizCompletedCallback(Function(int quizId, bool isCorrect) callback) {
+    _onSingleQuizCompletedCallbacks.remove(callback);
+  }
+
+  /// 오답노트 삭제 완료 콜백 등록
+  void addOnWrongNoteRemovedCallback(Function(int quizId) callback) {
+    _onWrongNoteRemovedCallbacks.add(callback);
+  }
+
+  /// 오답노트 삭제 완료 콜백 해제
+  void removeOnWrongNoteRemovedCallback(Function(int quizId) callback) {
+    _onWrongNoteRemovedCallbacks.remove(callback);
+  }
+
+  /// 오답노트 삭제 완료 알림 (외부에서 호출)
+  void notifyWrongNoteRemoved(int quizId) {
+    for (final callback in _onWrongNoteRemovedCallbacks) {
+      try {
+        callback(quizId);
+      } catch (e) {
+        debugPrint('오답노트 삭제 완료 콜백 실행 실패: $e');
+      }
+    }
   }
 
   // === 퀴즈 세션 관련 상태 ===
@@ -118,25 +155,90 @@ class QuizProvider extends ChangeNotifier {
   Future<bool> startQuiz(int chapterId) async {
     if (_isLoadingQuiz) return false;
 
+    debugPrint('🧠 [QUIZ_PROVIDER] 일반 퀴즈 진입 요청 - 챕터 ID: $chapterId (useMock: $_useMock)');
     _isLoadingQuiz = true;
     _quizError = null;
     notifyListeners();
 
     try {
       if (_useMock) {
+        debugPrint('🎭 [QUIZ_PROVIDER] Mock Repository로 퀴즈 진입 중...');
         _currentQuizSession = await _mockRepository!.enterQuiz(chapterId);
       } else {
+        debugPrint('🌐 [QUIZ_PROVIDER] Real API Repository로 퀴즈 진입 중...');
         _currentQuizSession = await _repository!.enterQuiz(chapterId);
       }
 
       // 기본 10분 타이머 시작 (API.md 스펙에서 timeLimit 제거됨)
       _startTimer(600); // 10분
+      debugPrint('⏰ [QUIZ_PROVIDER] 퀴즈 타이머 시작 - 10분');
 
+      debugPrint('✅ [QUIZ_PROVIDER] 일반 퀴즈 진입 성공 - 총 ${_currentQuizSession?.totalCount ?? 0}개 문제');
       _quizError = null;
       return true;
     } catch (e) {
       _quizError = e.toString();
-      debugPrint('퀴즈 진입 실패: $e');
+      debugPrint('❌ [QUIZ_PROVIDER] 일반 퀴즈 진입 실패 - 챕터: $chapterId, 에러: $e');
+      return false;
+    } finally {
+      _isLoadingQuiz = false;
+      notifyListeners();
+    }
+  }
+
+  /// 단일 퀴즈 진입 (오답노트 재시도용)
+  ///
+  /// [chapterId]: 챕터 ID
+  /// [quizId]: 특정 퀴즈 ID
+  Future<bool> startSingleQuiz(int chapterId, int quizId) async {
+    if (_isLoadingQuiz) return false;
+
+    debugPrint('🎯 [QUIZ_PROVIDER] 단일 퀴즈 진입 요청 - 챕터: $chapterId, 퀴즈: $quizId (useMock: $_useMock)');
+    _isLoadingQuiz = true;
+    _quizError = null;
+    notifyListeners();
+
+    try {
+      // 먼저 전체 퀴즈 세션을 가져온 후 특정 퀴즈만 필터링
+      QuizSession fullSession;
+      if (_useMock) {
+        debugPrint('🎭 [QUIZ_PROVIDER] Mock Repository로 단일 퀴즈 데이터 로드 중...');
+        fullSession = await _mockRepository!.enterQuiz(chapterId);
+      } else {
+        debugPrint('🌐 [QUIZ_PROVIDER] Real API Repository로 단일 퀴즈 데이터 로드 중...');
+        fullSession = await _repository!.enterQuiz(chapterId);
+      }
+
+      // 해당 quizId를 가진 퀴즈만 찾기
+      final targetQuiz = fullSession.quizList.where((quiz) => quiz.id == quizId).toList();
+      
+      if (targetQuiz.isEmpty) {
+        debugPrint('❌ [QUIZ_PROVIDER] 단일 퀴즈 찾기 실패 - ID: $quizId');
+        throw Exception('해당 퀴즈를 찾을 수 없습니다 (ID: $quizId)');
+      }
+
+      debugPrint('🔍 [QUIZ_PROVIDER] 단일 퀴즈 찾기 성공 - 문제: ${targetQuiz.first.question}');
+
+      // 단일 퀴즈로 구성된 새로운 QuizSession 생성
+      _currentQuizSession = QuizSession(
+        chapterId: chapterId,
+        quizList: targetQuiz,
+        currentQuizId: targetQuiz.first.id,
+        userAnswers: [null], // 1개 퀴즈이므로 하나의 null 답안
+        startedAt: DateTime.now(),
+        isSingleQuizMode: true, // 단일 퀴즈 모드 표시
+      );
+
+      // 단일 퀴즈는 5분 타이머
+      _startTimer(300); // 5분
+      debugPrint('⏰ [QUIZ_PROVIDER] 단일 퀴즈 타이머 시작 - 5분');
+
+      _quizError = null;
+      debugPrint('✅ [QUIZ_PROVIDER] 단일 퀴즈 진입 성공 - 챕터: $chapterId, 퀴즈: $quizId');
+      return true;
+    } catch (e) {
+      _quizError = e.toString();
+      debugPrint('❌ [QUIZ_PROVIDER] 단일 퀴즈 진입 실패 - 챕터: $chapterId, 퀴즈: $quizId, 에러: $e');
       return false;
     } finally {
       _isLoadingQuiz = false;
@@ -266,12 +368,33 @@ class QuizProvider extends ChangeNotifier {
       // 결과 목록에 추가
       _quizResults.insert(0, result);
 
-      // 퀴즈 완료 콜백 호출 (다른 Provider들에게 알림)
-      for (final callback in _onQuizCompletedCallbacks) {
-        try {
-          callback(chapterId, result);
-        } catch (e) {
-          debugPrint('퀴즈 완료 콜백 실행 실패: $e');
+      // 단일 퀴즈 모드일 때 오답노트 삭제 처리
+      final isSingleMode = _currentQuizSession!.isSingleQuizMode;
+      if (isSingleMode && _currentQuizSession!.quizList.isNotEmpty) {
+        final quiz = _currentQuizSession!.quizList.first;
+        final userAnswer = _currentQuizSession!.userAnswers.first;
+        final isCorrect = userAnswer == quiz.correctAnswerIndex;
+        
+        // 단일 퀴즈 완료 콜백 호출 (오답노트 삭제용)
+        for (final callback in _onSingleQuizCompletedCallbacks) {
+          try {
+            callback(quiz.id, isCorrect);
+          } catch (e) {
+            debugPrint('단일 퀴즈 완료 콜백 실행 실패: $e');
+          }
+        }
+        
+        debugPrint('🎯 [SINGLE_QUIZ] 단일 퀴즈 완료 - Quiz ${quiz.id}, 정답: $isCorrect');
+      }
+
+      // 일반 퀴즈 완료 콜백 호출 (교육 진도 업데이트용)
+      if (!isSingleMode) {
+        for (final callback in _onQuizCompletedCallbacks) {
+          try {
+            callback(chapterId, result);
+          } catch (e) {
+            debugPrint('퀴즈 완료 콜백 실행 실패: $e');
+          }
         }
       }
 
