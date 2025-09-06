@@ -296,10 +296,13 @@ class StockerApp extends StatelessWidget {
                 }
               });
 
-              // 🎯 QuizProvider -> WrongNoteProvider 단일 퀴즈 완료 콜백 (오답노트 삭제용)
-              quizProvider.addOnSingleQuizCompletedCallback((quizId, isCorrect) async {
+              // 🎯 QuizProvider -> WrongNoteProvider 단일 퀴즈 완료 콜백 (오답노트 관리용)
+              quizProvider.addOnSingleQuizCompletedCallback((chapterId, quizId, isCorrect, selectedOption) async {
+                debugPrint('🎯 [SINGLE_QUIZ_CALLBACK] 단일 퀴즈 완료 - Chapter: $chapterId, Quiz: $quizId, 정답: $isCorrect, 선택: $selectedOption');
+                
                 if (isCorrect) {
-                  debugPrint('🎯 [SINGLE_QUIZ_CALLBACK] 단일 퀴즈 $quizId 정답! 오답노트에서 삭제 시작...');
+                  // 정답인 경우: 오답노트에서 삭제
+                  debugPrint('🎯 [SINGLE_QUIZ_CALLBACK] 정답! 오답노트에서 삭제 시작...');
                   try {
                     await wrongNoteProvider.removeWrongNote(quizId);
                     debugPrint('✅ [SINGLE_QUIZ_CALLBACK] 오답노트에서 퀴즈 $quizId 삭제 완료');
@@ -308,10 +311,36 @@ class StockerApp extends StatelessWidget {
                     quizProvider.notifyWrongNoteRemoved(quizId);
                     debugPrint('📢 [SINGLE_QUIZ_CALLBACK] 오답 삭제 완료 알림 발송 - Quiz $quizId');
                   } catch (e) {
-                    debugPrint('❌ [SINGLE_QUIZ_CALLBACK] 오답노트 삭제 실패: $e');
+                    debugPrint('❌ [SINGLE_QUIZ_CALLBACK] 오답노트 삭제 실패 (계속 진행) - Quiz $quizId: $e');
+                    
+                    // 삭제 실패해도 네비게이션은 진행 (사용자 경험을 위해)
+                    // 단, 실제 에러인 경우만 (404는 이미 Provider에서 처리됨)
+                    if (!e.toString().contains('404') && !e.toString().contains('찾을 수 없습니다')) {
+                      debugPrint('⚠️ [SINGLE_QUIZ_CALLBACK] 실제 에러 발생, 네비게이션 중단');
+                      return; // 실제 에러면 네비게이션 중단
+                    }
+                    
+                    // 404 에러는 정상 처리로 간주하고 네비게이션 진행
+                    quizProvider.notifyWrongNoteRemoved(quizId);
+                    debugPrint('📢 [SINGLE_QUIZ_CALLBACK] 404 에러지만 네비게이션 진행 - Quiz $quizId');
                   }
                 } else {
-                  debugPrint('❌ [SINGLE_QUIZ_CALLBACK] 단일 퀴즈 $quizId 오답... 오답노트에서 유지됩니다');
+                  // 오답인 경우: 오답노트에 추가
+                  debugPrint('❌ [SINGLE_QUIZ_CALLBACK] 오답! 오답노트에 추가 시작...');
+                  try {
+                    await wrongNoteProvider.submitSingleQuizResult(chapterId, quizId, selectedOption);
+                    debugPrint('✅ [SINGLE_QUIZ_CALLBACK] 오답노트에 퀴즈 $quizId 추가 완료 (Chapter: $chapterId, Option: $selectedOption)');
+                    
+                    // 오답 추가 후에도 네비게이션 신호 (일관성을 위해)
+                    quizProvider.notifyWrongNoteRemoved(quizId);
+                    debugPrint('📢 [SINGLE_QUIZ_CALLBACK] 오답 추가 완료 알림 발송 - Quiz $quizId');
+                  } catch (e) {
+                    debugPrint('❌ [SINGLE_QUIZ_CALLBACK] 오답노트 추가 실패 - Quiz $quizId: $e');
+                    
+                    // 오답 추가 실패해도 네비게이션은 진행 (사용자 경험을 위해)
+                    quizProvider.notifyWrongNoteRemoved(quizId);
+                    debugPrint('📢 [SINGLE_QUIZ_CALLBACK] 오답 추가 실패지만 네비게이션 진행 - Quiz $quizId');
+                  }
                 }
               });
               

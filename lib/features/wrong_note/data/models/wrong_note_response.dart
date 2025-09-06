@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+
 /// 오답노트 응답 모델
 class WrongNoteResponse {
   final List<WrongNoteItem> wrongNotes;
@@ -58,25 +61,60 @@ class WrongNoteItem {
 
   /// 백엔드 JSON에서 객체 생성 (JOIN 데이터 포함)
   factory WrongNoteItem.fromBackendJson(Map<String, dynamic> json) {
-    return WrongNoteItem(
+    debugPrint('🔍 [WrongNote] API 응답 파싱 중: ${json.keys.join(', ')}');
+    
+    // selected_option null 처리 (API에서 null이 올 수 있음)
+    final selectedOpt = json['selected_option'];
+    final selectedOption = selectedOpt is int ? selectedOpt : (selectedOpt is String ? int.tryParse(selectedOpt) : null) ?? 1;
+    
+    // correct_option을 correct_answer_index로 변환 (1~4 → 0~3)
+    final correctOpt = json['correct_option'];
+    int? correctAnswerIndex;
+    if (correctOpt is int && correctOpt >= 1 && correctOpt <= 4) {
+      correctAnswerIndex = correctOpt - 1; // 1-based to 0-based
+    }
+    
+    // options 파싱 (JSON 문자열일 수도 있고, 배열일 수도 있음)
+    List<String>? optionsList;
+    final optionsData = json['options'];
+    if (optionsData != null) {
+      if (optionsData is List) {
+        optionsList = List<String>.from(optionsData);
+      } else if (optionsData is String) {
+        try {
+          // JSON 문자열인 경우 파싱 시도
+          final parsed = jsonDecode(optionsData);
+          if (parsed is List) {
+            optionsList = List<String>.from(parsed);
+          }
+        } catch (e) {
+          debugPrint('⚠️ [WrongNote] options 파싱 실패: $e');
+        }
+      }
+    }
+    
+    final result = WrongNoteItem(
       id: json['id'] as int,
       quizId: json['quiz_id'] as int,
       chapterId: json['chapter_id'] as int,
       userId: json['user_id'] as int,
-      selectedOption: json['selected_option'] as int,
+      selectedOption: selectedOption,
       createdDate: json['created_date'] != null
           ? DateTime.parse(json['created_date'] as String)
           : DateTime.now(),
       // JOIN된 추가 정보
       chapterTitle: json['chapter_title'] as String?,
       question: json['question'] as String?,
-      options: json['options'] != null
-          ? List<String>.from(json['options'] as List)
-          : null,
+      options: optionsList,
       explanation: json['explanation'] as String?,
-      correctAnswerIndex: json['correct_answer_index'] as int?,
-      correctAnswerText: json['correct_answer_text'] as String?,
+      correctAnswerIndex: correctAnswerIndex,
+      correctAnswerText: correctAnswerIndex != null && optionsList != null && 
+          correctAnswerIndex >= 0 && correctAnswerIndex < optionsList.length 
+          ? optionsList[correctAnswerIndex] : null,
     );
+    
+    debugPrint('✅ [WrongNote] 파싱 완료 - ID: ${result.id}, Quiz: ${result.quizId}, Selected: ${result.selectedOption}, Correct: ${result.correctAnswerIndex}');
+    return result;
   }
 
   /// Mock/기존 JSON 변환 (하위 호환성)

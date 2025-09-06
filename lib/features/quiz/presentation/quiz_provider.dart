@@ -9,13 +9,17 @@ class QuizProvider extends ChangeNotifier {
   final QuizRepository? _repository;
   final QuizMockRepository? _mockRepository;
   final bool _useMock;
-  
+
   // 퀴즈 완료 시 호출될 콜백 함수들
-  final List<Function(int chapterId, QuizResult result)> _onQuizCompletedCallbacks = [];
-  
-  // 단일 퀴즈 완료 시 호출될 콜백 함수들 (오답노트 삭제용)
-  final List<Function(int quizId, bool isCorrect)> _onSingleQuizCompletedCallbacks = [];
-  
+  final List<Function(int chapterId, QuizResult result)>
+      _onQuizCompletedCallbacks = [];
+
+  // 단일 퀴즈 완료 시 호출될 콜백 함수들 (오답노트 관리용)
+  final List<
+          Function(
+              int chapterId, int quizId, bool isCorrect, int selectedOption)>
+      _onSingleQuizCompletedCallbacks = [];
+
   // 단일 퀴즈 오답 삭제 완료 시 호출될 콜백 함수들 (네비게이션용)
   final List<Function(int quizId)> _onWrongNoteRemovedCallbacks = [];
 
@@ -32,22 +36,28 @@ class QuizProvider extends ChangeNotifier {
         _useMock = true;
 
   /// 퀴즈 완료 콜백 등록
-  void addOnQuizCompletedCallback(Function(int chapterId, QuizResult result) callback) {
+  void addOnQuizCompletedCallback(
+      Function(int chapterId, QuizResult result) callback) {
     _onQuizCompletedCallbacks.add(callback);
   }
 
   /// 퀴즈 완료 콜백 해제
-  void removeOnQuizCompletedCallback(Function(int chapterId, QuizResult result) callback) {
+  void removeOnQuizCompletedCallback(
+      Function(int chapterId, QuizResult result) callback) {
     _onQuizCompletedCallbacks.remove(callback);
   }
 
   /// 단일 퀴즈 완료 콜백 등록
-  void addOnSingleQuizCompletedCallback(Function(int quizId, bool isCorrect) callback) {
+  void addOnSingleQuizCompletedCallback(
+      Function(int chapterId, int quizId, bool isCorrect, int selectedOption)
+          callback) {
     _onSingleQuizCompletedCallbacks.add(callback);
   }
 
   /// 단일 퀴즈 완료 콜백 해제
-  void removeOnSingleQuizCompletedCallback(Function(int quizId, bool isCorrect) callback) {
+  void removeOnSingleQuizCompletedCallback(
+      Function(int chapterId, int quizId, bool isCorrect, int selectedOption)
+          callback) {
     _onSingleQuizCompletedCallbacks.remove(callback);
   }
 
@@ -155,7 +165,8 @@ class QuizProvider extends ChangeNotifier {
   Future<bool> startQuiz(int chapterId) async {
     if (_isLoadingQuiz) return false;
 
-    debugPrint('🧠 [QUIZ_PROVIDER] 일반 퀴즈 진입 요청 - 챕터 ID: $chapterId (useMock: $_useMock)');
+    debugPrint(
+        '🧠 [QUIZ_PROVIDER] 일반 퀴즈 진입 요청 - 챕터 ID: $chapterId (useMock: $_useMock)');
     _isLoadingQuiz = true;
     _quizError = null;
     notifyListeners();
@@ -173,7 +184,8 @@ class QuizProvider extends ChangeNotifier {
       _startTimer(600); // 10분
       debugPrint('⏰ [QUIZ_PROVIDER] 퀴즈 타이머 시작 - 10분');
 
-      debugPrint('✅ [QUIZ_PROVIDER] 일반 퀴즈 진입 성공 - 총 ${_currentQuizSession?.totalCount ?? 0}개 문제');
+      debugPrint(
+          '✅ [QUIZ_PROVIDER] 일반 퀴즈 진입 성공 - 총 ${_currentQuizSession?.totalCount ?? 0}개 문제');
       _quizError = null;
       return true;
     } catch (e) {
@@ -193,7 +205,8 @@ class QuizProvider extends ChangeNotifier {
   Future<bool> startSingleQuiz(int chapterId, int quizId) async {
     if (_isLoadingQuiz) return false;
 
-    debugPrint('🎯 [QUIZ_PROVIDER] 단일 퀴즈 진입 요청 - 챕터: $chapterId, 퀴즈: $quizId (useMock: $_useMock)');
+    debugPrint(
+        '🎯 [QUIZ_PROVIDER] 단일 퀴즈 진입 요청 - 챕터: $chapterId, 퀴즈: $quizId (useMock: $_useMock)');
     _isLoadingQuiz = true;
     _quizError = null;
     notifyListeners();
@@ -210,14 +223,16 @@ class QuizProvider extends ChangeNotifier {
       }
 
       // 해당 quizId를 가진 퀴즈만 찾기
-      final targetQuiz = fullSession.quizList.where((quiz) => quiz.id == quizId).toList();
-      
+      final targetQuiz =
+          fullSession.quizList.where((quiz) => quiz.id == quizId).toList();
+
       if (targetQuiz.isEmpty) {
         debugPrint('❌ [QUIZ_PROVIDER] 단일 퀴즈 찾기 실패 - ID: $quizId');
         throw Exception('해당 퀴즈를 찾을 수 없습니다 (ID: $quizId)');
       }
 
-      debugPrint('🔍 [QUIZ_PROVIDER] 단일 퀴즈 찾기 성공 - 문제: ${targetQuiz.first.question}');
+      debugPrint(
+          '🔍 [QUIZ_PROVIDER] 단일 퀴즈 찾기 성공 - 문제: ${targetQuiz.first.question}');
 
       // 단일 퀴즈로 구성된 새로운 QuizSession 생성
       _currentQuizSession = QuizSession(
@@ -238,7 +253,8 @@ class QuizProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _quizError = e.toString();
-      debugPrint('❌ [QUIZ_PROVIDER] 단일 퀴즈 진입 실패 - 챕터: $chapterId, 퀴즈: $quizId, 에러: $e');
+      debugPrint(
+          '❌ [QUIZ_PROVIDER] 단일 퀴즈 진입 실패 - 챕터: $chapterId, 퀴즈: $quizId, 에러: $e');
       return false;
     } finally {
       _isLoadingQuiz = false;
@@ -267,11 +283,13 @@ class QuizProvider extends ChangeNotifier {
       if (_useMock) {
         await _mockRepository!.updateQuizProgress(chapterId, currentQuizId);
         // Mock에서는 로컬 Repository를 통해 답안도 업데이트
-        await _repository?.updateLocalAnswer(chapterId, currentQuizIndex, selectedAnswer);
+        await _repository?.updateLocalAnswer(
+            chapterId, currentQuizIndex, selectedAnswer);
       } else {
         // Real API: 서버에 진행상황 업데이트 + 로컬 답안 저장
         await _repository!.updateQuizProgress(chapterId, currentQuizId);
-        await _repository.updateLocalAnswer(chapterId, currentQuizIndex, selectedAnswer);
+        await _repository.updateLocalAnswer(
+            chapterId, currentQuizIndex, selectedAnswer);
       }
 
       return true;
@@ -344,7 +362,7 @@ class QuizProvider extends ChangeNotifier {
 
     try {
       final chapterId = _currentQuizSession!.chapterId;
-      
+
       // 사용자 답안을 API 형식으로 변환: [{"quiz_id": 1, "selected_option": 2}]
       final answers = <Map<String, int>>[];
       for (int i = 0; i < _currentQuizSession!.quizList.length; i++) {
@@ -374,17 +392,21 @@ class QuizProvider extends ChangeNotifier {
         final quiz = _currentQuizSession!.quizList.first;
         final userAnswer = _currentQuizSession!.userAnswers.first;
         final isCorrect = userAnswer == quiz.correctAnswerIndex;
-        
-        // 단일 퀴즈 완료 콜백 호출 (오답노트 삭제용)
+
+        // 단일 퀴즈 완료 콜백 호출 (오답노트 관리용)
         for (final callback in _onSingleQuizCompletedCallbacks) {
           try {
-            callback(quiz.id, isCorrect);
+            // selectedOption을 1-based로 변환 (백엔드 API 호환)
+            final selectedOptionOneBased = userAnswer! + 1;
+            callback(_currentQuizSession!.chapterId, quiz.id, isCorrect,
+                selectedOptionOneBased);
           } catch (e) {
             debugPrint('단일 퀴즈 완료 콜백 실행 실패: $e');
           }
         }
-        
-        debugPrint('🎯 [SINGLE_QUIZ] 단일 퀴즈 완료 - Quiz ${quiz.id}, 정답: $isCorrect');
+
+        debugPrint(
+            '🎯 [SINGLE_QUIZ] 단일 퀴즈 완료 - Quiz ${quiz.id}, 정답: $isCorrect');
       }
 
       // 일반 퀴즈 완료 콜백 호출 (교육 진도 업데이트용)
@@ -402,7 +424,8 @@ class QuizProvider extends ChangeNotifier {
       _stopTimer();
       _currentQuizSession = null;
 
-      debugPrint('🎯 [QUIZ_PROVIDER] 퀴즈 완료 - 챕터 $chapterId, 점수: ${result.correctAnswers}/${result.totalQuestions} (${result.scorePercentage}%)');
+      debugPrint(
+          '🎯 [QUIZ_PROVIDER] 퀴즈 완료 - 챕터 $chapterId, 점수: ${result.correctAnswers}/${result.totalQuestions} (${result.scorePercentage}%)');
       return result;
     } catch (e) {
       _quizError = e.toString();
@@ -472,9 +495,8 @@ class QuizProvider extends ChangeNotifier {
         _currentQuizSession = session;
 
         // 진행 중인 세션이 있다면 기본 10분 타이머 시작
-        final elapsed = DateTime.now()
-            .difference(_currentQuizSession!.startedAt)
-            .inSeconds;
+        final elapsed =
+            DateTime.now().difference(_currentQuizSession!.startedAt).inSeconds;
         final defaultTimeLimit = 600; // 10분 고정
         final remaining = defaultTimeLimit - elapsed;
         if (remaining > 0) {
