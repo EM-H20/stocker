@@ -123,14 +123,24 @@ class LearningProgressProvider extends ChangeNotifier {
 
   /// ✅ 챕터 완료 표시
   Future<void> completeChapter(int chapterId) async {
+    // 이미 완료된 챕터라면 중복 처리하지 않음
+    if (_completedChapters[chapterId] == true) {
+      debugPrint('⚠️ [LearningProgress] 챕터 $chapterId 이미 완료됨 - 중복 처리 방지');
+      return;
+    }
+    
     _completedChapters[chapterId] = true;
     
-    // Repository를 통해 완료 상태 저장
-    await _repository.markChapterCompleted(chapterId);
+    try {
+      // Repository를 통해 완료 상태 저장
+      await _repository.markChapterCompleted(chapterId);
+      debugPrint('✅ [LearningProgress] 챕터 $chapterId 완료!');
+    } catch (e) {
+      debugPrint('❌ [LearningProgress] 챕터 $chapterId 완료 저장 실패: $e');
+      // 에러가 발생해도 로컬 상태는 유지 (사용자 경험을 위해)
+    }
     
     notifyListeners();
-
-    debugPrint('✅ [LearningProgress] 챕터 $chapterId 완료!');
   }
 
   /// 🎯 퀴즈 완료 표시

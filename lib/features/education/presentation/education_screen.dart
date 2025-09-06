@@ -84,11 +84,11 @@ class _EducationScreenState extends State<EducationScreen> {
                     description: '현재 진행 중인 챕터입니다. 이론 학습을 완료한 후 퀴즈에 도전하세요.',
                     onTheoryPressed: () {
                       provider.enterTheory(currentChapter.id);
-                      context.go(AppRoutes.theory);
+                      context.go('${AppRoutes.theory}?chapterId=${currentChapter.id}');
                     },
                     onQuizPressed: () {
-                      // 퀴즈 화면으로 이동
-                      context.go(AppRoutes.quiz);
+                      // 퀴즈 화면으로 이동 (현재 챕터 ID 전달)
+                      context.go('${AppRoutes.quiz}?chapterId=${currentChapter.id}');
                     },
                   );
                 },
@@ -186,7 +186,7 @@ class _EducationScreenState extends State<EducationScreen> {
                         icon: icon,
                         onTap: () {
                           provider.enterTheory(chapter.id);
-                          context.go(AppRoutes.theory);
+                          context.go('${AppRoutes.theory}?chapterId=${chapter.id}');
                         },
                       );
                     }).toList(),

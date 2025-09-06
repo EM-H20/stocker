@@ -18,13 +18,41 @@ class WrongNoteScreen extends StatefulWidget {
   State<WrongNoteScreen> createState() => _WrongNoteScreenState();
 }
 
-class _WrongNoteScreenState extends State<WrongNoteScreen> {
+class _WrongNoteScreenState extends State<WrongNoteScreen> 
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // 화면 로드 시 오답노트 데이터 로드
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<WrongNoteProvider>().loadWrongNotes();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // 앱이 포어그라운드로 돌아올 때 새로고침
+    if (state == AppLifecycleState.resumed && mounted) {
+      context.read<WrongNoteProvider>().loadWrongNotes();
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 화면에 다시 돌아올 때마다 새로고침 (go_router에서 유용)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<WrongNoteProvider>().loadWrongNotes();
+      }
     });
   }
 
@@ -37,8 +65,21 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
           builder: (context, provider, child) {
             // 로딩 중일 때
             if (provider.isLoading) {
-              return const Center(
-                child: CircularProgressIndicator(color: AppTheme.primaryColor),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(color: AppTheme.primaryColor),
+                    SizedBox(height: 16.h),
+                    Text(
+                      '오답노트를 불러오는 중...',
+                      style: TextStyle(
+                        color: AppTheme.grey600,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ],
+                ),
               );
             }
 
@@ -55,7 +96,7 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
                     ),
                     SizedBox(height: 16.h),
                     Text(
-                      provider.errorMessage ?? '오류가 발생했습니다.',
+                      _getUserFriendlyErrorMessage(provider.errorMessage),
                       style: TextStyle(
                         color: AppTheme.errorColor,
                         fontSize: 16.sp,
@@ -167,6 +208,30 @@ class _WrongNoteScreenState extends State<WrongNoteScreen> {
         ),
       ),
     );
+  }
+
+  /// 사용자 친화적인 에러 메시지로 변환
+  String _getUserFriendlyErrorMessage(String? errorMessage) {
+    if (errorMessage == null) return '알 수 없는 오류가 발생했습니다.';
+    
+    if (errorMessage.contains('chapter_id는 필수입니다')) {
+      return '챕터 정보를 불러올 수 없어요.\n잠시 후 다시 시도해주세요.';
+    }
+    
+    if (errorMessage.contains('네트워크') || errorMessage.contains('연결')) {
+      return '네트워크 연결을 확인해주세요.\n인터넷 연결 상태를 점검해보세요.';
+    }
+    
+    if (errorMessage.contains('401') || errorMessage.contains('인증')) {
+      return '로그인이 만료되었습니다.\n다시 로그인해주세요.';
+    }
+    
+    if (errorMessage.contains('500') || errorMessage.contains('서버')) {
+      return '서버에 일시적인 문제가 발생했어요.\n잠시 후 다시 시도해주세요.';
+    }
+    
+    // 기본 메시지
+    return '오답노트를 불러올 수 없어요.\n잠시 후 다시 시도해주세요.';
   }
 }
 

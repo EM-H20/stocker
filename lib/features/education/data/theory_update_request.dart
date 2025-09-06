@@ -12,7 +12,7 @@ class TheoryUpdateRequest {
   /// JSON에서 객체로 변환 (API.md 스펙 준수)
   factory TheoryUpdateRequest.fromJson(Map<String, dynamic> json) {
     return TheoryUpdateRequest(
-      chapterId: json['chpater_id'] as int, // API.md 스펙 (오타 포함)
+      chapterId: json['chapter_id'] as int, // API.md 스펙
       currentTheoryId: json['current_theory_id'] as int,
     );
   }
@@ -20,7 +20,7 @@ class TheoryUpdateRequest {
   /// 객체에서 JSON으로 변환 (API.md 스펙 준수)
   Map<String, dynamic> toJson() {
     return {
-      'chpater_id': chapterId, // API.md 스펙: chpater_id
+      'chapter_id': chapterId, // API.md 스펙
       'current_theory_id': currentTheoryId,
     };
   }

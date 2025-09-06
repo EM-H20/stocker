@@ -71,22 +71,18 @@ class TokenStorage {
     await _storage.deleteAll();
   }
 
-  /// 🔍 디버그용: 저장된 모든 데이터 확인
+  /// 🔍 디버그용: 저장된 모든 데이터 확인 (개발 환경에서만)
   static Future<void> debugPrintAllData() async {
+    if (!kDebugMode) return;
+    
     try {
       final allData = await _storage.readAll();
-      debugPrint('🔍 [TOKEN_STORAGE] === 저장된 모든 데이터 ===');
+      debugPrint('🔍 [TOKEN_STORAGE] Stored data count: ${allData.length}');
       if (allData.isEmpty) {
-        debugPrint('📭 [TOKEN_STORAGE] 저장된 데이터 없음');
-      } else {
-        allData.forEach((key, value) {
-          final maskedValue = value.length > 20 ? '${value.substring(0, 20)}...' : value;
-          debugPrint('🔑 [TOKEN_STORAGE] $key: $maskedValue');
-        });
+        debugPrint('📭 [TOKEN_STORAGE] No stored data');
       }
-      debugPrint('🔍 [TOKEN_STORAGE] ========================');
     } catch (e) {
-      debugPrint('❌ [TOKEN_STORAGE] 데이터 조회 실패: $e');
+      debugPrint('❌ [TOKEN_STORAGE] Failed to read data: $e');
     }
   }
 
@@ -107,24 +103,20 @@ class TokenStorage {
     }
   }
 
-  /// 📋 현재 인증 상태 요약
+  /// 📋 현재 인증 상태 요약 (개발 환경에서만)
   static Future<void> debugAuthStatus() async {
+    if (!kDebugMode) return;
+    
     try {
       final token = await accessToken;
       final userIdValue = await userId;
 
-      debugPrint('📋 [TOKEN_STORAGE] === 현재 인증 상태 ===');
+      debugPrint('📋 [TOKEN_STORAGE] Auth status: ${token != null && userIdValue != null ? "Authenticated" : "Not authenticated"}');
       if (token != null && userIdValue != null) {
-        debugPrint('✅ [TOKEN_STORAGE] 로그인 상태: 인증됨');
-        debugPrint('👤 [TOKEN_STORAGE] 유저 ID: $userIdValue');
-        debugPrint('🔑 [TOKEN_STORAGE] 토큰 있음: ${token.length}자');
-      } else {
-        debugPrint('❌ [TOKEN_STORAGE] 로그인 상태: 비인증됨');
-        debugPrint('💡 [TOKEN_STORAGE] 로그인 필요 - API 호출 시 401 에러 발생');
+        debugPrint('👤 [TOKEN_STORAGE] User ID: $userIdValue');
       }
-      debugPrint('📋 [TOKEN_STORAGE] =====================');
     } catch (e) {
-      debugPrint('❌ [TOKEN_STORAGE] 인증 상태 확인 실패: $e');
+      debugPrint('❌ [TOKEN_STORAGE] Failed to check auth status: $e');
     }
   }
 }

@@ -6,11 +6,11 @@ class WrongNoteResponse {
     required this.wrongNotes,
   });
 
-  /// JSON에서 객체 생성
+  /// JSON에서 객체 생성 (백엔드 응답 형식)
   factory WrongNoteResponse.fromJson(Map<String, dynamic> json) {
     return WrongNoteResponse(
       wrongNotes: (json['wrong_notes'] as List)
-          .map((item) => WrongNoteItem.fromJson(item))
+          .map((item) => WrongNoteItem.fromBackendJson(item))
           .toList(),
     );
   }
@@ -38,6 +38,8 @@ class WrongNoteItem {
   final String? question;
   final List<String>? options;
   final String? explanation;
+  final int? correctAnswerIndex; // 정답 인덱스 (0-based)
+  final String? correctAnswerText; // 정답 텍스트
 
   const WrongNoteItem({
     required this.id,
@@ -50,6 +52,8 @@ class WrongNoteItem {
     this.question,
     this.options,
     this.explanation,
+    this.correctAnswerIndex,
+    this.correctAnswerText,
   });
 
   /// 백엔드 JSON에서 객체 생성 (JOIN 데이터 포함)
@@ -70,6 +74,8 @@ class WrongNoteItem {
           ? List<String>.from(json['options'] as List)
           : null,
       explanation: json['explanation'] as String?,
+      correctAnswerIndex: json['correct_answer_index'] as int?,
+      correctAnswerText: json['correct_answer_text'] as String?,
     );
   }
 
@@ -91,6 +97,8 @@ class WrongNoteItem {
           ? List<String>.from(json['options'] as List)
           : null,
       explanation: json['explanation'] as String?,
+      correctAnswerIndex: json['correct_answer_index'] as int?,
+      correctAnswerText: json['correct_answer_text'] as String?,
     );
   }
 
@@ -119,6 +127,8 @@ class WrongNoteItem {
       'question': question,
       'options': options,
       'explanation': explanation,
+      'correct_answer_index': correctAnswerIndex,
+      'correct_answer_text': correctAnswerText,
     };
   }
 
@@ -134,6 +144,8 @@ class WrongNoteItem {
     String? question,
     List<String>? options,
     String? explanation,
+    int? correctAnswerIndex,
+    String? correctAnswerText,
   }) {
     return WrongNoteItem(
       id: id ?? this.id,
@@ -146,6 +158,8 @@ class WrongNoteItem {
       question: question ?? this.question,
       options: options ?? this.options,
       explanation: explanation ?? this.explanation,
+      correctAnswerIndex: correctAnswerIndex ?? this.correctAnswerIndex,
+      correctAnswerText: correctAnswerText ?? this.correctAnswerText,
     );
   }
 

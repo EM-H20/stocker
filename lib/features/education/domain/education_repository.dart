@@ -93,8 +93,8 @@ class EducationRepository {
       // 현재 이론 데이터를 로컬에 저장
       await _cacheCurrentTheory(response);
 
-      // Domain 모델로 변환하여 반환
-      return _mapToTheorySession(response);
+      // Domain 모델로 변환하여 반환 (chapterId 파라미터 추가)
+      return _mapToTheorySession(response, chapterId);
     } catch (e) {
       throw Exception('이론 진입 실패: $e');
     }
@@ -166,7 +166,9 @@ class EducationRepository {
       if (theoryStr != null) {
         final json = jsonDecode(theoryStr) as Map<String, dynamic>;
         final response = TheoryEnterResponse.fromJson(json);
-        return _mapToTheorySession(response);
+        // 캐시된 데이터에서는 chapterId를 알 수 없으므로 0을 기본값으로 사용
+        // 이 메서드는 캐시 조회용이므로 실제 API 호출에는 영향 없음
+        return _mapToTheorySession(response, 0);
       }
       return null;
     } catch (e) {
@@ -299,7 +301,7 @@ class EducationRepository {
   }
 
   /// TheoryEnterResponse를 TheorySession으로 변환
-  TheorySession _mapToTheorySession(TheoryEnterResponse response) {
+  TheorySession _mapToTheorySession(TheoryEnterResponse response, int chapterId) {
     // API.md 명세: theory_pages를 theories로 변환
     final theories = response.theoryPages
         .map((page) => TheoryInfo(
@@ -314,7 +316,7 @@ class EducationRepository {
     final currentIndex = response.currentPage - 1;
 
     return TheorySession(
-      chapterId: 0, // API.md 명세에서 제거됨, 기본값 사용
+      chapterId: chapterId, // 파라미터로 받은 실제 chapterId 사용
       chapterTitle: '이론 학습', // API.md 명세에서 제거됨, 기본값 사용
       theories: theories,
       currentTheoryIndex: currentIndex >= 0 ? currentIndex : 0,

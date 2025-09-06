@@ -26,6 +26,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
   @override
   void initState() {
     super.initState();
+    debugPrint('🎓 [THEORY_SCREEN] 이론 진입 시작 - 챕터 ID: ${widget.chapterId}');
     // 이론 진입
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<EducationProvider>().enterTheory(widget.chapterId);

@@ -247,31 +247,36 @@ class EducationProvider extends ChangeNotifier {
   Future<bool> enterTheory(int chapterId) async {
     if (_isLoadingTheory) return false;
 
+    debugPrint('🎓 [EDU_PROVIDER] 이론 진입 요청 - 챕터 ID: $chapterId (useMock: $_useMock)');
     _isLoadingTheory = true;
     _theoryError = null;
     notifyListeners();
 
     try {
       if (_useMock) {
+        debugPrint('🎭 [EDU_PROVIDER] Mock Repository로 이론 진입 중...');
         _currentTheorySession = await _mockRepository!.enterTheory(chapterId);
         // Mock에서는 진도 저장 기능 없음
       } else {
+        debugPrint('🌐 [EDU_PROVIDER] Real API Repository로 이론 진입 중...');
         _currentTheorySession = await _repository!.enterTheory(chapterId);
 
         // 저장된 진도가 있으면 해당 위치로 이동
         final savedProgress = await _repository.getTheoryProgress(chapterId);
         if (savedProgress != null && _currentTheorySession != null) {
+          debugPrint('📚 [EDU_PROVIDER] 저장된 진도 발견 - 이론 ID: $savedProgress');
           _currentTheorySession = _currentTheorySession!.copyWith(
             currentTheoryIndex: _findTheoryIndexById(savedProgress),
           );
         }
       }
 
+      debugPrint('✅ [EDU_PROVIDER] 이론 진입 성공 - 총 ${_currentTheorySession?.totalCount ?? 0}개 이론');
       _theoryError = null;
       return true;
     } catch (e) {
       _theoryError = e.toString();
-      debugPrint('이론 진입 실패: $e');
+      debugPrint('❌ [EDU_PROVIDER] 이론 진입 실패 - 챕터 ID: $chapterId, 에러: $e');
       return false;
     } finally {
       _isLoadingTheory = false;
