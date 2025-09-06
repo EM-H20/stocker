@@ -1,7 +1,7 @@
 // features/aptitude/domain/repository/aptitude_repository.dart
 import '../model/aptitude_question.dart';
 import '../model/aptitude_result.dart';
-import '../model/aptitude_type_summary.dart'; 
+import '../model/aptitude_type_summary.dart';
 import '../../data/dto/aptitude_answer_request.dart';
 
 /// 성향 분석 관련 데이터 처리를 위한 Repository 추상 클래스 (설계도)

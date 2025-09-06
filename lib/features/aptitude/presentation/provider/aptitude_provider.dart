@@ -37,10 +37,10 @@ class AptitudeProvider with ChangeNotifier {
   AptitudeResult? _currentResult;
   AptitudeResult? get currentResult => _currentResult;
 
-  // ✅ [수정] 'currentResult'의 setter 추가  마쟈???!!!!???
-  set currentResult(AptitudeResult? value) {
-    _currentResult = value;
-    // notifyListeners(); // 필요에 따라 UI 갱신을 알릴 수 있음
+  /// 현재 결과를 초기화하는 메서드
+  void clearCurrentResult() {
+    _currentResult = null;
+    notifyListeners();
   }
 
   /// 사용자가 이전에 검사를 했는지 여부
@@ -50,7 +50,6 @@ class AptitudeProvider with ChangeNotifier {
   /// 모든 성향 타입 요약 목록
   List<AptitudeTypeSummary> _allTypes = [];
   List<AptitudeTypeSummary> get allTypes => _allTypes;
-
 
   // --- 로직 메서드 ---
 
@@ -135,12 +134,11 @@ class AptitudeProvider with ChangeNotifier {
       } else {
         _currentResult = await _repository.submitResult(request);
       }
-      
+
       // 성공 후 상태 갱신
       _myResult = _currentResult;
       _hasPreviousResult = true;
       return true;
-
     } catch (e) {
       _errorMessage = '결과 제출에 실패했습니다: ${e.toString()}';
       return false;

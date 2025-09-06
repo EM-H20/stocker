@@ -17,7 +17,7 @@ class QuizResultActionsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Column(
       children: [
         // 다시 풀기 버튼

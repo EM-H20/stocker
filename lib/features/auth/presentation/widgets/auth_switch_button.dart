@@ -8,11 +8,10 @@ class AuthSwitchButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const AuthSwitchButton({
-    super.key,  // super.key로 변경
+    super.key, // super.key로 변경
     required this.buttonText,
     required this.onPressed,
   });
-  
 
   @override
   Widget build(BuildContext context) {

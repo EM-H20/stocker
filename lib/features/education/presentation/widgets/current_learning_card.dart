@@ -47,10 +47,9 @@ class CurrentLearningCard extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.trending_up,
-                    color:
-                        theme.brightness == Brightness.dark
-                            ? Colors.white
-                            : Theme.of(context).primaryColor,
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.white
+                        : Theme.of(context).primaryColor,
                     size: 24.sp,
                   ),
                 ),
@@ -59,10 +58,9 @@ class CurrentLearningCard extends StatelessWidget {
                   child: Text(
                     '현재 진행 학습',
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color:
-                          theme.brightness == Brightness.dark
-                              ? Colors.white
-                              : AppTheme.grey900,
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.white
+                          : AppTheme.grey900,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -74,10 +72,9 @@ class CurrentLearningCard extends StatelessWidget {
             Text(
               title,
               style: theme.textTheme.headlineSmall?.copyWith(
-                color:
-                    theme.brightness == Brightness.dark
-                        ? Colors.white
-                        : AppTheme.grey900,
+                color: theme.brightness == Brightness.dark
+                    ? Colors.white
+                    : AppTheme.grey900,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -100,10 +97,9 @@ class CurrentLearningCard extends StatelessWidget {
                   child: ActionButton(
                     text: '이론 학습',
                     icon: Icons.book_outlined,
-                    color:
-                        theme.brightness == Brightness.dark
-                            ? AppTheme.infoColor
-                            : Theme.of(context).primaryColor,
+                    color: theme.brightness == Brightness.dark
+                        ? AppTheme.infoColor
+                        : Theme.of(context).primaryColor,
                     // 아래 코드 해석 :
                     // onTheoryPressed가 null이면 debugPrint('이론 학습 클릭')을 실행
                     // 그렇지 않으면 onTheoryPressed를 실행
@@ -115,10 +111,9 @@ class CurrentLearningCard extends StatelessWidget {
                   child: ActionButton(
                     text: '퀴즈 풀기',
                     icon: Icons.quiz_outlined,
-                    color:
-                        theme.brightness == Brightness.dark
-                            ? AppTheme.successColor
-                            : AppTheme.successColor,
+                    color: theme.brightness == Brightness.dark
+                        ? AppTheme.successColor
+                        : AppTheme.successColor,
                     onPressed: onQuizPressed ?? () => debugPrint('퀴즈 풀기 클릭'),
                   ),
                 ),

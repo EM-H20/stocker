@@ -36,19 +36,19 @@ class AttendanceStatusCard extends StatelessWidget {
               Text(
                 '이번주 출석현황',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
               GestureDetector(
                 onTap: () => context.go(AppRoutes.attendance),
                 child: Text(
                   '전체 보기',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppTheme.primaryColor.withValues(alpha: 0.8)
-                        : AppTheme.primaryColor,
-                    fontWeight: FontWeight.w500,
-                  ),
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppTheme.primaryColor.withValues(alpha: 0.8)
+                            : AppTheme.primaryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
               ),
             ],
@@ -60,15 +60,19 @@ class AttendanceStatusCard extends StatelessWidget {
               final startOfWeek = _getStartOfWeek(now);
               final weekInfo = _getWeekInfo(startOfWeek);
               final attendanceStatus = attendanceProvider.attendanceStatus;
-              
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     weekInfo,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-                    ),
+                          color: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.color
+                              ?.withValues(alpha: 0.7),
+                        ),
                   ),
                   SizedBox(height: 16.h),
                   // 출석 현황 원형 표시
@@ -76,11 +80,13 @@ class AttendanceStatusCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(7, (index) {
                       final currentDay = startOfWeek.add(Duration(days: index));
-                      final dayKey = DateTime.utc(currentDay.year, currentDay.month, currentDay.day);
+                      final dayKey = DateTime.utc(
+                          currentDay.year, currentDay.month, currentDay.day);
                       final isAttended = attendanceStatus[dayKey] ?? false;
                       final isToday = _isSameDay(currentDay, now);
-                      final isPastDay = currentDay.isBefore(DateTime(now.year, now.month, now.day));
-                      
+                      final isPastDay = currentDay
+                          .isBefore(DateTime(now.year, now.month, now.day));
+
                       return Column(
                         children: [
                           Container(
@@ -88,11 +94,11 @@ class AttendanceStatusCard extends StatelessWidget {
                             height: 32.w,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: isToday 
+                              color: isToday
                                   ? Theme.of(context).primaryColor
-                                  : isAttended 
-                                      ? AppTheme.successColor 
-                                      : isPastDay 
+                                  : isAttended
+                                      ? AppTheme.successColor
+                                      : isPastDay
                                           ? Colors.red.withValues(alpha: 0.7)
                                           : Theme.of(context).disabledColor,
                             ),
@@ -103,8 +109,11 @@ class AttendanceStatusCard extends StatelessWidget {
                                   fontSize: 12.sp,
                                   fontWeight: FontWeight.w500,
                                   color: (isToday || isAttended || isPastDay)
-                                      ? Colors.white 
-                                      : Theme.of(context).textTheme.bodyMedium?.color,
+                                      ? Colors.white
+                                      : Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.color,
                                 ),
                               ),
                             ),
@@ -124,8 +133,8 @@ class AttendanceStatusCard extends StatelessWidget {
 
   // 같은 날인지 확인하는 유틸리티 함수
   bool _isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year && 
-           date1.month == date2.month && 
-           date1.day == date2.day;
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 }

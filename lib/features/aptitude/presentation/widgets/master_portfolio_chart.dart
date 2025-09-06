@@ -68,7 +68,8 @@ class MasterPortfolioChart extends StatelessWidget {
                 SizedBox(width: 6.w),
                 Text(
                   portfolio.keys.elementAt(index),
-                  style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.bodyMedium?.color),
                 ),
               ],
             );

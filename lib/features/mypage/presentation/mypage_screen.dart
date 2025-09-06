@@ -68,12 +68,12 @@ class _MypageScreenState extends State<MypageScreen> {
 
               // 노트 섹션
               const NoteSection(),
-            
+
               SizedBox(height: 16.h),
-            
+
               // 테마 설정
               const ThemeToggleWidget(),
-            
+
               SizedBox(height: 24.h),
             ],
           ),

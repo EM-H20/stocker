@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../app/core/widgets/action_button.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/config/app_routes.dart';
 import '../../data/models/wrong_note_response.dart';
 
 /// 개별 오답 카드 위젯
@@ -15,8 +17,8 @@ class WrongAnswerCard extends StatelessWidget {
   final bool isRetried; // 재시도 상태를 외부에서 받아옴
 
   const WrongAnswerCard({
-    super.key, 
-    required this.wrongNote, 
+    super.key,
+    required this.wrongNote,
     required this.onRetry,
     required this.isRetried,
     this.onRemove,
@@ -29,20 +31,20 @@ class WrongAnswerCard extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark 
-            ? AppTheme.darkSurface 
+        color: theme.brightness == Brightness.dark
+            ? AppTheme.darkSurface
             : Colors.grey[50],
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: theme.brightness == Brightness.dark 
-              ? AppTheme.grey600.withValues(alpha: 0.3) 
+          color: theme.brightness == Brightness.dark
+              ? AppTheme.grey600.withValues(alpha: 0.3)
               : AppTheme.grey300.withValues(alpha: 0.5),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: theme.brightness == Brightness.dark 
-                ? Colors.black.withValues(alpha: 0.3) 
+            color: theme.brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
                 : Colors.grey.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
@@ -75,19 +77,16 @@ class WrongAnswerCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color:
-                      isRetried
-                          ? AppTheme.infoColor.withValues(alpha: 0.2)
-                          : AppTheme.warningColor.withValues(alpha: 0.2),
+                  color: isRetried
+                      ? AppTheme.infoColor.withValues(alpha: 0.2)
+                      : AppTheme.warningColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6.r),
                 ),
                 child: Text(
                   isRetried ? '재시도 완료' : '미완료',
                   style: TextStyle(
                     color:
-                        isRetried
-                            ? AppTheme.infoColor
-                            : AppTheme.warningColor,
+                        isRetried ? AppTheme.infoColor : AppTheme.warningColor,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w500,
                   ),
@@ -102,8 +101,8 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             '문제',
             style: TextStyle(
-              color: theme.brightness == Brightness.dark 
-                  ? AppTheme.grey400 
+              color: theme.brightness == Brightness.dark
+                  ? AppTheme.grey400
                   : AppTheme.grey600,
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
@@ -113,10 +112,10 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             wrongNote.question ?? '문제 정보 없음',
             style: TextStyle(
-              color: theme.brightness == Brightness.dark 
-                  ? Colors.white 
-                  : AppTheme.grey900, 
-              fontSize: 14.sp, 
+              color: theme.brightness == Brightness.dark
+                  ? Colors.white
+                  : AppTheme.grey900,
+              fontSize: 14.sp,
               height: 1.4,
             ),
           ),
@@ -184,8 +183,8 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             '해설',
             style: TextStyle(
-              color: theme.brightness == Brightness.dark 
-                  ? AppTheme.grey400 
+              color: theme.brightness == Brightness.dark
+                  ? AppTheme.grey400
                   : AppTheme.grey600,
               fontSize: 12.sp,
               fontWeight: FontWeight.w500,
@@ -195,8 +194,8 @@ class WrongAnswerCard extends StatelessWidget {
           Text(
             wrongNote.explanation ?? '해설 정보 없음',
             style: TextStyle(
-              color: theme.brightness == Brightness.dark 
-                  ? AppTheme.grey300 
+              color: theme.brightness == Brightness.dark
+                  ? AppTheme.grey300
                   : AppTheme.grey700,
               fontSize: 13.sp,
               height: 1.4,
@@ -211,9 +210,9 @@ class WrongAnswerCard extends StatelessWidget {
               Text(
                 '${wrongNote.createdDate.month}/${wrongNote.createdDate.day}',
                 style: TextStyle(
-                  color: theme.brightness == Brightness.dark 
-                      ? AppTheme.grey500 
-                      : AppTheme.grey600, 
+                  color: theme.brightness == Brightness.dark
+                      ? AppTheme.grey500
+                      : AppTheme.grey600,
                   fontSize: 12.sp,
                 ),
               ),
@@ -223,7 +222,10 @@ class WrongAnswerCard extends StatelessWidget {
                   text: '다시 풀기',
                   icon: Icons.refresh,
                   color: AppTheme.successColor,
-                  onPressed: onRetry,
+                  onPressed: () {
+                    // 단일 퀴즈 모드로 해당 문제 재시도
+                    context.go('${AppRoutes.quiz}?chapterId=${wrongNote.chapterId}&quizId=${wrongNote.quizId}');
+                  },
                 ),
             ],
           ),
@@ -232,9 +234,22 @@ class WrongAnswerCard extends StatelessWidget {
     );
   }
 
-  /// 정답 텍스트 가져오기 (현재는 실제 정답 정보가 없으므로 placeholder)
+  /// 정답 텍스트 가져오기
   String _getCorrectAnswerText() {
-    // TODO: 실제 정답 정보가 필요한 경우 API에서 제공받아야 함
-    return '정답 정보 필요';
+    // correctAnswerText가 있으면 그것을 사용
+    if (wrongNote.correctAnswerText != null && wrongNote.correctAnswerText!.isNotEmpty) {
+      return wrongNote.correctAnswerText!;
+    }
+    
+    // correctAnswerIndex와 options로 정답 텍스트 구성
+    if (wrongNote.correctAnswerIndex != null && 
+        wrongNote.options != null && 
+        wrongNote.options!.isNotEmpty &&
+        wrongNote.correctAnswerIndex! < wrongNote.options!.length) {
+      final correctIndex = wrongNote.correctAnswerIndex!;
+      return '${correctIndex + 1}번. ${wrongNote.options![correctIndex]}';
+    }
+    
+    return '정답 정보 없음';
   }
 }

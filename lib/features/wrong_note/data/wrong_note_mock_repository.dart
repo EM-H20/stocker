@@ -1,5 +1,6 @@
 import 'models/wrong_note_request.dart';
 import 'models/wrong_note_response.dart';
+import 'package:flutter/material.dart';
 
 /// 오답노트 Mock Repository
 /// 더미 데이터를 사용하여 오답노트 기능을 시뮬레이션합니다.
@@ -17,7 +18,8 @@ class WrongNoteMockRepository {
       chapterTitle: '주식 기초 이론',
       question: '주식의 기본 개념에서 주주가 갖는 권리가 아닌 것은?',
       options: ['의결권', '배당수익권', '잔여재산분배권', '채권자 우선변제권'],
-      explanation: '주주는 기업의 소유자로서 의결권, 배당수익권, 잔여재산분배권을 가지지만, 채권자 우선변제권은 채권자의 권리입니다.',
+      explanation:
+          '주주는 기업의 소유자로서 의결권, 배당수익권, 잔여재산분배권을 가지지만, 채권자 우선변제권은 채권자의 권리입니다.',
     ),
     WrongNoteItem(
       id: 2,
@@ -93,13 +95,63 @@ class WrongNoteMockRepository {
     _retriedQuizIds.add(quizId);
   }
 
+  /// 단일 퀴즈 결과를 오답노트에 추가 (Mock용)
+  /// [userId]: 사용자 ID (Mock에서 사용)
+  /// [chapterId]: 챕터 ID
+  /// [quizId]: 퀴즈 ID
+  /// [selectedOption]: 선택한 답안 (1~4)
+  Future<void> submitSingleQuizResult(
+      String userId, int chapterId, int quizId, int selectedOption) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    // 이미 존재하는지 확인 (중복 방지)
+    final existingIndex =
+        _mockWrongNotes.indexWhere((item) => item.quizId == quizId);
+
+    if (existingIndex >= 0) {
+      // 이미 존재하면 선택 옵션만 업데이트
+      _mockWrongNotes[existingIndex] = _mockWrongNotes[existingIndex].copyWith(
+        selectedOption: selectedOption,
+        createdDate: DateTime.now(),
+      );
+      debugPrint(
+          '🎭 [MockRepo] 기존 오답노트 업데이트 - Quiz $quizId, Option: $selectedOption');
+    } else {
+      // 새로운 오답 항목 추가
+      final newWrongNote = WrongNoteItem(
+        id: _mockWrongNotes.length + 100, // Mock ID
+        quizId: quizId,
+        chapterId: chapterId,
+        userId: 1, // Mock user ID
+        selectedOption: selectedOption,
+        createdDate: DateTime.now(),
+        chapterTitle: '챕터 $chapterId',
+        question: 'Mock 퀴즈 $quizId 문제',
+        options: ['선택지 1', '선택지 2', '선택지 3', '선택지 4'],
+        explanation: 'Mock 해설입니다.',
+        correctAnswerIndex: 0, // Mock 정답
+        correctAnswerText: '선택지 1',
+      );
+
+      _mockWrongNotes.add(newWrongNote);
+      debugPrint(
+          '🎭 [MockRepo] 새 오답노트 추가 - Quiz $quizId, Chapter: $chapterId, Option: $selectedOption');
+    }
+  }
+
   /// 오답노트에서 문제 삭제 (정답 처리 시)
   Future<void> removeWrongNote(String userId, int quizId) async {
     await Future.delayed(const Duration(milliseconds: 200));
 
+    final removedCount = _mockWrongNotes.length;
     _mockWrongNotes.removeWhere((item) => item.quizId == quizId);
+    final finalCount = _mockWrongNotes.length;
+
     // 재시도 상태에서도 제거
     _retriedQuizIds.remove(quizId);
+
+    debugPrint(
+        '🎭 [MockRepo] 오답노트 삭제 완료 - Quiz $quizId (${removedCount - finalCount}개 제거됨)');
   }
 
   /// 특정 퀴즈가 재시도되었는지 확인

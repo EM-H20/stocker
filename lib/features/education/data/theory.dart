@@ -16,7 +16,7 @@ class Theory {
   /// JSON에서 객체로 변환
   factory Theory.fromJson(Map<String, dynamic> json) {
     return Theory(
-      theoryId: json['theoryId'] as int,
+      theoryId: json['theory_id'] as int,
       word: json['word'] as String,
       content: json['content'] as String,
     );
@@ -24,7 +24,7 @@ class Theory {
 
   /// 객체에서 JSON으로 변환
   Map<String, dynamic> toJson() {
-    return {'theoryId': theoryId, 'word': word, 'content': content};
+    return {'theory_id': theoryId, 'word': word, 'content': content};
   }
 
   /// 디버깅용 문자열 표현

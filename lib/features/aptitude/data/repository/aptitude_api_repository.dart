@@ -1,5 +1,3 @@
-
-
 // features/aptitude/data/repository/aptitude_api_repository.dart
 import '../../domain/model/aptitude_question.dart';
 import '../../domain/model/aptitude_result.dart';
@@ -7,7 +5,6 @@ import '../../domain/repository/aptitude_repository.dart';
 import '../dto/aptitude_answer_request.dart';
 import '../source/aptitude_api.dart';
 import '../../domain/model/aptitude_type_summary.dart'; // ✅ [추가]
-
 
 /// 실제 API를 호출하는 Repository 구현체
 class AptitudeApiRepository implements AptitudeRepository {

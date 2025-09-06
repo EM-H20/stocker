@@ -23,19 +23,32 @@ class ContinueLearningWidget extends StatelessWidget {
     return Consumer3<LearningProgressProvider, EducationProvider, AuthProvider>(
       builder:
           (context, progressProvider, educationProvider, authProvider, child) {
+        // 🔐 로그인 상태 체크 - 가장 먼저 확인
+        if (!authProvider.isLoggedIn) {
+          return _buildLoginRequiredUI(context);
+        }
+
         if (!progressProvider.isInitialized) {
           // 로딩 중일 때 스켈레톤 UI
           return _buildLoadingSkeleton(context);
+        }
+
+        // 🚨 Education API 에러 상태 처리
+        if (educationProvider.chaptersError != null &&
+            educationProvider.isAuthenticationError) {
+          // 인증 에러인 경우는 이미 위에서 처리되므로 여기는 다른 에러들
+          debugPrint('🔐 [CONTINUE_LEARNING] 인증 에러로 로그인 필요 UI 표시');
+          return _buildLoginRequiredUI(context);
         }
 
         final lastChapterId = progressProvider.lastChapterId;
         final lastStep = progressProvider.lastStep;
         final progress = progressProvider.getCurrentChapterProgress();
 
-        // 🔗 실제 Education 데이터와 연결
-        final realChapterTitle =
-            _getRealChapterTitle(educationProvider, lastChapterId) ??
-                progressProvider.getChapterTitle(lastChapterId);
+        // ✅ Repository 패턴으로 실제 데이터 사용
+        final chapterTitle = authProvider.isLoggedIn
+            ? progressProvider.getChapterTitle(lastChapterId)
+            : '로그인 후 이용 가능';
 
         return Container(
           margin: EdgeInsets.symmetric(horizontal: 20.w),
@@ -69,7 +82,7 @@ class ContinueLearningWidget extends StatelessWidget {
 
               // 📊 진도 정보
               _buildProgressInfo(
-                  context, lastChapterId, lastStep, progress, realChapterTitle),
+                  context, lastChapterId, lastStep, progress, chapterTitle),
 
               SizedBox(height: 20.h),
 
@@ -80,6 +93,90 @@ class ContinueLearningWidget extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  /// 🔐 로그인 필요 UI
+  Widget _buildLoginRequiredUI(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Theme.of(context).primaryColor.withValues(alpha: 0.7),
+            Theme.of(context).primaryColor.withValues(alpha: 0.5),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
+            blurRadius: 12.r,
+            offset: Offset(0, 4.h),
+            spreadRadius: 2.r,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 🔒 헤더
+          Row(
+            children: [
+              Icon(
+                Icons.lock_outline_rounded,
+                color: Colors.white,
+                size: 24.sp,
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                '학습을 시작해보세요',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 12.h),
+
+          // 📝 안내 메시지
+          Text(
+            '로그인하면 개인 맞춤 학습을 시작할 수 있어요!\n진도를 저장하고 퀴즈에 도전해보세요.',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: 14.sp,
+              height: 1.4,
+            ),
+          ),
+
+          SizedBox(height: 20.h),
+
+          // 🚀 로그인 버튼
+          Row(
+            children: [
+              Expanded(
+                child: ActionButton(
+                  text: '로그인하고 학습 시작',
+                  icon: Icons.login_rounded,
+                  color: Colors.white,
+                  width: double.infinity,
+                  height: 44.h,
+                  onPressed: () {
+                    debugPrint('🚀 [CONTINUE_LEARNING] 비로그인 상태에서 로그인 페이지로 이동');
+                    context.go(AppRoutes.login);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -326,22 +423,7 @@ class ContinueLearningWidget extends StatelessWidget {
     }
   }
 
-  /// 🔗 실제 Education 데이터에서 챕터 제목 가져오기
-  String? _getRealChapterTitle(
-      EducationProvider educationProvider, int chapterId) {
-    try {
-      if (educationProvider.chapters.isNotEmpty) {
-        final chapter = educationProvider.chapters.firstWhere(
-          (chapter) => chapter.id == chapterId,
-          orElse: () => educationProvider.chapters.first,
-        );
-        return chapter.title;
-      }
-    } catch (e) {
-      debugPrint('🔗 [CONTINUE_LEARNING] 실제 챕터 데이터를 찾을 수 없음: $e');
-    }
-    return null;
-  }
+  // 🔗 실제 데이터는 이제 LearningProgressProvider의 Repository 패턴을 통해 자동으로 처리됨
 
   /// 🔐 "계속하기" 버튼 처리 (로그인 체크 포함)
   void _handleContinueLearning(BuildContext context, AuthProvider authProvider,

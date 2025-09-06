@@ -16,9 +16,8 @@ class AptitudeResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AptitudeResult? result = context.select(
-      (AptitudeProvider p) => p.currentResult ?? p.myResult
-    );
+    final AptitudeResult? result =
+        context.select((AptitudeProvider p) => p.currentResult ?? p.myResult);
 
     if (result == null) {
       return const Scaffold(
@@ -47,10 +46,13 @@ class AptitudeResultScreen extends StatelessWidget {
               result.typeDescription,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16.sp, 
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8), 
-                height: 1.6
-              ),
+                  fontSize: 16.sp,
+                  color: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.color
+                      ?.withValues(alpha: 0.8),
+                  height: 1.6),
             ),
             SizedBox(height: 48.h),
             _buildSectionTitle('나와 비슷한 성향의 투자 거장'),
@@ -66,11 +68,16 @@ class AptitudeResultScreen extends StatelessWidget {
                       backgroundImage: NetworkImage(result.master.imageUrl),
                     ),
                     SizedBox(height: 16.h),
-                    Text(result.master.name, style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+                    Text(result.master.name,
+                        style: TextStyle(
+                            fontSize: 20.sp, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8.h),
-                    Text(result.master.description, textAlign: TextAlign.center),
+                    Text(result.master.description,
+                        textAlign: TextAlign.center),
                     SizedBox(height: 24.h),
-                    Text('포트폴리오 예시', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                    Text('포트폴리오 예시',
+                        style: TextStyle(
+                            fontSize: 16.sp, fontWeight: FontWeight.bold)),
                     SizedBox(height: 16.h),
                     MasterPortfolioChart(portfolio: result.master.portfolio),
                   ],
@@ -81,13 +88,16 @@ class AptitudeResultScreen extends StatelessWidget {
             _buildSectionTitle('이런 교육은 어때요?'),
             SizedBox(height: 24.h),
             ListTile(
-              leading: Icon(Icons.school, color: Theme.of(context).colorScheme.primary),
+              leading: Icon(Icons.school,
+                  color: Theme.of(context).colorScheme.primary),
               title: const Text('초보자를 위한 주식 용어 마스터'),
               subtitle: Text(
                 '기초부터 탄탄하게 시작해요',
-                style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodySmall?.color),
               ),
-              trailing: Icon(Icons.arrow_forward_ios, color: Theme.of(context).iconTheme.color),
+              trailing: Icon(Icons.arrow_forward_ios,
+                  color: Theme.of(context).iconTheme.color),
               onTap: () {},
             ),
             const Divider(),
@@ -96,9 +106,11 @@ class AptitudeResultScreen extends StatelessWidget {
               title: const Text('차트 분석 심화 과정'),
               subtitle: Text(
                 '기술적 분석의 모든 것',
-                style: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color),
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.bodySmall?.color),
               ),
-              trailing: Icon(Icons.arrow_forward_ios, color: Theme.of(context).iconTheme.color),
+              trailing: Icon(Icons.arrow_forward_ios,
+                  color: Theme.of(context).iconTheme.color),
               onTap: () {},
             ),
             SizedBox(height: 48.h),
@@ -115,7 +127,8 @@ class AptitudeResultScreen extends StatelessWidget {
               SizedBox(height: 12.h),
               OutlinedButton(
                 onPressed: () {
-                  debugPrint('🔄 [APTITUDE_RESULT] 재검사하기 버튼 클릭 - 현재 결과 화면을 교체하여 퀴즈로 이동');
+                  debugPrint(
+                      '🔄 [APTITUDE_RESULT] 재검사하기 버튼 클릭 - 현재 결과 화면을 교체하여 퀴즈로 이동');
                   // ✅ [수정] pushReplacement를 사용하여 스택 누적 방지
                   context.pushReplacement(AppRoutes.aptitudeQuiz);
                 },

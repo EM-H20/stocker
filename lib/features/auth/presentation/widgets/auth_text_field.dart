@@ -10,7 +10,7 @@ class AuthTextField extends StatelessWidget {
   final TextInputType keyboardType;
 
   const AuthTextField({
-    super.key, 
+    super.key,
     required this.controller,
     required this.hintText,
     this.isPassword = false,

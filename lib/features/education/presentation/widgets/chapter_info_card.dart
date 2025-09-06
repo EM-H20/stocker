@@ -46,7 +46,9 @@ class ChapterInfoCard extends StatelessWidget {
                 Text(
                   '현재 진행 챕터',
                   style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.brightness == Brightness.dark ? Colors.white : AppTheme.grey900,
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.white
+                        : AppTheme.grey900,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -58,7 +60,9 @@ class ChapterInfoCard extends StatelessWidget {
             Text(
               title,
               style: theme.textTheme.headlineSmall?.copyWith(
-                color: theme.brightness == Brightness.dark ? Colors.white : AppTheme.grey900,
+                color: theme.brightness == Brightness.dark
+                    ? Colors.white
+                    : AppTheme.grey900,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -68,7 +72,11 @@ class ChapterInfoCard extends StatelessWidget {
             Text(
               description,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6),
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.color
+                    ?.withValues(alpha: 0.6),
                 height: 1.5,
               ),
             ),

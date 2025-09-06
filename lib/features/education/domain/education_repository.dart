@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import '../data/education_api.dart';
 import '../data/chapter_card_response.dart';
@@ -8,6 +9,7 @@ import '../data/theory_update_request.dart';
 import '../data/theory_completed_request.dart';
 import 'models/chapter_info.dart';
 import 'models/theory_session.dart';
+import 'models/theory_info.dart';
 
 /// Education 관련 Repository 클래스
 /// API 통신과 로컬 저장소를 통합하여 데이터 관리
@@ -32,17 +34,28 @@ class EducationRepository {
   /// Returns: List ChapterInfo
   /// Throws: Exception on error
   Future<List<ChapterInfo>> getChapters({bool forceRefresh = false}) async {
+    debugPrint(
+        '🔥 [EDU_REPOSITORY] getChapters 시작 - forceRefresh: $forceRefresh');
     try {
       // 강제 새로고침이 아닌 경우 로컬 캐시 확인
       if (!forceRefresh) {
+        debugPrint('💾 [EDU_REPOSITORY] 로컬 캐시 확인 중...');
         final cachedChapters = await _getCachedChapters();
         if (cachedChapters != null && cachedChapters.isNotEmpty) {
+          debugPrint(
+              '💾 [EDU_REPOSITORY] 캐시된 데이터 발견 - ${cachedChapters.length}개 챕터');
           return cachedChapters.map(_mapToChapterInfo).toList();
+        } else {
+          debugPrint('💾 [EDU_REPOSITORY] 캐시된 데이터 없음, API 호출 진행');
         }
+      } else {
+        debugPrint('🔄 [EDU_REPOSITORY] 강제 새로고침 - 캐시 건너뛰고 API 호출');
       }
 
       // API에서 최신 데이터 가져오기
+      debugPrint('🌐 [EDU_REPOSITORY] API 호출 시작...');
       final chapters = await _api.getChapters();
+      debugPrint('✅ [EDU_REPOSITORY] API 호출 성공 - ${chapters.length}개 챕터 받음');
 
       // 로컬 캐시에 저장
       await _cacheChapters(chapters);
@@ -50,12 +63,19 @@ class EducationRepository {
       // Domain 모델로 변환하여 반환
       return chapters.map(_mapToChapterInfo).toList();
     } catch (e) {
+      debugPrint('❌ [EDU_REPOSITORY] API 호출 실패: $e');
+      debugPrint('❌ [EDU_REPOSITORY] Error type: ${e.runtimeType}');
+
       // API 호출 실패 시 캐시된 데이터라도 반환 시도
+      debugPrint('🔄 [EDU_REPOSITORY] API 실패로 캐시 데이터 확인 중...');
       final cachedChapters = await _getCachedChapters();
       if (cachedChapters != null && cachedChapters.isNotEmpty) {
+        debugPrint(
+            '💾 [EDU_REPOSITORY] 캐시 데이터로 폴백 - ${cachedChapters.length}개 챕터');
         return cachedChapters.map(_mapToChapterInfo).toList();
       }
 
+      debugPrint('💥 [EDU_REPOSITORY] 캐시도 없어서 완전히 실패');
       throw Exception('챕터 목록 조회 실패: $e');
     }
   }
@@ -73,8 +93,8 @@ class EducationRepository {
       // 현재 이론 데이터를 로컬에 저장
       await _cacheCurrentTheory(response);
 
-      // Domain 모델로 변환하여 반환
-      return _mapToTheorySession(response);
+      // Domain 모델로 변환하여 반환 (chapterId 파라미터 추가)
+      return _mapToTheorySession(response, chapterId);
     } catch (e) {
       throw Exception('이론 진입 실패: $e');
     }
@@ -146,7 +166,9 @@ class EducationRepository {
       if (theoryStr != null) {
         final json = jsonDecode(theoryStr) as Map<String, dynamic>;
         final response = TheoryEnterResponse.fromJson(json);
-        return _mapToTheorySession(response);
+        // 캐시된 데이터에서는 chapterId를 알 수 없으므로 0을 기본값으로 사용
+        // 이 메서드는 캐시 조회용이므로 실제 API 호출에는 영향 없음
+        return _mapToTheorySession(response, 0);
       }
       return null;
     } catch (e) {
@@ -244,20 +266,26 @@ class EducationRepository {
     try {
       final cachedChapters = await _getCachedChapters();
       if (cachedChapters != null) {
-        final updatedChapters =
-            cachedChapters.map((chapter) {
-              if (chapter.chapterId == chapterId) {
-                return chapter.copyWith(isTheoryCompleted: isCompleted);
-              }
-              return chapter;
-            }).toList();
+        final updatedChapters = cachedChapters.map((chapter) {
+          if (chapter.chapterId == chapterId) {
+            final updatedChapter = chapter.copyWith(isTheoryCompleted: isCompleted);
+            
+            // 이론과 퀴즈가 모두 완료된 경우 챕터도 완료로 설정
+            final shouldCompleteChapter = updatedChapter.isTheoryCompleted && updatedChapter.isQuizCompleted;
+            
+            return updatedChapter.copyWith(isChapterCompleted: shouldCompleteChapter);
+          }
+          return chapter;
+        }).toList();
 
         await _cacheChapters(updatedChapters);
+        debugPrint('💾 [EDU_REPOSITORY] 챕터 $chapterId 이론 완료 상태 캐시 업데이트 완료');
       }
     } catch (e) {
-      // 캐시 업데이트 실패는 무시
+      debugPrint('❌ [EDU_REPOSITORY] 캐시 업데이트 실패: $e');
     }
   }
+
 
   // === Data to Domain Model Mappers ===
 
@@ -268,22 +296,28 @@ class EducationRepository {
       title: response.title,
       isTheoryCompleted: response.isTheoryCompleted,
       isQuizCompleted: response.isQuizCompleted,
+      isChapterCompleted: response.isChapterCompleted,
     );
   }
 
   /// TheoryEnterResponse를 TheorySession으로 변환
-  TheorySession _mapToTheorySession(TheoryEnterResponse response) {
-    final theories =
-        response.theories.map((theory) => theory.toDomain()).toList();
+  TheorySession _mapToTheorySession(TheoryEnterResponse response, int chapterId) {
+    // API.md 명세: theory_pages를 theories로 변환
+    final theories = response.theoryPages
+        .map((page) => TheoryInfo(
+              id: page.id,
+              word: page.word,
+              content: page.content,
+              chapterId: null, // API.md 명세에서 chapter 정보가 개별 페이지에 없음
+            ))
+        .toList();
 
-    // currentTheoryId를 인덱스로 변환
-    final currentIndex = theories.indexWhere(
-      (theory) => theory.id == response.currentTheoryId,
-    );
+    // currentPage를 인덱스로 변환 (페이지는 1부터 시작, 인덱스는 0부터)
+    final currentIndex = response.currentPage - 1;
 
     return TheorySession(
-      chapterId: response.chapterId,
-      chapterTitle: response.chapterTitle,
+      chapterId: chapterId, // 파라미터로 받은 실제 chapterId 사용
+      chapterTitle: '이론 학습', // API.md 명세에서 제거됨, 기본값 사용
       theories: theories,
       currentTheoryIndex: currentIndex >= 0 ? currentIndex : 0,
     );

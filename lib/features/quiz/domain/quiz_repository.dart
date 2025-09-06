@@ -17,42 +17,41 @@ class QuizRepository {
 
   QuizRepository(this._api, this._storage);
 
-  /// 퀴즈 시작
+  /// 퀴즈 진입 (API.md 스펙 준수)
   ///
   /// 서버에서 퀴즈 세션을 시작하고 로컬에 저장
   ///
   /// Returns: QuizSession
-  Future<QuizSession> startQuiz(int chapterId) async {
+  Future<QuizSession> enterQuiz(int chapterId) async {
     try {
-      // 서버에서 퀴즈 세션 시작
-      final session = await _api.startQuiz(chapterId);
+      // 서버에서 퀴즈 진입
+      final session = await _api.enterQuiz(chapterId);
 
       // 로컬에 진행 상황 저장
       await _saveQuizProgress(session);
 
       return session;
     } catch (e) {
-      debugPrint('퀴즈 시작 실패: $e');
+      debugPrint('퀴즈 진입 실패: $e');
       rethrow;
     }
   }
 
-  /// 답안 제출
+  /// 퀴즈 진도 업데이트
   ///
-  /// 서버에 답안을 제출하고 로컬 진행 상황 업데이트
-  Future<void> submitAnswer(
+  /// 서버에 현재 퀴즈 진행 상황을 업데이트하고 로컬 상태 업데이트
+  Future<void> updateQuizProgress(
     int chapterId,
-    int quizIndex,
-    int selectedAnswer,
+    int currentQuizId,
   ) async {
     try {
-      // 서버에 답안 제출
-      await _api.submitAnswer(chapterId, quizIndex, selectedAnswer);
+      // 서버에 진도 업데이트
+      await _api.updateQuizProgress(chapterId, currentQuizId);
 
       // 로컬 진행 상황 업데이트
-      await _updateLocalProgress(chapterId, quizIndex, selectedAnswer);
+      await _updateLocalProgressForQuizId(chapterId, currentQuizId);
     } catch (e) {
-      debugPrint('답안 제출 실패: $e');
+      debugPrint('퀴즈 진도 업데이트 실패: $e');
       rethrow;
     }
   }
@@ -62,10 +61,13 @@ class QuizRepository {
   /// 서버에 퀴즈 완료를 알리고 결과를 받아옴
   ///
   /// Returns: QuizResult
-  Future<QuizResult> completeQuiz(int chapterId, int timeSpentSeconds) async {
+  Future<QuizResult> completeQuiz(
+    int chapterId,
+    List<Map<String, int>> answers,
+  ) async {
     try {
       // 서버에서 퀴즈 완료 처리
-      final result = await _api.completeQuiz(chapterId, timeSpentSeconds);
+      final result = await _api.completeQuiz(chapterId, answers);
 
       // 로컬에 결과 저장
       await _saveQuizResult(result);
@@ -80,53 +82,29 @@ class QuizRepository {
     }
   }
 
-  /// 퀴즈 결과 조회
+  /// 퀴즈 결과 조회 (로컬에서만)
   ///
-  /// 특정 챕터의 퀴즈 결과 목록 조회
+  /// 특정 챕터의 퀴즈 결과 목록 조회 (로컬 캐시만 사용)
   ///
-  /// Returns: List QuizResult
+  /// Returns: `List<QuizResult>`
   Future<List<QuizResult>> getQuizResults(int chapterId) async {
     try {
-      // 로컬 캐시 확인
-      final localResults = await _getLocalQuizResults(chapterId);
-      if (localResults.isNotEmpty) {
-        return localResults;
-      }
-
-      // 서버에서 결과 조회
-      final results = await _api.getQuizResults(chapterId);
-
-      // 로컬에 캐시 저장
-      for (final result in results) {
-        await _saveQuizResult(result);
-      }
-
-      return results;
+      return await _getLocalQuizResults(chapterId);
     } catch (e) {
       debugPrint('퀴즈 결과 조회 실패: $e');
-      // 로컬 캐시라도 반환
-      return await _getLocalQuizResults(chapterId);
+      return [];
     }
   }
 
-  /// 현재 진행 중인 퀴즈 세션 조회
+  /// 현재 진행 중인 퀴즈 세션 조회 (로컬에서만)
   ///
   /// Returns: QuizSession? (null이면 진행 중인 퀴즈 없음)
   Future<QuizSession?> getCurrentQuizSession() async {
     try {
-      // 서버에서 현재 세션 조회
-      final session = await _api.getCurrentQuizSession();
-
-      if (session != null) {
-        // 로컬에 저장
-        await _saveQuizProgress(session);
-      }
-
-      return session;
+      return await _getLocalQuizProgress();
     } catch (e) {
       debugPrint('현재 퀴즈 세션 조회 실패: $e');
-      // 로컬 캐시 확인
-      return await _getLocalQuizProgress();
+      return null;
     }
   }
 
@@ -161,8 +139,8 @@ class QuizRepository {
     }
   }
 
-  /// 로컬 진행 상황 업데이트
-  Future<void> _updateLocalProgress(
+  /// 로컬 진행 상황에서 답안 업데이트 (인덱스 기반)
+  Future<void> updateLocalAnswer(
     int chapterId,
     int quizIndex,
     int selectedAnswer,
@@ -177,7 +155,23 @@ class QuizRepository {
         await _saveQuizProgress(updatedSession);
       }
     } catch (e) {
-      debugPrint('로컬 진행 상황 업데이트 실패: $e');
+      debugPrint('로컬 답안 업데이트 실패: $e');
+    }
+  }
+
+  /// 로컬 진행 상황 업데이트 (퀴즈 ID 기반)
+  Future<void> _updateLocalProgressForQuizId(
+    int chapterId,
+    int currentQuizId,
+  ) async {
+    try {
+      final session = await _getLocalQuizProgress();
+      if (session != null && session.chapterId == chapterId) {
+        final updatedSession = session.copyWith(currentQuizId: currentQuizId);
+        await _saveQuizProgress(updatedSession);
+      }
+    } catch (e) {
+      debugPrint('로컬 퀴즈 ID 업데이트 실패: $e');
     }
   }
 
@@ -188,7 +182,7 @@ class QuizRepository {
       for (final entry in allKeys.entries) {
         if (entry.key.startsWith(_quizProgressKey)) {
           final json = jsonDecode(entry.value);
-          return QuizSession.fromJson(json as Map<String, dynamic>);
+          return QuizSession.fromLocalJson(json as Map<String, dynamic>);
         }
       }
       return null;
@@ -207,12 +201,11 @@ class QuizRepository {
       List<QuizResult> results = [];
       if (existingData != null) {
         final existingList = jsonDecode(existingData) as List;
-        results =
-            existingList
-                .map(
-                  (item) => QuizResult.fromJson(item as Map<String, dynamic>),
-                )
-                .toList();
+        results = existingList
+            .map(
+              (item) => QuizResult.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
       }
 
       // 새 결과 추가 (최신 순으로 정렬)

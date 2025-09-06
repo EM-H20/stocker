@@ -24,7 +24,7 @@ class QuizResult {
     required this.completedAt,
   });
 
-  /// JSON에서 QuizResult 객체 생성
+  /// JSON에서 QuizResult 객체 생성 (로컬 저장용)
   factory QuizResult.fromJson(Map<String, dynamic> json) {
     return QuizResult(
       chapterId: json['chapterId'] as int,
@@ -37,6 +37,30 @@ class QuizResult {
       isPassed: json['isPassed'] as bool,
       timeSpentSeconds: json['timeSpentSeconds'] as int,
       completedAt: DateTime.parse(json['completedAt'] as String),
+    );
+  }
+
+  /// 백엔드 응답에서 QuizResult 객체 생성
+  /// 서버 응답: {"total": 2, "correct": 2, "wrong": 0}
+  factory QuizResult.fromBackendJson(Map<String, dynamic> json, int chapterId) {
+    final totalQuestions = json['total'] as int;
+    final correctAnswers = json['correct'] as int;
+    final wrongAnswers = json['wrong'] as int;
+    final scorePercentage = ((correctAnswers / totalQuestions) * 100).round();
+    final grade = calculateGrade(scorePercentage);
+    final isPassed = calculatePassed(scorePercentage);
+
+    return QuizResult(
+      chapterId: chapterId,
+      chapterTitle: '챕터 $chapterId',
+      totalQuestions: totalQuestions,
+      correctAnswers: correctAnswers,
+      wrongAnswers: wrongAnswers,
+      scorePercentage: scorePercentage,
+      grade: grade,
+      isPassed: isPassed,
+      timeSpentSeconds: 0, // 소요시간은 사용하지 않음
+      completedAt: DateTime.now(),
     );
   }
 

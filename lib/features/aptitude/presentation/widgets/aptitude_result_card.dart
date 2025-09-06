@@ -73,11 +73,16 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: LinearPercentIndicator(
-                    percent: totalQuestions > 0 ? (provider.answers.length / totalQuestions) : 0,
+                    percent: totalQuestions > 0
+                        ? (provider.answers.length / totalQuestions)
+                        : 0,
                     lineHeight: 12.0,
                     center: Text(
                       '${provider.answers.length} / $totalQuestions',
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold),
                     ),
                     backgroundColor: Colors.grey[300],
                     progressColor: Theme.of(context).primaryColor,
@@ -88,7 +93,8 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(), // 사용자가 직접 스와이프하는 것 방지
+                    physics:
+                        const NeverScrollableScrollPhysics(), // 사용자가 직접 스와이프하는 것 방지
                     itemCount: totalQuestions,
                     itemBuilder: (context, index) {
                       final question = questions[index];
@@ -114,15 +120,18 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                                 padding: const EdgeInsets.only(bottom: 12.0),
                                 child: QuizOptionButton(
                                   text: choice.text,
-                                  isSelected: provider.answers[question.id] == choice.value,
+                                  isSelected: provider.answers[question.id] ==
+                                      choice.value,
                                   onPressed: () {
                                     // 답변을 Provider에 저장
-                                    provider.answerQuestion(question.id, choice.value);
-                                    
+                                    provider.answerQuestion(
+                                        question.id, choice.value);
+
                                     // 마지막 문제가 아니면 다음 페이지로 자동 이동
                                     if (index < totalQuestions - 1) {
                                       _pageController.nextPage(
-                                        duration: const Duration(milliseconds: 300),
+                                        duration:
+                                            const Duration(milliseconds: 300),
                                         curve: Curves.easeInOut,
                                       );
                                     }
@@ -140,7 +149,8 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                 Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: ElevatedButton(
-                    onPressed: (provider.answers.length == totalQuestions && totalQuestions > 0)
+                    onPressed: (provider.answers.length == totalQuestions &&
+                            totalQuestions > 0)
                         ? _submit
                         : null, // 모든 질문에 답하지 않으면 버튼 비활성화
                     style: ElevatedButton.styleFrom(
@@ -150,8 +160,11 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                       disabledBackgroundColor: Colors.grey[300],
                     ),
                     child: provider.isLoading
-                        ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2.0)
-                        : const Text('결과 분석하기', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        ? const CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2.0)
+                        : const Text('결과 분석하기',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],

@@ -17,20 +17,16 @@ class TheoryPageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w),
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: isDarkMode 
-            ? AppTheme.darkSurface 
-            : Colors.white,
+        color: isDarkMode ? AppTheme.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: isDarkMode 
-            ? null 
-            : Border.all(color: AppTheme.grey200),
-        boxShadow: isDarkMode 
-            ? null 
+        border: isDarkMode ? null : Border.all(color: AppTheme.grey200),
+        boxShadow: isDarkMode
+            ? null
             : [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),

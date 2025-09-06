@@ -1,4 +1,3 @@
-
 // FILE: lib/features/note/presentation/widgets/template_picker_dialog.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,10 +28,10 @@ class TemplatePickerDialog extends StatelessWidget {
             Text(
               '노트 템플릿 선택',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).textTheme.titleLarge?.color,
-              ),
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).textTheme.titleLarge?.color,
+                  ),
             ),
           ],
         ),
@@ -55,22 +54,30 @@ class TemplatePickerDialog extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final template = NoteTemplates.templates[index];
                   final isLast = index == NoteTemplates.templates.length - 1;
-                  
+
                   return Material(
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () => Navigator.of(context).pop(template),
-                      splashColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                      highlightColor: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+                      splashColor:
+                          Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      highlightColor: Theme.of(context)
+                          .primaryColor
+                          .withValues(alpha: 0.05),
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 24.w, vertical: 16.h),
                         decoration: BoxDecoration(
-                          border: !isLast ? Border(
-                            bottom: BorderSide(
-                              color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
-                              width: 1.h,
-                            ),
-                          ) : null,
+                          border: !isLast
+                              ? Border(
+                                  bottom: BorderSide(
+                                    color: Theme.of(context)
+                                        .dividerColor
+                                        .withValues(alpha: 0.2),
+                                    width: 1.h,
+                                  ),
+                                )
+                              : null,
                         ),
                         child: Row(
                           children: [
@@ -78,7 +85,8 @@ class TemplatePickerDialog extends StatelessWidget {
                               width: 40.w,
                               height: 40.w,
                               decoration: BoxDecoration(
-                                color: _getTemplateColor(template.name, context),
+                                color:
+                                    _getTemplateColor(template.name, context),
                                 borderRadius: BorderRadius.circular(10.r),
                               ),
                               child: Icon(
@@ -94,26 +102,43 @@ class TemplatePickerDialog extends StatelessWidget {
                                 children: [
                                   Text(
                                     template.name,
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).textTheme.titleMedium?.color,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.color,
+                                        ),
                                   ),
                                   SizedBox(height: 4.h),
                                   Text(
                                     _getTemplateDescription(template.name),
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontSize: 12.sp,
-                                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          fontSize: 12.sp,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium
+                                              ?.color
+                                              ?.withValues(alpha: 0.6),
+                                        ),
                                   ),
                                 ],
                               ),
                             ),
                             Icon(
                               Icons.arrow_forward_ios,
-                              color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.3),
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.color
+                                  ?.withValues(alpha: 0.3),
                               size: 16.sp,
                             ),
                           ],
@@ -141,7 +166,11 @@ class TemplatePickerDialog extends StatelessWidget {
             child: Text(
               '취소',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.color
+                    ?.withValues(alpha: 0.8),
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
               ),

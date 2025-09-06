@@ -1,8 +1,8 @@
 /// 앱 전체에서 사용할 라우팅 경로 상수 정의
-/// 
+///
 /// 🎯 새로운 정보구조 설계 원칙:
 /// 1. Linear Learning Path: 학습자가 순차적으로 진행할 수 있는 경로
-/// 2. Clear Hierarchy: 현재 위치를 명확히 알 수 있는 depth 구조  
+/// 2. Clear Hierarchy: 현재 위치를 명확히 알 수 있는 depth 구조
 /// 3. Progressive Flow: Theory → Quiz → Result → Next Chapter
 /// 4. Hub & Spoke Optimization: 필요한 곳에만 대시보드 복귀
 class AppRoutes {
@@ -17,20 +17,23 @@ class AppRoutes {
   // ============= 메인 학습 경로 (Linear Path) =============
   /// 🎓 학습 메인 - 전체 커리큘럼 및 진도 확인
   static const String learningPath = '/learning';
-  
+
   /// 📚 챕터별 학습 플로우 (연속적 진행)
   static const String learningChapter = '/learning/chapter'; // + ?id=1
-  static const String learningTheory = '/learning/chapter/theory'; // + ?chapterId=1
-  static const String learningQuiz = '/learning/chapter/quiz'; // + ?chapterId=1  
-  static const String learningResult = '/learning/chapter/result'; // + ?chapterId=1
-  
+  static const String learningTheory =
+      '/learning/chapter/theory'; // + ?chapterId=1
+  static const String learningQuiz = '/learning/chapter/quiz'; // + ?chapterId=1
+  static const String learningResult =
+      '/learning/chapter/result'; // + ?chapterId=1
+
   /// 🏆 단원 완료 및 다음 단계 안내
-  static const String learningComplete = '/learning/chapter/complete'; // + ?chapterId=1
+  static const String learningComplete =
+      '/learning/chapter/complete'; // + ?chapterId=1
 
   // ============= 메인 탭 경로들 (개선된 4개 탭) =============
   static const String education = '/education'; // 📚 전체 학습 자료 (기존 유지)
   static const String attendance = '/attendance'; // 📅 출석 체크
-  static const String wrongNote = '/wrong-note'; // 📝 오답노트 & 개인 기록  
+  static const String wrongNote = '/wrong-note'; // 📝 오답노트 & 개인 기록
   static const String mypage = '/mypage'; // 👤 프로필 & 설정
 
   // ============= 레거시 교육 경로 (호환성 유지) =============
@@ -54,10 +57,10 @@ class AppRoutes {
   static const String profile = '/profile';
 
   // ============= 유틸리티 메서드 =============
-  
+
   /// 🔗 학습 플로우 내 다음 단계로 이동하는 헬퍼
   static String getNextLearningStep({
-    required int chapterId, 
+    required int chapterId,
     required String currentStep, // 'theory', 'quiz', 'result'
   }) {
     switch (currentStep) {

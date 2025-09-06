@@ -23,20 +23,20 @@ class WrongNoteStatsCard extends StatelessWidget {
       margin: EdgeInsets.all(16.w),
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark 
-            ? AppTheme.darkSurface 
+        color: theme.brightness == Brightness.dark
+            ? AppTheme.darkSurface
             : Colors.grey[50],
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: theme.brightness == Brightness.dark 
-              ? AppTheme.grey600.withValues(alpha: 0.3) 
+          color: theme.brightness == Brightness.dark
+              ? AppTheme.grey600.withValues(alpha: 0.3)
               : AppTheme.grey300.withValues(alpha: 0.5),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: theme.brightness == Brightness.dark 
-                ? Colors.black.withValues(alpha: 0.3) 
+            color: theme.brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
                 : Colors.grey.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
@@ -69,8 +69,8 @@ class WrongNoteStatsCard extends StatelessWidget {
                 Text(
                   '오답 현황',
                   style: TextStyle(
-                    color: theme.brightness == Brightness.dark 
-                        ? Colors.white 
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.white
                         : AppTheme.grey900,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
@@ -109,11 +109,11 @@ class WrongNoteStatsCard extends StatelessWidget {
               ),
             ),
             Text(
-              label, 
+              label,
               style: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? Colors.grey[400] 
-                    : AppTheme.grey600, 
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[400]
+                    : AppTheme.grey600,
                 fontSize: 12.sp,
               ),
             ),

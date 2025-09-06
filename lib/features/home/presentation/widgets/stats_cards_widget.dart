@@ -19,7 +19,6 @@ class StatsCardsWidget extends StatelessWidget {
     );
   }
 
-
   /// 통계 정보 카드
   Widget _buildStatsCard(BuildContext context) {
     return Container(
@@ -41,26 +40,50 @@ class StatsCardsWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: Consumer4<AttendanceProvider, WrongNoteProvider, NoteProvider, AptitudeProvider>(
-        builder: (context, attendanceProvider, wrongNoteProvider, noteProvider, aptitudeProvider, child) {
-          final attendedDays = attendanceProvider.attendanceStatus.values.where((v) => v).length;
+      child: Consumer4<AttendanceProvider, WrongNoteProvider, NoteProvider,
+          AptitudeProvider>(
+        builder: (context, attendanceProvider, wrongNoteProvider, noteProvider,
+            aptitudeProvider, child) {
+          final attendedDays =
+              attendanceProvider.attendanceStatus.values.where((v) => v).length;
           final wrongNotes = wrongNoteProvider.wrongNotes.length;
-          
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 헤더
-              Text(
-                '출석 교육',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? AppTheme.grey400
-                      : AppTheme.grey600,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '학습 현황',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppTheme.grey400
+                              : AppTheme.grey600,
+                        ),
+                  ),
+                  // 성향분석 결과가 있으면 표시
+                  if (aptitudeProvider.myResult != null)
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: AppTheme.warningColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Text(
+                        aptitudeProvider.myResult!.typeName,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppTheme.warningColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                    ),
+                ],
               ),
-              
+
               SizedBox(height: 12.h),
-              
+
               // Done 통계
               Row(
                 children: [
@@ -80,17 +103,17 @@ class StatsCardsWidget extends StatelessWidget {
                   Text(
                     '$attendedDays Done',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : AppTheme.grey900,
-                    ),
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : AppTheme.grey900,
+                        ),
                   ),
                 ],
               ),
-              
+
               SizedBox(height: 8.h),
-              
+
               // To-Do 통계
               Row(
                 children: [
@@ -110,14 +133,47 @@ class StatsCardsWidget extends StatelessWidget {
                   Text(
                     '$wrongNotes To-Do',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white
-                          : AppTheme.grey900,
-                    ),
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : AppTheme.grey900,
+                        ),
                   ),
                 ],
               ),
+
+              // 성향분석 결과가 있으면 표시
+              if (aptitudeProvider.myResult != null) ...[
+                SizedBox(height: 8.h),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(4.w),
+                      decoration: BoxDecoration(
+                        color: AppTheme.warningColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Icon(
+                        Icons.psychology,
+                        color: AppTheme.warningColor,
+                        size: 16.sp,
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(
+                        '투자성향: ${aptitudeProvider.myResult!.typeName}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white
+                                  : AppTheme.grey700,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           );
         },

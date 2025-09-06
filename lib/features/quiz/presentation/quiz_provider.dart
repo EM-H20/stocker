@@ -10,17 +10,77 @@ class QuizProvider extends ChangeNotifier {
   final QuizMockRepository? _mockRepository;
   final bool _useMock;
 
+  // 퀴즈 완료 시 호출될 콜백 함수들
+  final List<Function(int chapterId, QuizResult result)>
+      _onQuizCompletedCallbacks = [];
+
+  // 단일 퀴즈 완료 시 호출될 콜백 함수들 (오답노트 관리용)
+  final List<
+          Function(
+              int chapterId, int quizId, bool isCorrect, int selectedOption)>
+      _onSingleQuizCompletedCallbacks = [];
+
+  // 단일 퀴즈 오답 삭제 완료 시 호출될 콜백 함수들 (네비게이션용)
+  final List<Function(int quizId)> _onWrongNoteRemovedCallbacks = [];
+
   /// 실제 API Repository를 사용하는 생성자
   QuizProvider(QuizRepository repository)
-    : _repository = repository,
-      _mockRepository = null,
-      _useMock = false;
+      : _repository = repository,
+        _mockRepository = null,
+        _useMock = false;
 
   /// Mock Repository를 사용하는 생성자 (UI 개발/테스트용)
   QuizProvider.withMock(QuizMockRepository mockRepository)
-    : _repository = null,
-      _mockRepository = mockRepository,
-      _useMock = true;
+      : _repository = null,
+        _mockRepository = mockRepository,
+        _useMock = true;
+
+  /// 퀴즈 완료 콜백 등록
+  void addOnQuizCompletedCallback(
+      Function(int chapterId, QuizResult result) callback) {
+    _onQuizCompletedCallbacks.add(callback);
+  }
+
+  /// 퀴즈 완료 콜백 해제
+  void removeOnQuizCompletedCallback(
+      Function(int chapterId, QuizResult result) callback) {
+    _onQuizCompletedCallbacks.remove(callback);
+  }
+
+  /// 단일 퀴즈 완료 콜백 등록
+  void addOnSingleQuizCompletedCallback(
+      Function(int chapterId, int quizId, bool isCorrect, int selectedOption)
+          callback) {
+    _onSingleQuizCompletedCallbacks.add(callback);
+  }
+
+  /// 단일 퀴즈 완료 콜백 해제
+  void removeOnSingleQuizCompletedCallback(
+      Function(int chapterId, int quizId, bool isCorrect, int selectedOption)
+          callback) {
+    _onSingleQuizCompletedCallbacks.remove(callback);
+  }
+
+  /// 오답노트 삭제 완료 콜백 등록
+  void addOnWrongNoteRemovedCallback(Function(int quizId) callback) {
+    _onWrongNoteRemovedCallbacks.add(callback);
+  }
+
+  /// 오답노트 삭제 완료 콜백 해제
+  void removeOnWrongNoteRemovedCallback(Function(int quizId) callback) {
+    _onWrongNoteRemovedCallbacks.remove(callback);
+  }
+
+  /// 오답노트 삭제 완료 알림 (외부에서 호출)
+  void notifyWrongNoteRemoved(int quizId) {
+    for (final callback in _onWrongNoteRemovedCallbacks) {
+      try {
+        callback(quizId);
+      } catch (e) {
+        debugPrint('오답노트 삭제 완료 콜백 실행 실패: $e');
+      }
+    }
+  }
 
   // === 퀴즈 세션 관련 상태 ===
   QuizSession? _currentQuizSession;
@@ -99,33 +159,38 @@ class QuizProvider extends ChangeNotifier {
 
   // === 퀴즈 세션 관련 메서드 ===
 
-  /// 퀴즈 시작
+  /// 퀴즈 진입 (API.md 스펙 준수)
   ///
   /// [chapterId]: 시작할 챕터 ID
   Future<bool> startQuiz(int chapterId) async {
     if (_isLoadingQuiz) return false;
 
+    debugPrint(
+        '🧠 [QUIZ_PROVIDER] 일반 퀴즈 진입 요청 - 챕터 ID: $chapterId (useMock: $_useMock)');
     _isLoadingQuiz = true;
     _quizError = null;
     notifyListeners();
 
     try {
       if (_useMock) {
-        _currentQuizSession = await _mockRepository!.startQuiz(chapterId);
+        debugPrint('🎭 [QUIZ_PROVIDER] Mock Repository로 퀴즈 진입 중...');
+        _currentQuizSession = await _mockRepository!.enterQuiz(chapterId);
       } else {
-        _currentQuizSession = await _repository!.startQuiz(chapterId);
+        debugPrint('🌐 [QUIZ_PROVIDER] Real API Repository로 퀴즈 진입 중...');
+        _currentQuizSession = await _repository!.enterQuiz(chapterId);
       }
 
-      // 타이머 시작 (시간 제한이 있는 경우)
-      if (_currentQuizSession?.timeLimit != null) {
-        _startTimer(_currentQuizSession!.timeLimit!);
-      }
+      // 기본 10분 타이머 시작 (API.md 스펙에서 timeLimit 제거됨)
+      _startTimer(600); // 10분
+      debugPrint('⏰ [QUIZ_PROVIDER] 퀴즈 타이머 시작 - 10분');
 
+      debugPrint(
+          '✅ [QUIZ_PROVIDER] 일반 퀴즈 진입 성공 - 총 ${_currentQuizSession?.totalCount ?? 0}개 문제');
       _quizError = null;
       return true;
     } catch (e) {
       _quizError = e.toString();
-      debugPrint('퀴즈 시작 실패: $e');
+      debugPrint('❌ [QUIZ_PROVIDER] 일반 퀴즈 진입 실패 - 챕터: $chapterId, 에러: $e');
       return false;
     } finally {
       _isLoadingQuiz = false;
@@ -133,9 +198,73 @@ class QuizProvider extends ChangeNotifier {
     }
   }
 
-  /// 답안 제출
+  /// 단일 퀴즈 진입 (오답노트 재시도용)
   ///
-  /// [selectedAnswer]: 선택한 답안 인덱스
+  /// [chapterId]: 챕터 ID
+  /// [quizId]: 특정 퀴즈 ID
+  Future<bool> startSingleQuiz(int chapterId, int quizId) async {
+    if (_isLoadingQuiz) return false;
+
+    debugPrint(
+        '🎯 [QUIZ_PROVIDER] 단일 퀴즈 진입 요청 - 챕터: $chapterId, 퀴즈: $quizId (useMock: $_useMock)');
+    _isLoadingQuiz = true;
+    _quizError = null;
+    notifyListeners();
+
+    try {
+      // 먼저 전체 퀴즈 세션을 가져온 후 특정 퀴즈만 필터링
+      QuizSession fullSession;
+      if (_useMock) {
+        debugPrint('🎭 [QUIZ_PROVIDER] Mock Repository로 단일 퀴즈 데이터 로드 중...');
+        fullSession = await _mockRepository!.enterQuiz(chapterId);
+      } else {
+        debugPrint('🌐 [QUIZ_PROVIDER] Real API Repository로 단일 퀴즈 데이터 로드 중...');
+        fullSession = await _repository!.enterQuiz(chapterId);
+      }
+
+      // 해당 quizId를 가진 퀴즈만 찾기
+      final targetQuiz =
+          fullSession.quizList.where((quiz) => quiz.id == quizId).toList();
+
+      if (targetQuiz.isEmpty) {
+        debugPrint('❌ [QUIZ_PROVIDER] 단일 퀴즈 찾기 실패 - ID: $quizId');
+        throw Exception('해당 퀴즈를 찾을 수 없습니다 (ID: $quizId)');
+      }
+
+      debugPrint(
+          '🔍 [QUIZ_PROVIDER] 단일 퀴즈 찾기 성공 - 문제: ${targetQuiz.first.question}');
+
+      // 단일 퀴즈로 구성된 새로운 QuizSession 생성
+      _currentQuizSession = QuizSession(
+        chapterId: chapterId,
+        quizList: targetQuiz,
+        currentQuizId: targetQuiz.first.id,
+        userAnswers: [null], // 1개 퀴즈이므로 하나의 null 답안
+        startedAt: DateTime.now(),
+        isSingleQuizMode: true, // 단일 퀴즈 모드 표시
+      );
+
+      // 단일 퀴즈는 5분 타이머
+      _startTimer(300); // 5분
+      debugPrint('⏰ [QUIZ_PROVIDER] 단일 퀴즈 타이머 시작 - 5분');
+
+      _quizError = null;
+      debugPrint('✅ [QUIZ_PROVIDER] 단일 퀴즈 진입 성공 - 챕터: $chapterId, 퀴즈: $quizId');
+      return true;
+    } catch (e) {
+      _quizError = e.toString();
+      debugPrint(
+          '❌ [QUIZ_PROVIDER] 단일 퀴즈 진입 실패 - 챕터: $chapterId, 퀴즈: $quizId, 에러: $e');
+      return false;
+    } finally {
+      _isLoadingQuiz = false;
+      notifyListeners();
+    }
+  }
+
+  /// 답안 제출 및 진행 상황 업데이트 (API.md 스펙)
+  ///
+  /// [selectedAnswer]: 선택한 답안 인덱스 (0-based)
   Future<bool> submitAnswer(int selectedAnswer) async {
     if (_isSubmittingAnswer || _currentQuizSession == null) return false;
 
@@ -144,25 +273,29 @@ class QuizProvider extends ChangeNotifier {
 
     try {
       final chapterId = _currentQuizSession!.chapterId;
-      final quizIndex = _currentQuizSession!.currentQuizIndex;
+      final currentQuizIndex = _currentQuizSession!.currentQuizIndex;
+      final currentQuizId = _currentQuizSession!.currentQuizId;
 
+      // 1. 로컬 답안 저장 (즉시 UI 업데이트용)
+      _updateLocalAnswer(currentQuizIndex, selectedAnswer);
+
+      // 2. Mock에서는 진행상황 업데이트만, Real에서는 서버와 통신
       if (_useMock) {
-        await _mockRepository!.submitAnswer(
-          chapterId,
-          quizIndex,
-          selectedAnswer,
-        );
+        await _mockRepository!.updateQuizProgress(chapterId, currentQuizId);
+        // Mock에서는 로컬 Repository를 통해 답안도 업데이트
+        await _repository?.updateLocalAnswer(
+            chapterId, currentQuizIndex, selectedAnswer);
       } else {
-        await _repository!.submitAnswer(chapterId, quizIndex, selectedAnswer);
+        // Real API: 서버에 진행상황 업데이트 + 로컬 답안 저장
+        await _repository!.updateQuizProgress(chapterId, currentQuizId);
+        await _repository.updateLocalAnswer(
+            chapterId, currentQuizIndex, selectedAnswer);
       }
-
-      // 로컬 상태 업데이트
-      _updateLocalAnswer(quizIndex, selectedAnswer);
 
       return true;
     } catch (e) {
       _quizError = e.toString();
-      debugPrint('답안 제출 실패: $e');
+      debugPrint('답안 제출 및 진행상황 업데이트 실패: $e');
       return false;
     } finally {
       _isSubmittingAnswer = false;
@@ -170,42 +303,54 @@ class QuizProvider extends ChangeNotifier {
     }
   }
 
-  /// 다음 퀴즈로 이동
+  /// 다음 퀴즈로 이동 (currentQuizId 기반)
   void moveToNextQuiz() {
     if (_currentQuizSession?.hasNext ?? false) {
-      _currentQuizSession = _currentQuizSession!.copyWith(
-        currentQuizIndex: _currentQuizSession!.currentQuizIndex + 1,
-      );
-      notifyListeners();
+      final currentIndex = _currentQuizSession!.currentQuizIndex;
+      final nextIndex = currentIndex + 1;
+      if (nextIndex < _currentQuizSession!.quizList.length) {
+        final nextQuizId = _currentQuizSession!.quizList[nextIndex].id;
+        _currentQuizSession = _currentQuizSession!.copyWith(
+          currentQuizId: nextQuizId,
+        );
+        notifyListeners();
+      }
     }
   }
 
-  /// 이전 퀴즈로 이동
+  /// 이전 퀴즈로 이동 (currentQuizId 기반)
   void moveToPreviousQuiz() {
     if (_currentQuizSession?.hasPrevious ?? false) {
-      _currentQuizSession = _currentQuizSession!.copyWith(
-        currentQuizIndex: _currentQuizSession!.currentQuizIndex - 1,
-      );
-      notifyListeners();
+      final currentIndex = _currentQuizSession!.currentQuizIndex;
+      final prevIndex = currentIndex - 1;
+      if (prevIndex >= 0) {
+        final prevQuizId = _currentQuizSession!.quizList[prevIndex].id;
+        _currentQuizSession = _currentQuizSession!.copyWith(
+          currentQuizId: prevQuizId,
+        );
+        notifyListeners();
+      }
     }
   }
 
-  /// 특정 퀴즈로 이동
+  /// 특정 퀴즈로 이동 (currentQuizId 기반)
   ///
   /// [index]: 이동할 퀴즈 인덱스
   void moveToQuiz(int index) {
     if (_currentQuizSession == null ||
         index < 0 ||
-        index >= _currentQuizSession!.totalCount)
+        index >= _currentQuizSession!.totalCount) {
       return;
+    }
 
+    final targetQuizId = _currentQuizSession!.quizList[index].id;
     _currentQuizSession = _currentQuizSession!.copyWith(
-      currentQuizIndex: index,
+      currentQuizId: targetQuizId,
     );
     notifyListeners();
   }
 
-  /// 퀴즈 완료
+  /// 퀴즈 완료 (API.md 스펙)
   ///
   /// Returns: QuizResult?
   Future<QuizResult?> completeQuiz() async {
@@ -216,33 +361,71 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final timeSpent =
-          _currentQuizSession!.timeLimit != null
-              ? _currentQuizSession!.timeLimit! - _remainingSeconds
-              : 0;
+      final chapterId = _currentQuizSession!.chapterId;
+
+      // 사용자 답안을 API 형식으로 변환: [{"quiz_id": 1, "selected_option": 2}]
+      final answers = <Map<String, int>>[];
+      for (int i = 0; i < _currentQuizSession!.quizList.length; i++) {
+        final quiz = _currentQuizSession!.quizList[i];
+        final userAnswer = _currentQuizSession!.userAnswers[i];
+        if (userAnswer != null) {
+          answers.add({
+            'quiz_id': quiz.id,
+            'selected_option': userAnswer + 1, // 0-based → 1-based 변환
+          });
+        }
+      }
 
       QuizResult result;
       if (_useMock) {
-        result = await _mockRepository!.completeQuiz(
-          _currentQuizSession!.chapterId,
-          _currentQuizSession!.quizzes,
-          _currentQuizSession!.userAnswers,
-          timeSpent,
-        );
+        result = await _mockRepository!.completeQuiz(chapterId, answers);
       } else {
-        result = await _repository!.completeQuiz(
-          _currentQuizSession!.chapterId,
-          timeSpent,
-        );
+        result = await _repository!.completeQuiz(chapterId, answers);
       }
 
       // 결과 목록에 추가
       _quizResults.insert(0, result);
 
+      // 단일 퀴즈 모드일 때 오답노트 삭제 처리
+      final isSingleMode = _currentQuizSession!.isSingleQuizMode;
+      if (isSingleMode && _currentQuizSession!.quizList.isNotEmpty) {
+        final quiz = _currentQuizSession!.quizList.first;
+        final userAnswer = _currentQuizSession!.userAnswers.first;
+        final isCorrect = userAnswer == quiz.correctAnswerIndex;
+
+        // 단일 퀴즈 완료 콜백 호출 (오답노트 관리용)
+        for (final callback in _onSingleQuizCompletedCallbacks) {
+          try {
+            // selectedOption을 1-based로 변환 (백엔드 API 호환)
+            final selectedOptionOneBased = userAnswer! + 1;
+            callback(_currentQuizSession!.chapterId, quiz.id, isCorrect,
+                selectedOptionOneBased);
+          } catch (e) {
+            debugPrint('단일 퀴즈 완료 콜백 실행 실패: $e');
+          }
+        }
+
+        debugPrint(
+            '🎯 [SINGLE_QUIZ] 단일 퀴즈 완료 - Quiz ${quiz.id}, 정답: $isCorrect');
+      }
+
+      // 일반 퀴즈 완료 콜백 호출 (교육 진도 업데이트용)
+      if (!isSingleMode) {
+        for (final callback in _onQuizCompletedCallbacks) {
+          try {
+            callback(chapterId, result);
+          } catch (e) {
+            debugPrint('퀴즈 완료 콜백 실행 실패: $e');
+          }
+        }
+      }
+
       // 세션 정리
       _stopTimer();
       _currentQuizSession = null;
 
+      debugPrint(
+          '🎯 [QUIZ_PROVIDER] 퀴즈 완료 - 챕터 $chapterId, 점수: ${result.correctAnswers}/${result.totalQuestions} (${result.scorePercentage}%)');
       return result;
     } catch (e) {
       _quizError = e.toString();
@@ -311,16 +494,15 @@ class QuizProvider extends ChangeNotifier {
       if (session != null) {
         _currentQuizSession = session;
 
-        // 진행 중인 세션이 있고 시간 제한이 있다면 타이머 재시작
-        if (_currentQuizSession?.timeLimit != null) {
-          final elapsed =
-              DateTime.now()
-                  .difference(_currentQuizSession!.startedAt)
-                  .inSeconds;
-          final remaining = _currentQuizSession!.timeLimit! - elapsed;
-          if (remaining > 0) {
-            _startTimer(remaining);
-          }
+        // 진행 중인 세션이 있다면 기본 10분 타이머 시작
+        final elapsed =
+            DateTime.now().difference(_currentQuizSession!.startedAt).inSeconds;
+        final defaultTimeLimit = 600; // 10분 고정
+        final remaining = defaultTimeLimit - elapsed;
+        if (remaining > 0) {
+          _startTimer(remaining);
+        } else {
+          _startTimer(defaultTimeLimit); // 새로운 10분 타이머
         }
 
         notifyListeners();

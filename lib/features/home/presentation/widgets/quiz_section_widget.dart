@@ -18,16 +18,16 @@ class QuizSectionWidget extends StatelessWidget {
           Text(
             '오늘의 퀴즈',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white
-                  : AppTheme.grey900,
-            ),
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : AppTheme.grey900,
+                ),
           ),
-          
+
           SizedBox(height: 16.h),
-          
+
           // 퀴즈 컨테이너
           Container(
             width: double.infinity,
@@ -58,9 +58,9 @@ class QuizSectionWidget extends StatelessWidget {
                   onAnswerO: () => _handleAnswer(context, 1, true),
                   onAnswerX: () => _handleAnswer(context, 1, false),
                 ),
-                
+
                 SizedBox(height: 16.h),
-                
+
                 // 퀴즈 2
                 QuizItemWidget(
                   number: 2,
@@ -68,9 +68,9 @@ class QuizSectionWidget extends StatelessWidget {
                   onAnswerO: () => _handleAnswer(context, 2, true),
                   onAnswerX: () => _handleAnswer(context, 2, false),
                 ),
-                
+
                 SizedBox(height: 16.h),
-                
+
                 // 퀴즈 3
                 QuizItemWidget(
                   number: 3,

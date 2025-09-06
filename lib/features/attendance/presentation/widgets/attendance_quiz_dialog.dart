@@ -64,8 +64,11 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? '출석이 완료되었습니다!' : provider.errorMessage ?? '출석 처리 중 오류가 발생했습니다.'),
-          backgroundColor: success ? AppTheme.successColor : AppTheme.errorColor,
+          content: Text(success
+              ? '출석이 완료되었습니다!'
+              : provider.errorMessage ?? '출석 처리 중 오류가 발생했습니다.'),
+          backgroundColor:
+              success ? AppTheme.successColor : AppTheme.errorColor,
         ),
       );
     }
@@ -93,8 +96,8 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
                   color: isDarkMode ? Colors.white : Colors.black87,
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w700,
-                  shadows: isDarkMode 
-                      ? [Shadow(color: Colors.black54, blurRadius: 1)] 
+                  shadows: isDarkMode
+                      ? [Shadow(color: Colors.black54, blurRadius: 1)]
                       : [Shadow(color: Colors.white70, blurRadius: 1)],
                 ),
               ),
@@ -156,9 +159,8 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
 
     if (_showResult && _selectedAnswer == isO) {
       // 🎯 선택된 답안 결과 - 더 임팩트 있는 아이콘과 색상
-      buttonIcon = _isCorrect 
-          ? Icons.check_circle_rounded 
-          : Icons.cancel_rounded;
+      buttonIcon =
+          _isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded;
       buttonColor = _isCorrect ? AppTheme.successColor : AppTheme.errorColor;
     } else if (_showResult) {
       // 선택되지 않은 답안은 은은한 회색
@@ -178,10 +180,9 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
         icon: buttonIcon,
         color: buttonColor,
         onPressed: _showResult ? null : () => _onAnswerSelected(isO),
-        width: 80.w,  // 🔥 정사각형 스타일
-        height: 80.h, // 🔥 정사각형 스타일 
+        width: 80.w, // 🔥 정사각형 스타일
+        height: 80.h, // 🔥 정사각형 스타일
       ),
     );
   }
 }
-

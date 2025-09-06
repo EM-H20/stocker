@@ -11,18 +11,31 @@ class EducationProvider extends ChangeNotifier {
   final EducationRepository? _repository;
   final EducationMockRepository? _mockRepository;
   final bool _useMock;
+  
+  // 챕터 완료 시 호출될 콜백 함수들
+  final List<Function(int chapterId)> _onChapterCompletedCallbacks = [];
 
   /// 실제 API Repository를 사용하는 생성자
   EducationProvider(EducationRepository repository)
-    : _repository = repository,
-      _mockRepository = null,
-      _useMock = false;
+      : _repository = repository,
+        _mockRepository = null,
+        _useMock = false;
 
   /// Mock Repository를 사용하는 생성자 (UI 개발/테스트용)
   EducationProvider.withMock(EducationMockRepository mockRepository)
-    : _repository = null,
-      _mockRepository = mockRepository,
-      _useMock = true;
+      : _repository = null,
+        _mockRepository = mockRepository,
+        _useMock = true;
+
+  /// 챕터 완료 콜백 등록
+  void addOnChapterCompletedCallback(Function(int chapterId) callback) {
+    _onChapterCompletedCallbacks.add(callback);
+  }
+
+  /// 챕터 완료 콜백 해제
+  void removeOnChapterCompletedCallback(Function(int chapterId) callback) {
+    _onChapterCompletedCallbacks.remove(callback);
+  }
 
   // === 챕터 관련 상태 ===
   List<ChapterInfo> _chapters = [];
@@ -48,6 +61,10 @@ class EducationProvider extends ChangeNotifier {
 
   /// 챕터 에러 메시지
   String? get chaptersError => _chaptersError;
+
+  /// 인증 에러 여부 확인 (401 Unauthorized)
+  bool get isAuthenticationError =>
+      _chaptersError?.contains('로그인이 필요한 서비스입니다') ?? false;
 
   /// 현재 이론 세션 데이터
   TheorySession? get currentTheorySession => _currentTheorySession;
@@ -86,13 +103,28 @@ class EducationProvider extends ChangeNotifier {
   /// 진행률 = (이론 완료 챕터 수 + 퀴즈 완료 챕터 수) / (전체 챕터 수 × 2)
   double get globalProgressRatio {
     if (_chapters.isEmpty) return 0.0;
-    
+
     final totalTasks = _chapters.length * 2; // 각 챕터당 이론 + 퀴즈 = 2개 작업
     final completedTasks = getCompletedTaskCount();
-    
+
     if (totalTasks == 0) return 0.0;
     return completedTasks / totalTasks;
   }
+
+  /// 완료된 챕터 수 조회
+  int getCompletedChapterCount() {
+    return _chapters.where((chapter) => chapter.isChapterCompleted).length;
+  }
+
+  /// 챕터별 완료율 (0.0 ~ 1.0)
+  /// 전체 챕터 중 완료된 챕터 비율
+  double get chapterCompletionRatio {
+    if (_chapters.isEmpty) return 0.0;
+    return getCompletedChapterCount() / _chapters.length;
+  }
+
+  /// 챕터 완료율을 백분율로 반환
+  double get chapterCompletionPercentage => chapterCompletionRatio * 100;
 
   /// 전체 작업 개수 조회 (챕터 수 × 2)
   int getTotalTaskCount() {
@@ -101,8 +133,10 @@ class EducationProvider extends ChangeNotifier {
 
   /// 완료된 작업 개수 조회 (완료된 이론 + 완료된 퀴즈)
   int getCompletedTaskCount() {
-    int completedTheories = _chapters.where((chapter) => chapter.isTheoryCompleted).length;
-    int completedQuizzes = _chapters.where((chapter) => chapter.isQuizCompleted).length;
+    int completedTheories =
+        _chapters.where((chapter) => chapter.isTheoryCompleted).length;
+    int completedQuizzes =
+        _chapters.where((chapter) => chapter.isQuizCompleted).length;
     return completedTheories + completedQuizzes;
   }
 
@@ -118,8 +152,10 @@ class EducationProvider extends ChangeNotifier {
 
   /// 상세 진행 상황 요약
   String get detailedProgressSummary {
-    final completedTheories = _chapters.where((chapter) => chapter.isTheoryCompleted).length;
-    final completedQuizzes = _chapters.where((chapter) => chapter.isQuizCompleted).length;
+    final completedTheories =
+        _chapters.where((chapter) => chapter.isTheoryCompleted).length;
+    final completedQuizzes =
+        _chapters.where((chapter) => chapter.isQuizCompleted).length;
     final totalChapters = _chapters.length;
     return '이론: $completedTheories/$totalChapters, 퀴즈: $completedQuizzes/$totalChapters';
   }
@@ -135,7 +171,8 @@ class EducationProvider extends ChangeNotifier {
       return;
     }
 
-    debugPrint('🔄 [EDU_PROVIDER] 챕터 목록 로드 시작 (useMock: $_useMock, forceRefresh: $forceRefresh)');
+    debugPrint(
+        '🔄 [EDU_PROVIDER] 챕터 목록 로드 시작 (useMock: $_useMock, forceRefresh: $forceRefresh)');
     _isLoadingChapters = true;
     _chaptersError = null;
     notifyListeners();
@@ -144,22 +181,45 @@ class EducationProvider extends ChangeNotifier {
       if (_useMock) {
         debugPrint('🎭 [EDU_PROVIDER] Mock Repository 사용');
         _chapters = await _mockRepository!.getChaptersForUser();
+        debugPrint(
+            '🎭 [EDU_PROVIDER] Mock 데이터 로드됨: ${_chapters.map((c) => c.title).toList()}');
       } else {
         debugPrint('🌐 [EDU_PROVIDER] Real API Repository 사용');
+        debugPrint('🌐 [EDU_PROVIDER] Repository instance: $_repository');
+        debugPrint('🌐 [EDU_PROVIDER] ForceRefresh: $forceRefresh');
         _chapters = await _repository!.getChapters(forceRefresh: forceRefresh);
+        debugPrint(
+            '🌐 [EDU_PROVIDER] Real API 데이터 로드됨: ${_chapters.map((c) => c.title).toList()}');
       }
-      
+
       debugPrint('✅ [EDU_PROVIDER] 챕터 로드 성공 - 총 ${_chapters.length}개 챕터');
       _chaptersError = null;
     } catch (e) {
-      _chaptersError = e.toString();
       debugPrint('❌ [EDU_PROVIDER] 챕터 로드 실패: $e');
-      
-      // 에러 타입별 상세 로깅
-      if (e.toString().contains('No host specified')) {
-        debugPrint('🚨 [EDU_PROVIDER] URL 설정 문제 감지!');
+
+      // 🔐 401 Unauthorized 에러 처리 (로그인 필요)
+      if (e.toString().contains('401') ||
+          e.toString().contains('Unauthorized') ||
+          e.toString().contains('토큰이 제공되지 않았습니다')) {
+        _chaptersError = '로그인이 필요한 서비스입니다. 로그인 후 다시 시도해주세요.';
+        debugPrint('🔐 [EDU_PROVIDER] 401 Unauthorized - 로그인 필요');
+      }
+      // 🌐 네트워크 관련 에러
+      else if (e.toString().contains('No host specified') ||
+          e.toString().contains('Connection refused') ||
+          e.toString().contains('timeout')) {
+        _chaptersError = '네트워크 연결에 문제가 있습니다. 연결 상태를 확인하고 다시 시도해주세요.';
+        debugPrint('🌐 [EDU_PROVIDER] 네트워크 연결 문제 감지');
         debugPrint('🔧 [EDU_PROVIDER] .env 파일과 dio 설정을 확인하세요');
       }
+      // 🚨 기타 에러
+      else {
+        _chaptersError = '챕터 정보를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.';
+        debugPrint('🚨 [EDU_PROVIDER] 예상치 못한 에러: $e');
+      }
+
+      // 에러 발생시 챕터 리스트 비우기
+      _chapters.clear();
     } finally {
       _isLoadingChapters = false;
       debugPrint('🏁 [EDU_PROVIDER] 챕터 로드 프로세스 완료');
@@ -187,31 +247,36 @@ class EducationProvider extends ChangeNotifier {
   Future<bool> enterTheory(int chapterId) async {
     if (_isLoadingTheory) return false;
 
+    debugPrint('🎓 [EDU_PROVIDER] 이론 진입 요청 - 챕터 ID: $chapterId (useMock: $_useMock)');
     _isLoadingTheory = true;
     _theoryError = null;
     notifyListeners();
 
     try {
       if (_useMock) {
+        debugPrint('🎭 [EDU_PROVIDER] Mock Repository로 이론 진입 중...');
         _currentTheorySession = await _mockRepository!.enterTheory(chapterId);
         // Mock에서는 진도 저장 기능 없음
       } else {
+        debugPrint('🌐 [EDU_PROVIDER] Real API Repository로 이론 진입 중...');
         _currentTheorySession = await _repository!.enterTheory(chapterId);
 
         // 저장된 진도가 있으면 해당 위치로 이동
         final savedProgress = await _repository.getTheoryProgress(chapterId);
         if (savedProgress != null && _currentTheorySession != null) {
+          debugPrint('📚 [EDU_PROVIDER] 저장된 진도 발견 - 이론 ID: $savedProgress');
           _currentTheorySession = _currentTheorySession!.copyWith(
             currentTheoryIndex: _findTheoryIndexById(savedProgress),
           );
         }
       }
 
+      debugPrint('✅ [EDU_PROVIDER] 이론 진입 성공 - 총 ${_currentTheorySession?.totalCount ?? 0}개 이론');
       _theoryError = null;
       return true;
     } catch (e) {
       _theoryError = e.toString();
-      debugPrint('이론 진입 실패: $e');
+      debugPrint('❌ [EDU_PROVIDER] 이론 진입 실패 - 챕터 ID: $chapterId, 에러: $e');
       return false;
     } finally {
       _isLoadingTheory = false;
@@ -272,14 +337,19 @@ class EducationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      final chapterId = _currentTheorySession!.chapterId;
+      
       if (_useMock) {
-        await _mockRepository!.completeTheory(_currentTheorySession!.chapterId);
+        await _mockRepository!.completeTheory(chapterId);
       } else {
-        await _repository!.completeTheory(_currentTheorySession!.chapterId);
+        await _repository!.completeTheory(chapterId);
       }
 
-      // 로컬 상태 업데이트
-      _updateLocalChapterCompletion(_currentTheorySession!.chapterId, true);
+      // 로컬 상태 업데이트: 이론 완료
+      _updateLocalChapterCompletion(chapterId, isTheoryCompleted: true);
+      
+      // 챕터 완료 상태 확인 및 업데이트
+      _checkAndUpdateChapterCompletion(chapterId);
 
       // 현재 이론 데이터 초기화
       _currentTheorySession = null;
@@ -306,14 +376,19 @@ class EducationProvider extends ChangeNotifier {
 
   /// 전체 캐시 삭제
   Future<void> clearCache() async {
+    debugPrint('🧹 [EDU_PROVIDER] 캐시 삭제 시작 (useMock: $_useMock)');
     if (!_useMock) {
+      debugPrint('🧹 [EDU_PROVIDER] Real Repository 캐시 삭제 중...');
       await _repository!.clearCache();
+    } else {
+      debugPrint('🧹 [EDU_PROVIDER] Mock 모드에서는 캐시 삭제 기능 없음');
     }
-    // Mock에서는 캐시 삭제 기능 없음
+    // 메모리 상태 초기화
     _chapters.clear();
     _currentTheorySession = null;
     _chaptersError = null;
     _theoryError = null;
+    debugPrint('🧹 [EDU_PROVIDER] 메모리 상태 초기화 완료');
     notifyListeners();
   }
 
@@ -372,12 +447,60 @@ class EducationProvider extends ChangeNotifier {
   }
 
   /// 로컬 챕터 완료 상태 업데이트
-  void _updateLocalChapterCompletion(int chapterId, bool isCompleted) {
+  void _updateLocalChapterCompletion(
+    int chapterId, {
+    bool? isTheoryCompleted,
+    bool? isQuizCompleted,
+    bool? isChapterCompleted,
+  }) {
     final chapterIndex = _chapters.indexWhere((c) => c.id == chapterId);
     if (chapterIndex >= 0) {
       _chapters[chapterIndex] = _chapters[chapterIndex].copyWith(
-        isTheoryCompleted: isCompleted,
+        isTheoryCompleted: isTheoryCompleted,
+        isQuizCompleted: isQuizCompleted,
+        isChapterCompleted: isChapterCompleted,
       );
+    }
+  }
+
+  /// 퀴즈 완료 상태 업데이트 (QuizProvider에서 호출됨)
+  void updateQuizCompletion(int chapterId, {required bool isPassed}) {
+    debugPrint('🎯 [EDU_PROVIDER] 퀴즈 완료 상태 업데이트 - 챕터 $chapterId (합격: $isPassed)');
+    
+    // 로컬 상태 업데이트
+    _updateLocalChapterCompletion(chapterId, isQuizCompleted: isPassed);
+    
+    // 챕터 완료 상태 확인 및 업데이트
+    _checkAndUpdateChapterCompletion(chapterId);
+    
+    notifyListeners();
+  }
+
+  /// 챕터 완료 상태 확인 및 업데이트
+  /// 이론과 퀴즈가 모두 완료된 경우 챕터를 완료 상태로 변경
+  void _checkAndUpdateChapterCompletion(int chapterId) {
+    final chapterIndex = _chapters.indexWhere((c) => c.id == chapterId);
+    if (chapterIndex >= 0) {
+      final chapter = _chapters[chapterIndex];
+      
+      // 이론과 퀴즈가 모두 완료된 경우에만 챕터 완료
+      if (chapter.isTheoryCompleted && chapter.isQuizCompleted) {
+        debugPrint('🎉 [EDU_PROVIDER] 챕터 완료! ID: $chapterId, Title: ${chapter.title}');
+        _updateLocalChapterCompletion(chapterId, isChapterCompleted: true);
+        
+        // 챕터 완료 콜백 호출 (LearningProgressProvider 등에 알림)
+        for (final callback in _onChapterCompletedCallbacks) {
+          try {
+            callback(chapterId);
+          } catch (e) {
+            debugPrint('❌ [EDU_PROVIDER] 챕터 완료 콜백 실행 실패: $e');
+          }
+        }
+        
+        debugPrint('✅ [EDU_PROVIDER] 챕터 완료 상태 백엔드 업데이트 요청 완료');
+      } else {
+        debugPrint('⏳ [EDU_PROVIDER] 챕터 미완료 - 이론: ${chapter.isTheoryCompleted}, 퀴즈: ${chapter.isQuizCompleted}');
+      }
     }
   }
 

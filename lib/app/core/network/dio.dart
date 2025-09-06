@@ -10,17 +10,21 @@ final Dio dio = Dio();
 Future<void> setupDio() async {
   // 환경 변수에서 API URL 가져오기 (백엔드 8080 포트 기본값)
   final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8080';
-  final connectTimeout = int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '15') ?? 15;
-  final receiveTimeout = int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '15') ?? 15;
-  
+  final connectTimeout =
+      int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '15') ?? 15;
+  final receiveTimeout =
+      int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '15') ?? 15;
+
   // URL 검증
   if (!_isValidUrl(baseUrl)) {
     debugPrint('🚨 [DIO] 잘못된 BASE_URL 감지: $baseUrl');
-    throw ArgumentError('Invalid BASE_URL: $baseUrl. URL must start with http:// or https://');
+    throw ArgumentError(
+        'Invalid BASE_URL: $baseUrl. URL must start with http:// or https://');
   }
-  
+
   debugPrint('🌐 [DIO] Setting up Dio with baseUrl: $baseUrl');
-  debugPrint('⏰ [DIO] Timeouts - Connect: ${connectTimeout}s, Receive: ${receiveTimeout}s');
+  debugPrint(
+      '⏰ [DIO] Timeouts - Connect: ${connectTimeout}s, Receive: ${receiveTimeout}s');
 
   dio.options = BaseOptions(
     baseUrl: baseUrl,
@@ -42,7 +46,7 @@ Future<void> setupDio() async {
   // 인터셉터 설정
   dio.interceptors.clear();
   dio.interceptors.add(AuthInterceptor(dio));
-  
+
   // 개발 환경에서만 로깅 활성화
   if (dotenv.env['DEBUG_MODE'] == 'true' && kDebugMode) {
     debugPrint('📊 [DIO] Enabling request/response logging in debug mode');
@@ -64,12 +68,12 @@ Future<void> setupDio() async {
 /// URL 유효성 검증 헬퍼 함수
 bool _isValidUrl(String url) {
   if (url.isEmpty) return false;
-  
+
   try {
     final uri = Uri.parse(url);
-    return uri.hasScheme && 
-           (uri.scheme == 'http' || uri.scheme == 'https') &&
-           uri.hasAuthority;
+    return uri.hasScheme &&
+        (uri.scheme == 'http' || uri.scheme == 'https') &&
+        uri.hasAuthority;
   } catch (e) {
     debugPrint('🚨 [DIO] URL 파싱 실패: $e');
     return false;

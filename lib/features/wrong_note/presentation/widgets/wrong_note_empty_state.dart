@@ -5,7 +5,7 @@ import '../../../../app/core/widgets/action_button.dart';
 import '../../../../app/config/app_theme.dart';
 
 /// 오답노트 빈 상태 위젯
-/// 
+///
 /// 오답이 없을 때 표시되는 안내 화면
 class WrongNoteEmptyState extends StatelessWidget {
   final VoidCallback onGoToQuiz;
@@ -22,18 +22,18 @@ class WrongNoteEmptyState extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.quiz_outlined, 
-            size: 64.sp, 
-            color: Theme.of(context).brightness == Brightness.dark 
-                ? AppTheme.grey600 
+            Icons.quiz_outlined,
+            size: 64.sp,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppTheme.grey600
                 : AppTheme.grey500,
           ),
           SizedBox(height: 16.h),
           Text(
             '오답이 없습니다',
             style: TextStyle(
-              color: Theme.of(context).brightness == Brightness.dark 
-                  ? AppTheme.grey400 
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppTheme.grey400
                   : AppTheme.grey700,
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
@@ -43,9 +43,9 @@ class WrongNoteEmptyState extends StatelessWidget {
           Text(
             '퀴즈를 풀고 틀린 문제들을 복습해보세요',
             style: TextStyle(
-              color: Theme.of(context).brightness == Brightness.dark 
-                  ? AppTheme.grey500 
-                  : AppTheme.grey600, 
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppTheme.grey500
+                  : AppTheme.grey600,
               fontSize: 14.sp,
             ),
           ),

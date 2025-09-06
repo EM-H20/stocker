@@ -20,7 +20,7 @@ class AttendanceProvider with ChangeNotifier {
   List<AttendanceQuiz> get quizzes => _quizzes;
 
   DateTime _focusedMonth = DateTime.now();
-  
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -49,7 +49,7 @@ class AttendanceProvider with ChangeNotifier {
   void initialize() {
     fetchAttendanceStatus(_focusedMonth);
   }
-  
+
   Future<void> setQuizLoading(bool value) async {
     _isQuizLoading = value;
     _safeNotifyListeners();
@@ -62,7 +62,11 @@ class AttendanceProvider with ChangeNotifier {
 
     try {
       final attendanceList = await _repository.getAttendanceStatus(month);
-      _attendanceStatus = {for (var day in attendanceList) DateTime.utc(day.date.year, day.date.month, day.date.day): day.isPresent};
+      _attendanceStatus = {
+        for (var day in attendanceList)
+          DateTime.utc(day.date.year, day.date.month, day.date.day):
+              day.isPresent
+      };
       _errorMessage = null;
     } catch (e) {
       _errorMessage = '출석 현황 로딩 실패: ${e.toString()}';
@@ -96,7 +100,8 @@ class AttendanceProvider with ChangeNotifier {
     _safeNotifyListeners();
 
     try {
-      final submission = QuizSubmissionDto(userId: userId, answers: userAnswers);
+      final submission =
+          QuizSubmissionDto(userId: userId, answers: userAnswers);
       await _repository.submitAttendance(submission);
       _errorMessage = null;
       await fetchAttendanceStatus(_focusedMonth);
