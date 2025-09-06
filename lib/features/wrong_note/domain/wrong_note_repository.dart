@@ -18,7 +18,7 @@ class WrongNoteRepository {
     }
   }
 
-  /// 퀴즈 결과를 제출하여 오답노트 업데이트 (새 API 방식)
+  /// 퀴즈 결과를 제출하여 오답노트 업데이트 (일반 퀴즈 전용)
   /// [chapterId]: 챕터 ID
   /// [wrongItems]: 오답 항목 리스트
   Future<void> submitQuizResults(int chapterId, List<Map<String, dynamic>> wrongItems) async {
@@ -26,6 +26,18 @@ class WrongNoteRepository {
       await _api.submitQuizResults(chapterId, wrongItems);
     } catch (e) {
       throw Exception('퀴즈 결과 제출 실패: $e');
+    }
+  }
+
+  /// 단일 퀴즈 결과를 오답노트에 제출 (단일 퀴즈 전용)
+  /// [chapterId]: 챕터 ID
+  /// [quizId]: 퀴즈 ID
+  /// [selectedOption]: 선택한 답안 (1~4)
+  Future<void> submitSingleQuizResult(int chapterId, int quizId, int selectedOption) async {
+    try {
+      await _api.submitSingleQuizResult(chapterId, quizId, selectedOption);
+    } catch (e) {
+      throw Exception('단일 퀴즈 결과 제출 실패: $e');
     }
   }
 

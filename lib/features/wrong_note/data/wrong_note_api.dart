@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'models/wrong_note_response.dart';
 
 /// 오답노트 API 클라이언트
@@ -51,11 +52,43 @@ class WrongNoteApi {
     }
   }
 
+  /// 단일 퀴즈 결과를 오답노트에 제출 (단일 퀴즈용)
+  /// [chapterId]: 챕터 ID
+  /// [quizId]: 퀴즈 ID 
+  /// [selectedOption]: 선택한 답안 (1~4)
+  Future<void> submitSingleQuizResult(int chapterId, int quizId, int selectedOption) async {
+    try {
+      debugPrint('🌐 [WrongNoteAPI] 단일 퀴즈 결과 제출 API 호출');
+      debugPrint('🌐 [WrongNoteAPI] POST /api/wrong_note/single');
+      debugPrint('📋 [WrongNoteAPI] 데이터: chapterId=$chapterId, quizId=$quizId, selectedOption=$selectedOption');
+      
+      await _dio.post('/api/wrong_note/single', data: {
+        'chapterId': chapterId,
+        'quizId': quizId, 
+        'selectedOption': selectedOption,
+      });
+      
+      debugPrint('✅ [WrongNoteAPI] 단일 퀴즈 결과 제출 API 성공');
+    } catch (e) {
+      debugPrint('❌ [WrongNoteAPI] 단일 퀴즈 결과 제출 API 실패 - Error: $e');
+      throw Exception('단일 퀴즈 결과 제출 실패: $e');
+    }
+  }
+
   /// 오답노트에서 문제 삭제 (정답 처리 시, JWT에서 userId 자동 추출)
   Future<void> removeWrongNote(int quizId) async {
     try {
-      await _dio.delete('/api/wrong_note/$quizId');
+      debugPrint('🌐 [WrongNoteAPI] 오답노트 삭제 API 호출 - Quiz ID: $quizId');
+      debugPrint('🌐 [WrongNoteAPI] DELETE /api/wrong_note/$quizId');
+      
+      final response = await _dio.delete('/api/wrong_note/$quizId');
+      
+      debugPrint('✅ [WrongNoteAPI] 오답노트 삭제 API 성공 - Status: ${response.statusCode}');
+      if (response.data != null) {
+        debugPrint('📋 [WrongNoteAPI] Response Data: ${response.data}');
+      }
     } catch (e) {
+      debugPrint('❌ [WrongNoteAPI] 오답노트 삭제 API 실패 - Quiz ID: $quizId, Error: $e');
       throw Exception('오답노트 삭제 실패: $e');
     }
   }
