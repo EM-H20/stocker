@@ -18,9 +18,13 @@ class EducationScreen extends StatefulWidget {
 }
 
 class _EducationScreenState extends State<EducationScreen> {
+  late final ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+
     // 화면 로드 시 챕터 목록을 가져옴
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = context.read<EducationProvider>();
@@ -31,6 +35,23 @@ class _EducationScreenState extends State<EducationScreen> {
         provider.loadChapters(forceRefresh: true);
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// CurrentLearningCard로 부드럽게 스크롤
+  void _scrollToCurrentLearningCard() {
+    // CurrentLearningCard는 페이지 상단에서 약 100픽셀 정도 위치
+    // 검색바(약 50h) + 진행률바(약 40h) + 여백들 = 대략 100-150픽셀
+    _scrollController.animateTo(
+      0.0, // 맨 위로 스크롤
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -45,6 +66,7 @@ class _EducationScreenState extends State<EducationScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
+          controller: _scrollController,
           padding: EdgeInsets.all(20.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,31 +87,49 @@ class _EducationScreenState extends State<EducationScreen> {
                     return CurrentLearningCard(
                       title: '학습 준비 중...',
                       description: '챕터 정보를 불러오고 있습니다.',
+                      isTheoryCompleted: false, // 로딩 중일 때는 퀴즈 버튼 잠금
                       onTheoryPressed: null,
                       onQuizPressed: null,
                     );
                   }
 
-                  // 현재 진행 중인 챕터 찾기 (미완료 챕터 중 첫 번째)
-                  final currentChapter = provider.chapters
-                          .where((chapter) => !chapter.isTheoryCompleted)
-                          .isNotEmpty
-                      ? provider.chapters
-                          .where((chapter) => !chapter.isTheoryCompleted)
-                          .first
-                      : provider.chapters.first;
+                  // 표시할 챕터 결정: 선택된 챕터가 있으면 선택된 챕터, 없으면 미완료 첫 번째 챕터
+                  final displayChapter = provider.selectedChapter ??
+                      (provider.chapters
+                              .where((chapter) => !chapter.isTheoryCompleted)
+                              .isNotEmpty
+                          ? provider.chapters
+                              .where((chapter) => !chapter.isTheoryCompleted)
+                              .first
+                          : provider.chapters.first);
+
+                  // 제목과 설명 결정
+                  final cardTitle = provider.hasSelectedChapter
+                      ? '${displayChapter.title} ✨'
+                      : displayChapter.title;
+                  final cardDescription = provider.hasSelectedChapter
+                      ? '선택된 챕터입니다. 이론 학습을 완료한 후 퀴즈에 도전하세요.'
+                      : '현재 진행 중인 챕터입니다. 이론 학습을 완료한 후 퀴즈에 도전하세요.';
 
                   return CurrentLearningCard(
-                    title: currentChapter.title,
-                    description: '현재 진행 중인 챕터입니다. 이론 학습을 완료한 후 퀴즈에 도전하세요.',
+                    title: cardTitle,
+                    description: cardDescription,
+                    isTheoryCompleted: displayChapter.isTheoryCompleted,
+                    isSelectedChapter: provider.hasSelectedChapter,
                     onTheoryPressed: () {
-                      provider.enterTheory(currentChapter.id);
-                      context.go('${AppRoutes.theory}?chapterId=${currentChapter.id}');
+                      provider.enterTheory(displayChapter.id);
+                      context.go('${AppRoutes.theory}?chapterId=${displayChapter.id}');
                     },
                     onQuizPressed: () {
-                      // 퀴즈 화면으로 이동 (현재 챕터 ID 전달)
-                      context.go('${AppRoutes.quiz}?chapterId=${currentChapter.id}');
+                      // 퀴즈 화면으로 이동 (표시된 챕터 ID 전달)
+                      context.go('${AppRoutes.quiz}?chapterId=${displayChapter.id}');
                     },
+                    onClearSelection: provider.hasSelectedChapter
+                        ? () {
+                            provider.clearSelectedChapter();
+                            debugPrint('🔄 [EDUCATION_SCREEN] 챕터 선택 해제됨');
+                          }
+                        : null,
                   );
                 },
               ),
@@ -185,8 +225,14 @@ class _EducationScreenState extends State<EducationScreen> {
                         description: description,
                         icon: icon,
                         onTap: () {
-                          provider.enterTheory(chapter.id);
-                          context.go('${AppRoutes.theory}?chapterId=${chapter.id}');
+                          // 챕터 선택하고 CurrentLearningCard로 스크롤
+                          provider.selectChapter(chapter.id);
+                          debugPrint('📌 [EDUCATION_SCREEN] 챕터 선택됨: ${chapter.title}');
+
+                          // 선택 후 부드럽게 맨 위로 스크롤 (CurrentLearningCard 위치)
+                          Future.delayed(const Duration(milliseconds: 100), () {
+                            _scrollToCurrentLearningCard();
+                          });
                         },
                       );
                     }).toList(),

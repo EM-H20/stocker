@@ -429,30 +429,18 @@ class ContinueLearningWidget extends StatelessWidget {
   void _handleContinueLearning(BuildContext context, AuthProvider authProvider,
       int lastChapterId, String lastStep) {
     if (authProvider.isLoggedIn) {
-      // 로그인된 경우: 실제 존재하는 Education 경로로 이동
+      // 로그인된 경우: 마지막 학습 챕터를 선택하고 Education 페이지로 이동
       debugPrint(
-          '✅ [CONTINUE_LEARNING] 로그인 상태 확인됨 - Chapter $lastChapterId ($lastStep)으로 이동');
+          '✅ [CONTINUE_LEARNING] 로그인 상태 확인됨 - Chapter $lastChapterId ($lastStep) 선택');
 
-      // 🔧 실제 존재하는 라우트로 이동 (레거시 경로 사용)
-      String targetRoute;
-      switch (lastStep) {
-        case 'theory':
-          targetRoute =
-              '${AppRoutes.quiz}?chapterId=$lastChapterId'; // 이론 완료 후 퀴즈로
-          break;
-        case 'quiz':
-          targetRoute =
-              '${AppRoutes.quizResult}?chapterId=$lastChapterId'; // 퀴즈 완료 후 결과로
-          break;
-        case 'result':
-        default:
-          targetRoute =
-              '${AppRoutes.theory}?chapterId=$lastChapterId'; // 결과 확인 후 다음 이론으로
-          break;
-      }
+      // 마지막 학습 챕터를 선택된 챕터로 설정
+      final educationProvider = context.read<EducationProvider>();
+      educationProvider.selectChapter(lastChapterId);
+      debugPrint('📌 [CONTINUE_LEARNING] 마지막 학습 챕터 선택 완료: $lastChapterId');
 
-      debugPrint('🎯 [CONTINUE_LEARNING] 이동할 경로: $targetRoute');
-      context.go(targetRoute);
+      // Education 페이지로 이동 (CurrentLearningCard에서 선택된 챕터 확인 가능)
+      context.go(AppRoutes.education);
+      debugPrint('🎯 [CONTINUE_LEARNING] Education 페이지로 이동 - 선택된 챕터에서 학습 계속 가능');
     } else {
       // 로그인 안된 경우: 로그인 안내 다이얼로그
       debugPrint('🔒 [CONTINUE_LEARNING] 비로그인 상태 - 학습 기능 접근 차단');
@@ -463,8 +451,14 @@ class ContinueLearningWidget extends StatelessWidget {
   /// 🔐 "전체보기" 버튼 처리 (로그인 체크 포함)
   void _handleViewAll(BuildContext context, AuthProvider authProvider) {
     if (authProvider.isLoggedIn) {
-      // 로그인된 경우: Education 메인 페이지로 이동
+      // 로그인된 경우: 선택된 챕터 초기화 후 Education 메인 페이지로 이동
       debugPrint('✅ [CONTINUE_LEARNING] 로그인 상태 확인됨 - Education 메인으로 이동');
+
+      // 선택된 챕터 초기화 (전체 챕터 목록을 깔끔하게 보기 위해)
+      final educationProvider = context.read<EducationProvider>();
+      educationProvider.clearSelectedChapter();
+      debugPrint('🔄 [CONTINUE_LEARNING] 선택된 챕터 초기화 완료');
+
       context.go(AppRoutes.education);
     } else {
       // 로그인 안된 경우: 로그인 안내 다이얼로그
