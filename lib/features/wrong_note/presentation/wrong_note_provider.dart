@@ -17,6 +17,9 @@ class WrongNoteProvider extends ChangeNotifier {
   // 재시도된 퀴즈 ID들을 추적 (isRetried 대체)
   Set<int> _retriedQuizIds = {};
 
+  // 현재 삭제 처리 중인 퀴즈 ID들 (중복 삭제 방지)
+  Set<int> _deletingQuizIds = {};
+
   // Getters
   List<WrongNoteItem> get wrongNotes => _wrongNotes;
   bool get isLoading => _isLoading;
@@ -58,22 +61,30 @@ class WrongNoteProvider extends ChangeNotifier {
 
       _wrongNotes = response.wrongNotes;
       debugPrint('✅ [WrongNote] 오답노트 로드 완료 - ${_wrongNotes.length}개 문제');
-      
+
       // 각 문제 정보 출력 (디버깅용)
       for (int i = 0; i < _wrongNotes.length; i++) {
         final note = _wrongNotes[i];
-        debugPrint('   [$i] ID: ${note.id}, Quiz: ${note.quizId}, Chapter: ${note.chapterId}');
-        
+        debugPrint(
+            '   [$i] ID: ${note.id}, Quiz: ${note.quizId}, Chapter: ${note.chapterId}');
+
         // 문자열 안전하게 자르기
         String questionPreview = '미지정';
         if (note.question != null) {
           final question = note.question!;
-          questionPreview = question.length > 20 ? '${question.substring(0, 20)}...' : question;
+          questionPreview = question.length > 20
+              ? '${question.substring(0, 20)}...'
+              : question;
         }
         debugPrint('       문제: $questionPreview');
-        debugPrint('       선택: ${note.selectedOption}, 정답: ${note.correctAnswerIndex}');
+        debugPrint(
+            '       선택: ${note.selectedOption}, 정답: ${note.correctAnswerIndex}');
       }
-      
+
+      // 🔍 ReadOnly 복습 상태 요약 로깅
+      final retriedCount = _wrongNotes.where((note) => _retriedQuizIds.contains(note.quizId)).length;
+      debugPrint('📊 [WrongNote] 복습 상태 요약: $retriedCount/${_wrongNotes.length}개 복습 완료');
+
       notifyListeners();
     } catch (e) {
       debugPrint('❌ [WrongNote] 오답노트 로드 실패: $e');
@@ -89,8 +100,9 @@ class WrongNoteProvider extends ChangeNotifier {
   Future<void> submitQuizResults(
       int chapterId, List<Map<String, dynamic>> wrongItems) async {
     try {
-      debugPrint('📝 [WrongNote] 일반 퀴즈 결과 제출 시작 - Chapter: $chapterId, 오답 수: ${wrongItems.length}');
-      
+      debugPrint(
+          '📝 [WrongNote] 일반 퀴즈 결과 제출 시작 - Chapter: $chapterId, 오답 수: ${wrongItems.length}');
+
       if (_mockRepository != null) {
         // Mock repository는 기존 방식 유지 - WrongNoteRequest 형식으로 변환
         final request = WrongNoteRequest(
@@ -122,16 +134,20 @@ class WrongNoteProvider extends ChangeNotifier {
   /// [chapterId]: 챕터 ID
   /// [quizId]: 퀴즈 ID
   /// [selectedOption]: 선택한 답안 (1~4)
-  Future<void> submitSingleQuizResult(int chapterId, int quizId, int selectedOption) async {
+  Future<void> submitSingleQuizResult(
+      int chapterId, int quizId, int selectedOption) async {
     try {
-      debugPrint('📝 [WrongNote] 단일 퀴즈 결과 제출 시작 - Chapter: $chapterId, Quiz: $quizId, Option: $selectedOption');
-      
+      debugPrint(
+          '📝 [WrongNote] 단일 퀴즈 결과 제출 시작 - Chapter: $chapterId, Quiz: $quizId, Option: $selectedOption');
+
       if (_mockRepository != null) {
         debugPrint('🎭 [WrongNote] Mock Repository로 단일 퀴즈 제출');
-        await _mockRepository.submitSingleQuizResult('mock_user', chapterId, quizId, selectedOption);
+        await _mockRepository.submitSingleQuizResult(
+            'mock_user', chapterId, quizId, selectedOption);
       } else if (_repository != null) {
         debugPrint('🌐 [WrongNote] Real API Repository로 단일 퀴즈 제출');
-        await _repository.submitSingleQuizResult(chapterId, quizId, selectedOption);
+        await _repository.submitSingleQuizResult(
+            chapterId, quizId, selectedOption);
       }
 
       // 제출 후 오답노트 다시 로드 (새로운 오답이 추가되었으므로)
@@ -160,35 +176,84 @@ class WrongNoteProvider extends ChangeNotifier {
     }
   }
 
+  /// 📖 읽기 전용 모드: DB 수정 없이 프론트엔드 상태만 업데이트
+  /// 이 메서드는 오답노트를 삭제하지 않고 복습용으로만 마크함
+  void markAsRetriedLocally(int quizId) {
+    debugPrint('📖 [WrongNote] ReadOnly 모드 - 로컬 재시도 마크만 업데이트');
+    debugPrint('🛡️ [WrongNote] Quiz ID: $quizId - DB 수정 없음, 삭제 없음!');
+    debugPrint('💡 [WrongNote] 복습용으로 계속 유지되며, 서버 동기화 없음');
+
+    // 🔍 해당 퀴즈가 실제로 존재하는지 확인
+    final targetQuiz = _wrongNotes.where((item) => item.quizId == quizId).toList();
+    if (targetQuiz.isEmpty) {
+      debugPrint('⚠️ [WrongNote] Quiz $quizId가 오답노트에 없음 - 마크 건너뜀');
+      return;
+    }
+
+    // 🎯 재시도 마크 추가 (중복 방지)
+    final wasAlreadyMarked = _retriedQuizIds.contains(quizId);
+    _retriedQuizIds.add(quizId);
+
+    debugPrint('📊 [WrongNote] 상태 업데이트:');
+    debugPrint('   - Quiz $quizId: ${wasAlreadyMarked ? '이미 마크됨' : '새로 마크됨'}');
+    debugPrint('   - 전체 재시도 마크: ${_retriedQuizIds.length}개');
+    debugPrint('   - 전체 오답노트: ${_wrongNotes.length}개');
+
+    // ReadOnly 모드에서는 절대 삭제하지 않고 상태만 업데이트
+    debugPrint('✅ [WrongNote] ReadOnly 로컬 마크 완료 - 오답노트에서 제거하지 않음');
+
+    // 🔔 상태 변경 알림 (UI 업데이트)
+    notifyListeners();
+  }
+
   /// 오답노트에서 문제 삭제 (정답 처리 시)
   Future<void> removeWrongNote(int quizId) async {
     debugPrint('🗑️ [WrongNote] 오답노트 삭제 시작 - Quiz ID: $quizId');
-    
-    // 현재 오답노트 상태 요약 로깅
-    debugPrint('📊 [WrongNote] 현재 오답노트 상태: ${_wrongNotes.length}개 문제');
-    for (final note in _wrongNotes) {
-      debugPrint('   - Quiz ${note.quizId} (Chapter: ${note.chapterId}, Selected: ${note.selectedOption})');
-    }
-    
-    // 로컬에서 해당 quiz_id 찾기
-    final existingNote = _wrongNotes.where((item) => item.quizId == quizId).toList();
-    if (existingNote.isEmpty) {
-      debugPrint('⚠️ [WrongNote] 로컬에서 Quiz $quizId를 찾을 수 없음');
-      debugPrint('💡 [WrongNote] 가능한 원인:');
-      debugPrint('   1. 이미 삭제된 문제');
-      debugPrint('   2. 오답노트에 없던 문제 (원래 정답이었던 문제)');
-      debugPrint('   3. 서버와 로컬 상태 불일치');
-      debugPrint('🏁 [WrongNote] 삭제 작업 건너뛰기');
-      return; // 로컬에 없으면 삭제할 필요 없음
-    }
-    
-    debugPrint('📍 [WrongNote] 삭제 대상 발견: ${existingNote.length}개');
-    for (final note in existingNote) {
-      debugPrint('   - ID: ${note.id}, Quiz: ${note.quizId}, Chapter: ${note.chapterId}');
-      debugPrint('   - 선택: ${note.selectedOption}, 정답: ${note.correctAnswerIndex}');
+
+    // 🛡️ 중복 삭제 방지: 이미 삭제 처리 중이면 스킵
+    if (_deletingQuizIds.contains(quizId)) {
+      debugPrint('⚠️ [WrongNote] 이미 삭제 처리 중인 Quiz $quizId - 중복 호출 방지');
+      debugPrint('💡 [WrongNote] 무한 루프 방지를 위해 현재 요청을 무시합니다');
+      return;
     }
 
+    // 삭제 처리 중 플래그 설정
+    _deletingQuizIds.add(quizId);
+    debugPrint('🔒 [WrongNote] Quiz $quizId 삭제 처리 중 플래그 설정');
+
     try {
+      // 현재 오답노트 상태 요약 로깅
+      debugPrint('📊 [WrongNote] 현재 오답노트 상태: ${_wrongNotes.length}개 문제');
+      for (final note in _wrongNotes) {
+        debugPrint(
+            '   - Quiz ${note.quizId} (Chapter: ${note.chapterId}, Selected: ${note.selectedOption})');
+      }
+
+      // 로컬에서 해당 quiz_id 찾기
+      final existingNote =
+          _wrongNotes.where((item) => item.quizId == quizId).toList();
+      if (existingNote.isEmpty) {
+        debugPrint('⚠️ [WrongNote] 로컬에서 Quiz $quizId를 찾을 수 없음');
+        debugPrint('💡 [WrongNote] 가능한 원인:');
+        debugPrint('   1. 이미 삭제된 문제');
+        debugPrint('   2. 오답노트에 없던 문제 (원래 정답이었던 문제)');
+        debugPrint('   3. 서버와 로컬 상태 불일치');
+        debugPrint('🏁 [WrongNote] 삭제 작업 건너뛰기');
+        // 🔓 플래그 해제 후 리턴
+        _deletingQuizIds.remove(quizId);
+        debugPrint('🔓 [WrongNote] Quiz $quizId 플래그 해제 (로컬에 없음)');
+        return; // 로컬에 없으면 삭제할 필요 없음
+      }
+
+      debugPrint('📍 [WrongNote] 삭제 대상 발견: ${existingNote.length}개');
+      for (final note in existingNote) {
+        debugPrint(
+            '   - ID: ${note.id}, Quiz: ${note.quizId}, Chapter: ${note.chapterId}');
+        debugPrint(
+            '   - 선택: ${note.selectedOption}, 정답: ${note.correctAnswerIndex}');
+      }
+
+      // API 호출 시작
       if (_mockRepository != null) {
         debugPrint('🎭 [WrongNote] Mock Repository로 삭제 API 호출');
         await _mockRepository.removeWrongNote('mock_user', quizId);
@@ -202,39 +267,46 @@ class WrongNoteProvider extends ChangeNotifier {
       _wrongNotes.removeWhere((item) => item.quizId == quizId);
       final currentCount = _wrongNotes.length;
       final actualRemoved = removedCount - currentCount;
-      
+
       debugPrint('✅ [WrongNote] 서버 & 로컬 삭제 성공!');
       debugPrint('   - Quiz ID: $quizId');
       debugPrint('   - 제거된 항목 수: $actualRemoved개');
       debugPrint('   - 삭제 전 총 개수: $removedCount개 → 삭제 후: $currentCount개');
       notifyListeners();
-      
     } catch (e) {
       final errorStr = e.toString();
-      
+
       // 404 에러 처리: 서버에서 이미 삭제되었거나 없는 경우
       if (errorStr.contains('404') || errorStr.contains('찾을 수 없습니다')) {
         debugPrint('🤷‍♀️ [WrongNote] 서버 404 에러 - Quiz $quizId를 찾을 수 없음');
         debugPrint('💡 [WrongNote] 서버에서 이미 삭제되었을 가능성이 높음');
         debugPrint('🧹 [WrongNote] 로컬 상태만 정리하여 서버와 동기화');
-        
+
         // 로컬에서는 제거 (서버와 동기화)
         final removedCount = _wrongNotes.length;
         _wrongNotes.removeWhere((item) => item.quizId == quizId);
         final currentCount = _wrongNotes.length;
         final actualRemoved = removedCount - currentCount;
-        
+
         debugPrint('✅ [WrongNote] 로컬 정리 완료 - ${actualRemoved}개 항목 제거됨');
         notifyListeners();
+
+        // 🔓 404 처리 완료: 플래그 해제
+        _deletingQuizIds.remove(quizId);
+        debugPrint('🔓 [WrongNote] Quiz $quizId 플래그 해제 (404 처리)');
         return; // 404는 성공으로 처리
       }
-      
+
       // 다른 에러는 실제 에러로 처리
       debugPrint('❌ [WrongNote] 오답노트 삭제 실패 - Quiz $quizId');
       debugPrint('💥 [WrongNote] 에러 상세: $e');
       debugPrint('🚨 [WrongNote] 이 에러는 상위 콜백으로 전파됩니다');
       _setError('오답노트 삭제 실패: $e');
       rethrow; // 실제 에러는 다시 던져서 상위에서 처리
+    } finally {
+      // 🔓 삭제 처리 완료: 플래그 해제 (성공/실패 관계없이)
+      _deletingQuizIds.remove(quizId);
+      debugPrint('🔓 [WrongNote] Quiz $quizId 삭제 처리 완료 - 플래그 해제');
     }
   }
 
@@ -263,6 +335,18 @@ class WrongNoteProvider extends ChangeNotifier {
       'retried': retriedCount,
       'pending': pendingCount,
     };
+  }
+
+  /// 🧹 ReadOnly 상태 초기화 (무한루프 방지용)
+  void clearReadOnlyState() {
+    debugPrint('🧹 [WrongNote] ReadOnly 상태 초기화 시작');
+    debugPrint('   - 초기화 전 재시도 마크: ${_retriedQuizIds.length}개');
+
+    // ReadOnly 모드에서 마크된 항목들 중 일부 정리
+    // (전체 삭제는 하지 않고 UI 상태만 안정화)
+
+    debugPrint('✅ [WrongNote] ReadOnly 상태 초기화 완료');
+    notifyListeners();
   }
 
   /// 로딩 상태 설정

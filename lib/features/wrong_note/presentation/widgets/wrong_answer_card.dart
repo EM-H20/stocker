@@ -75,21 +75,37 @@ class WrongAnswerCard extends StatelessWidget {
               ),
               const Spacer(),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                 decoration: BoxDecoration(
                   color: isRetried
-                      ? AppTheme.infoColor.withValues(alpha: 0.2)
-                      : AppTheme.warningColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(6.r),
-                ),
-                child: Text(
-                  isRetried ? '재시도 완료' : '미완료',
-                  style: TextStyle(
-                    color:
-                        isRetried ? AppTheme.infoColor : AppTheme.warningColor,
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
+                      ? AppTheme.successColor.withValues(alpha: 0.15)
+                      : AppTheme.warningColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: isRetried
+                        ? AppTheme.successColor.withValues(alpha: 0.3)
+                        : AppTheme.warningColor.withValues(alpha: 0.3),
+                    width: 1,
                   ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isRetried ? Icons.check_circle_outline : Icons.schedule_outlined,
+                      color: isRetried ? AppTheme.successColor : AppTheme.warningColor,
+                      size: 14.sp,
+                    ),
+                    SizedBox(width: 4.w),
+                    Text(
+                      isRetried ? '복습 완료 ✨' : '복습 대기',
+                      style: TextStyle(
+                        color: isRetried ? AppTheme.successColor : AppTheme.warningColor,
+                        fontSize: 11.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -217,16 +233,53 @@ class WrongAnswerCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              if (!isRetried)
-                ActionButton(
-                  text: '다시 풀기',
-                  icon: Icons.refresh,
-                  color: AppTheme.successColor,
-                  onPressed: () {
-                    // 단일 퀴즈 모드로 해당 문제 재시도
-                    context.go('${AppRoutes.quiz}?chapterId=${wrongNote.chapterId}&quizId=${wrongNote.quizId}');
-                  },
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // 복습 모드 안내 텍스트
+                  Container(
+                    margin: EdgeInsets.only(bottom: 8.h),
+                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    decoration: BoxDecoration(
+                      color: AppTheme.infoColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6.r),
+                      border: Border.all(
+                        color: AppTheme.infoColor.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 12.sp,
+                          color: AppTheme.infoColor,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          '복습 모드 - 삭제되지 않아요 📚',
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            color: AppTheme.infoColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // 기존 버튼
+                  ActionButton(
+                    text: isRetried ? '다시 복습하기' : '다시 풀기',
+                    icon: isRetried ? Icons.replay_outlined : Icons.refresh,
+                    color: isRetried ? AppTheme.infoColor : AppTheme.successColor,
+                    onPressed: () {
+                      // 단일 퀴즈 모드로 해당 문제 재시도 (읽기 전용 모드)
+                      context.go('${AppRoutes.quiz}?chapterId=${wrongNote.chapterId}&quizId=${wrongNote.quizId}&readOnly=true');
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
         ],

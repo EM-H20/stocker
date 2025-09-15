@@ -15,10 +15,11 @@ import 'widgets/quiz_navigation_widget.dart';
 import 'widgets/quiz_error_widget.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key, required this.chapterId, this.singleQuizId});
+  const QuizScreen({super.key, required this.chapterId, this.singleQuizId, this.isReadOnly = false});
 
   final int chapterId;
   final int? singleQuizId; // 단일 퀴즈 모드용 quiz ID
+  final bool isReadOnly; // 읽기 전용 모드 (오답노트 복습용)
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
@@ -47,15 +48,15 @@ class _QuizScreenState extends State<QuizScreen> {
     });
   }
 
-  /// 퀴즈를 바로 시작 (단일 퀴즈 모드 지원)
+  /// 퀴즈를 바로 시작 (단일 퀴즈 모드 및 읽기 전용 모드 지원)
   Future<void> _startQuiz() async {
     final quizProvider = context.read<QuizProvider>();
 
     try {
       if (widget.singleQuizId != null) {
         // 단일 퀴즈 모드
-        debugPrint('🧠 [QUIZ_SCREEN] 단일 퀴즈 진입 - 챕터: ${widget.chapterId}, 퀴즈: ${widget.singleQuizId}');
-        await quizProvider.startSingleQuiz(widget.chapterId, widget.singleQuizId!);
+        debugPrint('🧠 [QUIZ_SCREEN] 단일 퀴즈 진입 - 챕터: ${widget.chapterId}, 퀴즈: ${widget.singleQuizId}, 읽기전용: ${widget.isReadOnly}');
+        await quizProvider.startSingleQuiz(widget.chapterId, widget.singleQuizId!, isReadOnly: widget.isReadOnly);
       } else {
         // 일반 퀴즈 모드
         debugPrint('🧠 [QUIZ_SCREEN] 일반 퀴즈 진입 - 챕터 ID: ${widget.chapterId}');
@@ -331,13 +332,31 @@ class _QuizScreenState extends State<QuizScreen> {
 
     if (result != null && mounted) {
       if (widget.singleQuizId != null) {
-        // 단일 퀴즈 모드: 정답이면 오답 삭제 완료를 기다림, 오답이면 바로 이동
+        // 🎯 단일 퀴즈 모드
         final session = provider.currentQuizSession;
         if (session != null && session.quizList.isNotEmpty) {
           final quiz = session.quizList.first;
           final userAnswer = session.userAnswers.first;
           final isCorrect = userAnswer == quiz.correctAnswerIndex;
-          
+
+          // 🚨 ReadOnly 모드 완료 처리 (무한루프 방지!)
+          if (provider.isReadOnlyMode) {
+            debugPrint('📖 [QUIZ_SCREEN] ReadOnly 퀴즈 완료 - 복습 모드 종료');
+
+            // 🕐 잠깐 대기 후 오답노트로 이동 (자동 퀴즈 시작 방지)
+            await Future.delayed(const Duration(milliseconds: 500));
+
+            // 🛡️ ReadOnly 모드 해제 후 안전하게 오답노트로 이동
+            provider.exitReadOnlyMode();
+            debugPrint('🛡️ [QUIZ_SCREEN] ReadOnly 모드 해제 완료, 오답노트로 안전 이동');
+
+            if (mounted) {
+              context.go(AppRoutes.wrongNote);
+            }
+            return; // 🚨 여기서 완전 종료! 추가 로직 실행 방지
+          }
+
+          // 🔄 일반 모드: 기존 로직 유지
           if (isCorrect) {
             // 정답: 오답 삭제 완료를 기다림 (콜백에서 처리)
             setState(() {

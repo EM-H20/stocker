@@ -173,24 +173,30 @@ class AppRouter {
         pageBuilder: (context, state) {
           final chapterIdStr = state.uri.queryParameters['chapterId'];
           final quizIdStr = state.uri.queryParameters['quizId'];
-          
+          final readOnlyStr = state.uri.queryParameters['readOnly'];
+
           final chapterId = int.tryParse(chapterIdStr ?? '');
           final quizId = int.tryParse(quizIdStr ?? '');
-          
+          final isReadOnly = readOnlyStr == 'true';
+
+          debugPrint('🧠 [ROUTER] 퀴즈 라우팅 - chapterId: $chapterId, quizId: $quizId, readOnly: $isReadOnly');
+
           if (chapterId == null) {
             debugPrint('❌ [ROUTER] 퀴즈 - chapterId 파라미터 오류, 기본값 1 사용');
             return NoTransitionPage(
               child: QuizScreen(
-                chapterId: 1, 
+                chapterId: 1,
                 singleQuizId: quizId,
+                isReadOnly: isReadOnly,
               ),
             );
           }
-          
+
           return NoTransitionPage(
             child: QuizScreen(
               chapterId: chapterId,
               singleQuizId: quizId,
+              isReadOnly: isReadOnly,
             ),
           );
         },

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'widgets/wrong_answer_card.dart';
 import 'widgets/wrong_note_empty_state.dart';
 import 'wrong_note_provider.dart';
+import '../../quiz/presentation/quiz_provider.dart';
 import '../../../app/config/app_theme.dart';
 
 /// 오답노트 메인 화면
@@ -18,15 +19,23 @@ class WrongNoteScreen extends StatefulWidget {
   State<WrongNoteScreen> createState() => _WrongNoteScreenState();
 }
 
-class _WrongNoteScreenState extends State<WrongNoteScreen> 
+class _WrongNoteScreenState extends State<WrongNoteScreen>
     with WidgetsBindingObserver {
+  bool _hasLoadedOnce = false; // 🎯 중복 로드 방지 플래그
+  DateTime? _lastQuizCompletionTime; // 🕐 마지막 퀴즈 완료 시간 추적
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // 화면 로드 시 오답노트 데이터 로드
+    // 화면 로드 시 오답노트 데이터 한 번만 로드 (중복 방지)
+    debugPrint('📝 [WrongNote] Screen 초기화 - 오답노트 로드 시작');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<WrongNoteProvider>().loadWrongNotes();
+      if (mounted) {
+        _loadWrongNotesWithCheck();
+        _hasLoadedOnce = true;
+        debugPrint('📝 [WrongNote] initState에서 오답노트 로드 완료');
+      }
     });
   }
 
@@ -39,21 +48,42 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    // 앱이 포어그라운드로 돌아올 때 새로고침
-    if (state == AppLifecycleState.resumed && mounted) {
-      context.read<WrongNoteProvider>().loadWrongNotes();
+    // 🚨 ReadOnly 퀴즈 완료 직후에는 새로고침 방지 (무한루프 방지!)
+    if (state == AppLifecycleState.resumed && mounted && _hasLoadedOnce) {
+      final now = DateTime.now();
+      // 🕐 마지막 퀴즈 완료 후 5초 이내에는 새로고침 안 함
+      if (_lastQuizCompletionTime != null &&
+          now.difference(_lastQuizCompletionTime!).inSeconds < 5) {
+        debugPrint('🛡️ [WrongNote] 퀴즈 완료 직후 - 새로고침 건너뜀 (무한루프 방지)');
+        return;
+      }
+
+      debugPrint('📱 [WrongNote] 앱 포어그라운드 복귀 - 오답노트 새로고침');
+      _loadWrongNotesWithCheck();
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // 화면에 다시 돌아올 때마다 새로고침 (go_router에서 유용)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<WrongNoteProvider>().loadWrongNotes();
-      }
-    });
+  // didChangeDependencies에서 중복 호출 제거 - initState에서만 로드하도록 변경
+
+  /// 🛡️ 안전한 오답노트 로드 (무한루프 방지 로직 포함)
+  Future<void> _loadWrongNotesWithCheck() async {
+    debugPrint('🔍 [WrongNote] 안전한 로드 시작');
+
+    // 🚨 ReadOnly 모드에서 돌아온 직후인지 확인
+    final quizProvider = context.read<QuizProvider>();
+    if (quizProvider.isReadOnlyMode) {
+      debugPrint('🛡️ [WrongNote] ReadOnly 모드 활성 - 로드 스킵 (상태 안정화 대기)');
+      return;
+    }
+
+    await context.read<WrongNoteProvider>().loadWrongNotes();
+    debugPrint('✅ [WrongNote] 안전한 로드 완료');
+  }
+
+  /// 🕐 퀴즈 완료 시간 기록 (외부에서 호출 가능)
+  void markQuizCompletion() {
+    _lastQuizCompletionTime = DateTime.now();
+    debugPrint('🕐 [WrongNote] 퀴즈 완료 시간 기록: $_lastQuizCompletionTime');
   }
 
   @override
@@ -69,7 +99,8 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const CircularProgressIndicator(color: AppTheme.primaryColor),
+                    const CircularProgressIndicator(
+                        color: AppTheme.primaryColor),
                     SizedBox(height: 16.h),
                     Text(
                       '오답노트를 불러오는 중...',
@@ -107,7 +138,7 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
                     ElevatedButton(
                       onPressed: () {
                         provider.clearError();
-                        provider.loadWrongNotes();
+                        _loadWrongNotesWithCheck();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
@@ -180,6 +211,75 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
                   ),
                 ),
 
+                // 💡 친절한 안내 배너
+                Container(
+                  margin:
+                      EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppTheme.infoColor.withValues(alpha: 0.1),
+                        AppTheme.successColor.withValues(alpha: 0.1),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: AppTheme.infoColor.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8.w),
+                        decoration: BoxDecoration(
+                          color: AppTheme.infoColor.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Icon(
+                          Icons.lightbulb_outline,
+                          color: AppTheme.infoColor,
+                          size: 20.sp,
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '💡 복습용 문제는 여기서 계속 확인하세요!',
+                              style: TextStyle(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? Colors.white
+                                    : AppTheme.grey900,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              '완전히 정리하려면 교육 → 해당 챕터 → 퀴즈풀기에서 정답을 맞춰주세요! 📚',
+                              style: TextStyle(
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? AppTheme.grey300
+                                    : AppTheme.grey600,
+                                fontSize: 12.sp,
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 // 오답 목록
                 Expanded(
                   child: ListView.builder(
@@ -213,23 +313,23 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
   /// 사용자 친화적인 에러 메시지로 변환
   String _getUserFriendlyErrorMessage(String? errorMessage) {
     if (errorMessage == null) return '알 수 없는 오류가 발생했습니다.';
-    
+
     if (errorMessage.contains('chapter_id는 필수입니다')) {
       return '챕터 정보를 불러올 수 없어요.\n잠시 후 다시 시도해주세요.';
     }
-    
+
     if (errorMessage.contains('네트워크') || errorMessage.contains('연결')) {
       return '네트워크 연결을 확인해주세요.\n인터넷 연결 상태를 점검해보세요.';
     }
-    
+
     if (errorMessage.contains('401') || errorMessage.contains('인증')) {
       return '로그인이 만료되었습니다.\n다시 로그인해주세요.';
     }
-    
+
     if (errorMessage.contains('500') || errorMessage.contains('서버')) {
       return '서버에 일시적인 문제가 발생했어요.\n잠시 후 다시 시도해주세요.';
     }
-    
+
     // 기본 메시지
     return '오답노트를 불러올 수 없어요.\n잠시 후 다시 시도해주세요.';
   }

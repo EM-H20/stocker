@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 개발 환경에서 HTTP 트래픽 허용 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- 로컬 개발 서버 -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+
+        <!-- OCI 클라우드 서버 -->
+        <domain includeSubdomains="false">168.107.22.83</domain>
+    </domain-config>
+
+    <!-- 기본 보안: HTTPS만 허용 -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>
