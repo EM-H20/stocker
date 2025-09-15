@@ -9,7 +9,7 @@ final Dio dio = Dio();
 
 Future<void> setupDio() async {
   // 환경 변수에서 API URL 가져오기 (백엔드 8080 포트 기본값)
-  final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://localhost:8080';
+  final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://168.107.22.83:8080';
   final connectTimeout =
       int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '15') ?? 15;
   final receiveTimeout =
@@ -47,22 +47,22 @@ Future<void> setupDio() async {
   dio.interceptors.clear();
   dio.interceptors.add(AuthInterceptor(dio));
 
-  // 개발 환경에서만 로깅 활성화
-  if (dotenv.env['DEBUG_MODE'] == 'true' && kDebugMode) {
-    debugPrint('📊 [DIO] Enabling request/response logging in debug mode');
-    dio.interceptors.add(
-      LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-        requestHeader: true,
-        responseHeader: false,
-        error: true,
-        logPrint: (obj) => debugPrint('🌐 [DIO_LOG] $obj'),
-      ),
-    );
-  }
+  // // 개발 환경에서만 로깅 활성화
+  // if (dotenv.env['DEBUG_MODE'] == 'true' && kDebugMode) {
+  //   debugPrint('📊 [DIO] Enabling request/response logging in debug mode');
+  //   dio.interceptors.add(
+  //     LogInterceptor(
+  //       requestBody: true,
+  //       responseBody: true,
+  //       requestHeader: true,
+  //       responseHeader: false,
+  //       error: true,
+  //       logPrint: (obj) => debugPrint('🌐 [DIO_LOG] $obj'),
+  //     ),
+  //   );
+  // }
 
-  debugPrint('✅ [DIO] Setup completed successfully');
+  // debugPrint('✅ [DIO] Setup completed successfully');
 }
 
 /// URL 유효성 검증 헬퍼 함수

@@ -9,6 +9,7 @@ class CurrentLearningCard extends StatelessWidget {
   final String description;
   final VoidCallback? onTheoryPressed;
   final VoidCallback? onQuizPressed;
+  final bool isTheoryCompleted; // 이론학습 완료 여부
 
   const CurrentLearningCard({
     super.key,
@@ -16,6 +17,7 @@ class CurrentLearningCard extends StatelessWidget {
     required this.description,
     this.onTheoryPressed,
     this.onQuizPressed,
+    this.isTheoryCompleted = false, // 기본값은 미완료
   });
 
   @override
@@ -90,7 +92,7 @@ class CurrentLearningCard extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24.h), // ActionButton을 위한 공간
-            // ActionButton 추가
+            // ActionButton 추가 - 동일한 크기로 통일
             Row(
               children: [
                 Expanded(
@@ -100,22 +102,57 @@ class CurrentLearningCard extends StatelessWidget {
                     color: theme.brightness == Brightness.dark
                         ? AppTheme.infoColor
                         : Theme.of(context).primaryColor,
-                    // 아래 코드 해석 :
-                    // onTheoryPressed가 null이면 debugPrint('이론 학습 클릭')을 실행
-                    // 그렇지 않으면 onTheoryPressed를 실행
                     onPressed: onTheoryPressed ?? () => debugPrint('이론 학습 클릭'),
                   ),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: ActionButton(
-                    text: '퀴즈 풀기',
-                    icon: Icons.quiz_outlined,
-                    color: theme.brightness == Brightness.dark
-                        ? AppTheme.successColor
-                        : AppTheme.successColor,
-                    onPressed: onQuizPressed ?? () => debugPrint('퀴즈 풀기 클릭'),
-                  ),
+                  child: isTheoryCompleted
+                      ? ActionButton(
+                          text: '학습용 퀴즈',
+                          icon: Icons.quiz_outlined,
+                          color: theme.brightness == Brightness.dark
+                              ? AppTheme.successColor
+                              : AppTheme.successColor,
+                          onPressed: onQuizPressed ?? () => debugPrint('퀴즈 풀기 클릭'),
+                        )
+                      : Container(
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          decoration: BoxDecoration(
+                            color: AppTheme.grey300.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(12.r),
+                            border: Border.all(
+                              color: AppTheme.grey400.withValues(alpha: 0.5),
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.lock_outline,
+                                color: AppTheme.grey500,
+                                size: 20.sp,
+                              ),
+                              SizedBox(height: 4.h),
+                              Text(
+                                '이론학습 먼저',
+                                style: TextStyle(
+                                  color: AppTheme.grey500,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              Text(
+                                '완료해주세요 📚',
+                                style: TextStyle(
+                                  color: AppTheme.grey500,
+                                  fontSize: 10.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                 ),
               ],
             ),

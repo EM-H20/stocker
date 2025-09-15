@@ -88,6 +88,9 @@ class QuizProvider extends ChangeNotifier {
   bool _isSubmittingAnswer = false;
   String? _quizError;
 
+  // === 읽기 전용 모드 (오답노트 복습용) ===
+  bool _isReadOnlyMode = false;
+
   // === 타이머 관련 상태 ===
   int _remainingSeconds = 0;
   bool _isTimerRunning = false;
@@ -150,6 +153,18 @@ class QuizProvider extends ChangeNotifier {
   /// 타이머 실행 중인지
   bool get isTimerRunning => _isTimerRunning;
 
+  /// 읽기 전용 모드인지 (오답노트 복습용)
+  bool get isReadOnlyMode => _isReadOnlyMode;
+
+  /// 🚨 ReadOnly 모드 해제 (무한루프 방지용)
+  void exitReadOnlyMode() {
+    if (_isReadOnlyMode) {
+      _isReadOnlyMode = false;
+      debugPrint('🛡️ [QUIZ_PROVIDER] ReadOnly 모드 해제 완료');
+      notifyListeners();
+    }
+  }
+
   /// 남은 시간 포맷 (MM:SS)
   String get formattedRemainingTime {
     final minutes = _remainingSeconds ~/ 60;
@@ -202,13 +217,25 @@ class QuizProvider extends ChangeNotifier {
   ///
   /// [chapterId]: 챕터 ID
   /// [quizId]: 특정 퀴즈 ID
-  Future<bool> startSingleQuiz(int chapterId, int quizId) async {
+  /// [isReadOnly]: 읽기 전용 모드 (오답노트 복습용, DB 수정 없음)
+  ///
+  /// ReadOnly 모드에서는 DB를 수정하지 않고 복습만 가능합니다.
+  Future<bool> startSingleQuiz(int chapterId, int quizId, {bool isReadOnly = false}) async {
     if (_isLoadingQuiz) return false;
 
     debugPrint(
-        '🎯 [QUIZ_PROVIDER] 단일 퀴즈 진입 요청 - 챕터: $chapterId, 퀴즈: $quizId (useMock: $_useMock)');
+        '🎯 [QUIZ_PROVIDER] 단일 퀴즈 진입 요청 - 챕터: $chapterId, 퀴즈: $quizId (useMock: $_useMock, readOnly: $isReadOnly)');
     _isLoadingQuiz = true;
     _quizError = null;
+    _isReadOnlyMode = isReadOnly; // 읽기 전용 모드 설정
+
+    if (_isReadOnlyMode) {
+      debugPrint('📖 [QUIZ_PROVIDER] ReadOnly 모드 활성화 - DB 수정 없음, 복습 전용');
+      debugPrint('🛡️ [QUIZ_PROVIDER] 이 모드에서는 오답노트가 삭제되지 않습니다');
+    } else {
+      debugPrint('🔄 [QUIZ_PROVIDER] 일반 모드 - DB 수정 포함');
+    }
+
     notifyListeners();
 
     try {
@@ -450,6 +477,7 @@ class QuizProvider extends ChangeNotifier {
     _currentQuizSession = null;
     _remainingSeconds = 0;
     _quizError = null;
+    _isReadOnlyMode = false; // 읽기 전용 모드 초기화
     notifyListeners();
   }
 

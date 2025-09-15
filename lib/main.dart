@@ -219,135 +219,116 @@ class StockerApp extends StatelessWidget {
           create: (context) => NoteProvider(context.read<NoteRepository>()),
         ),
 
-        // Learning Progress Provider (Repository 패턴 적용)
-        ChangeNotifierProxyProvider3<EducationProvider, QuizProvider, WrongNoteProvider, LearningProgressProvider>(
+        // Learning Progress Provider (Repository 패턴 적용) - 🚀 새로운 안전한 구조
+        ChangeNotifierProvider(
           create: (context) {
             debugPrint('🎯 [PROVIDER] Creating LearningProgressProvider (useMock: $useMock)');
+
+            LearningProgressProvider learningProgressProvider;
             if (useMock) {
               // Mock 환경: Mock Repository 사용
               final mockRepository = LearningProgressMockRepository();
-              return LearningProgressProvider(mockRepository);
+              learningProgressProvider = LearningProgressProvider(mockRepository);
             } else {
               // Real 환경: API Repository 사용
               final learningProgressApi = LearningProgressApi(dio);
               final educationProvider = context.read<EducationProvider>();
               final apiRepository = LearningProgressApiRepository(learningProgressApi, educationProvider);
-              return LearningProgressProvider(apiRepository);
+              learningProgressProvider = LearningProgressProvider(apiRepository);
             }
-          },
-          update: (context, educationProvider, quizProvider, wrongNoteProvider, learningProgressProvider) {
-            debugPrint('🔗 [PROVIDER] Connecting Provider callbacks... (콜백 중복 방지)');
-            
-            // Provider 간 콜백 연결 설정
-            if (learningProgressProvider != null) {
-              // 🚨 콜백 중복 등록 방지: 기존 콜백들을 모두 제거
-              debugPrint('🧹 [CALLBACK] 기존 콜백 제거 중...');
-              
-              // EducationProvider -> LearningProgressProvider 콜백 연결
-              final chapterCompletedCallback = (int chapterId) {
-                debugPrint('🎉 [CALLBACK] 챕터 $chapterId 완료 - LearningProgress에 알림');
-                learningProgressProvider.completeChapter(chapterId);
-              };
-              
-              educationProvider.addOnChapterCompletedCallback(chapterCompletedCallback);
-              
-              // QuizProvider -> EducationProvider 콜백 연결 (퀴즈 완료 시 EducationProvider 업데이트)
-              quizProvider.addOnQuizCompletedCallback((chapterId, result) {
-                debugPrint('🎯 [CALLBACK] 퀴즈 $chapterId 완료 - Education에 알림 (${result.scorePercentage}%)');
-                educationProvider.updateQuizCompletion(chapterId, isPassed: result.isPassed);
-              });
 
-              // 🔥 QuizProvider -> WrongNoteProvider 콜백 연결 (오답노트 자동 업데이트)
-              quizProvider.addOnQuizCompletedCallback((chapterId, result) async {
-                debugPrint('📝 [CALLBACK] 퀴즈 $chapterId 완료 - 오답노트 업데이트 시작...');
-                try {
-                  // 퀴즈 세션에서 오답 항목 추출
-                  final currentSession = quizProvider.currentQuizSession;
-                  if (currentSession != null) {
-                    final wrongItems = <Map<String, dynamic>>[];
-                    
-                    // 틀린 문제들만 추출
-                    for (int i = 0; i < currentSession.quizList.length; i++) {
-                      final quiz = currentSession.quizList[i];
-                      final userAnswer = currentSession.userAnswers[i];
-                      
-                      if (userAnswer != null && userAnswer != quiz.correctAnswerIndex) {
-                        // 0-based -> 1-based 변환하여 백엔드 형식에 맞춤
-                        wrongItems.add({
-                          'quiz_id': quiz.id,
-                          'selected_option': userAnswer + 1, // 0-based -> 1-based
-                        });
-                      }
-                    }
-                    
-                    // 오답노트에 결과 제출
-                    await wrongNoteProvider.submitQuizResults(chapterId, wrongItems);
-                    debugPrint('✅ [CALLBACK] 오답노트 업데이트 완료 - ${wrongItems.length}개 오답 항목');
-                    
-                    // 사용자에게 친화적인 알림 (추후 스낵바 등으로 구현 가능)
-                    if (wrongItems.isNotEmpty) {
-                      debugPrint('💡 [UX] ${wrongItems.length}개의 틀린 문제가 오답노트에 추가되었습니다. 복습해보세요!');
-                    } else {
-                      debugPrint('🎉 [UX] 모든 문제를 맞혔습니다! 완벽해요!');
+            // 🔥 단 한 번만 실행되는 콜백 등록 로직을 여기에 배치!
+            debugPrint('🔗 [PROVIDER] Setting up one-time Provider callbacks...');
+
+            final educationProvider = context.read<EducationProvider>();
+            final quizProvider = context.read<QuizProvider>();
+            final wrongNoteProvider = context.read<WrongNoteProvider>();
+
+            // 🎯 콜백 등록 (create에서 단 한 번만 실행됨!)
+
+            // 1. EducationProvider -> LearningProgressProvider 콜백
+            educationProvider.addOnChapterCompletedCallback((int chapterId) {
+              debugPrint('🎉 [CALLBACK] 챕터 $chapterId 완료 - LearningProgress에 알림');
+              learningProgressProvider.completeChapter(chapterId);
+            });
+
+            // 2. QuizProvider -> EducationProvider 콜백
+            quizProvider.addOnQuizCompletedCallback((chapterId, result) {
+              debugPrint('🎯 [CALLBACK] 퀴즈 $chapterId 완료 - Education에 알림 (${result.scorePercentage}%)');
+              educationProvider.updateQuizCompletion(chapterId, isPassed: result.isPassed);
+            });
+
+            // 3. 🔥 QuizProvider -> WrongNoteProvider 일반 퀴즈 콜백
+            quizProvider.addOnQuizCompletedCallback((chapterId, result) async {
+              debugPrint('📝 [GENERAL_QUIZ_CALLBACK] 일반 퀴즈 $chapterId 완료 - 오답노트 업데이트 시작...');
+              try {
+                final currentSession = quizProvider.currentQuizSession;
+                if (currentSession != null && !currentSession.isSingleQuizMode) {
+                  debugPrint('✅ [GENERAL_QUIZ_CALLBACK] 일반 퀴즈 모드 확인됨. 계속 진행...');
+
+                  final wrongItems = <Map<String, dynamic>>[];
+                  for (int i = 0; i < currentSession.quizList.length; i++) {
+                    final quiz = currentSession.quizList[i];
+                    final userAnswer = currentSession.userAnswers[i];
+
+                    if (userAnswer != null && userAnswer != quiz.correctAnswerIndex) {
+                      wrongItems.add({
+                        'quiz_id': quiz.id,
+                        'selected_option': userAnswer + 1, // 0-based -> 1-based
+                      });
                     }
                   }
-                } catch (e) {
-                  debugPrint('❌ [CALLBACK] 오답노트 업데이트 실패: $e');
-                }
-              });
 
-              // 🎯 QuizProvider -> WrongNoteProvider 단일 퀴즈 완료 콜백 (오답노트 관리용)
-              quizProvider.addOnSingleQuizCompletedCallback((chapterId, quizId, isCorrect, selectedOption) async {
-                debugPrint('🎯 [SINGLE_QUIZ_CALLBACK] 단일 퀴즈 완료 - Chapter: $chapterId, Quiz: $quizId, 정답: $isCorrect, 선택: $selectedOption');
-                
+                  await wrongNoteProvider.submitQuizResults(chapterId, wrongItems);
+                  debugPrint('✅ [GENERAL_QUIZ_CALLBACK] 오답노트 업데이트 완료 - ${wrongItems.length}개 오답 항목');
+                }
+              } catch (e) {
+                debugPrint('❌ [GENERAL_QUIZ_CALLBACK] 오답노트 업데이트 실패: $e');
+              }
+            });
+
+            // 4. 🎯 QuizProvider -> WrongNoteProvider 단일 퀴즈 콜백 (핵심!)
+            quizProvider.addOnSingleQuizCompletedCallback((chapterId, quizId, isCorrect, selectedOption) async {
+              final isReadOnlyMode = quizProvider.isReadOnlyMode;
+              debugPrint('🎯 [SINGLE_QUIZ_CALLBACK] 단일 퀴즈 완료 - Chapter: $chapterId, Quiz: $quizId, 정답: $isCorrect, ReadOnly: $isReadOnlyMode');
+
+              if (isReadOnlyMode) {
+                // 📖 읽기 전용 모드: DB 수정 없이 프론트엔드 상태만 업데이트
+                debugPrint('📖 [SINGLE_QUIZ_CALLBACK] 읽기 전용 모드 - DB 수정 없이 프론트엔드 상태만 업데이트');
                 if (isCorrect) {
-                  // 정답인 경우: 오답노트에서 삭제
-                  debugPrint('🎯 [SINGLE_QUIZ_CALLBACK] 정답! 오답노트에서 삭제 시작...');
-                  try {
-                    await wrongNoteProvider.removeWrongNote(quizId);
-                    debugPrint('✅ [SINGLE_QUIZ_CALLBACK] 오답노트에서 퀴즈 $quizId 삭제 완료');
-                    
-                    // 오답 삭제 완료 알림 발송 (QuizScreen으로 네비게이션 신호)
-                    quizProvider.notifyWrongNoteRemoved(quizId);
-                    debugPrint('📢 [SINGLE_QUIZ_CALLBACK] 오답 삭제 완료 알림 발송 - Quiz $quizId');
-                  } catch (e) {
-                    debugPrint('❌ [SINGLE_QUIZ_CALLBACK] 오답노트 삭제 실패 (계속 진행) - Quiz $quizId: $e');
-                    
-                    // 삭제 실패해도 네비게이션은 진행 (사용자 경험을 위해)
-                    // 단, 실제 에러인 경우만 (404는 이미 Provider에서 처리됨)
-                    if (!e.toString().contains('404') && !e.toString().contains('찾을 수 없습니다')) {
-                      debugPrint('⚠️ [SINGLE_QUIZ_CALLBACK] 실제 에러 발생, 네비게이션 중단');
-                      return; // 실제 에러면 네비게이션 중단
-                    }
-                    
-                    // 404 에러는 정상 처리로 간주하고 네비게이션 진행
-                    quizProvider.notifyWrongNoteRemoved(quizId);
-                    debugPrint('📢 [SINGLE_QUIZ_CALLBACK] 404 에러지만 네비게이션 진행 - Quiz $quizId');
-                  }
+                  // 🛡️ ReadOnly 모드에서는 로컬 상태만 업데이트하고 절대 삭제하지 않음
+                  wrongNoteProvider.markAsRetriedLocally(quizId);
+                  debugPrint('✅ [SINGLE_QUIZ_CALLBACK] Quiz $quizId 로컬 재시도 마크 완료 (DB 수정 없음, 삭제 없음!)');
                 } else {
-                  // 오답인 경우: 오답노트에 추가
-                  debugPrint('❌ [SINGLE_QUIZ_CALLBACK] 오답! 오답노트에 추가 시작...');
-                  try {
-                    await wrongNoteProvider.submitSingleQuizResult(chapterId, quizId, selectedOption);
-                    debugPrint('✅ [SINGLE_QUIZ_CALLBACK] 오답노트에 퀴즈 $quizId 추가 완료 (Chapter: $chapterId, Option: $selectedOption)');
-                    
-                    // 오답 추가 후에도 네비게이션 신호 (일관성을 위해)
-                    quizProvider.notifyWrongNoteRemoved(quizId);
-                    debugPrint('📢 [SINGLE_QUIZ_CALLBACK] 오답 추가 완료 알림 발송 - Quiz $quizId');
-                  } catch (e) {
-                    debugPrint('❌ [SINGLE_QUIZ_CALLBACK] 오답노트 추가 실패 - Quiz $quizId: $e');
-                    
-                    // 오답 추가 실패해도 네비게이션은 진행 (사용자 경험을 위해)
-                    quizProvider.notifyWrongNoteRemoved(quizId);
-                    debugPrint('📢 [SINGLE_QUIZ_CALLBACK] 오답 추가 실패지만 네비게이션 진행 - Quiz $quizId');
-                  }
+                  // ReadOnly 모드에서 오답일 경우도 DB에 추가하지 않음
+                  debugPrint('📖 [SINGLE_QUIZ_CALLBACK] ReadOnly 모드에서 오답 - DB 추가 없음');
                 }
-              });
-              
-              debugPrint('✅ [PROVIDER] Provider 간 콜백 연결 완료!');
-            }
-            
-            return learningProgressProvider ?? LearningProgressProvider(LearningProgressMockRepository());
+                return; // 읽기 전용 모드에서는 여기서 완전 종료
+              }
+
+              // 🔄 일반 모드: 기존 로직 유지 (DB 수정 포함)
+              if (isCorrect) {
+                // ✅ 정답: 오답노트에서 삭제하지 않고 재시도 마크만 업데이트
+                try {
+                  await wrongNoteProvider.markAsRetried(quizId);
+                  debugPrint('✅ [SINGLE_QUIZ_CALLBACK] Quiz $quizId 재시도 완료 마크 - 복습용으로 유지됨');
+                } catch (e) {
+                  debugPrint('❌ [SINGLE_QUIZ_CALLBACK] Quiz $quizId 재시도 마크 실패: $e');
+                }
+              } else {
+                // ❌ 오답: 오답노트에 추가 (기존과 동일)
+                try {
+                  await wrongNoteProvider.submitSingleQuizResult(chapterId, quizId, selectedOption);
+                  debugPrint('✅ [SINGLE_QUIZ_CALLBACK] 오답노트에 Quiz $quizId 추가 완료');
+                } catch (e) {
+                  debugPrint('❌ [SINGLE_QUIZ_CALLBACK] Quiz $quizId 추가 실패: $e');
+                }
+              }
+            });
+
+            debugPrint('✅ [PROVIDER] 모든 콜백 등록 완료 (단 한 번만 실행됨!)');
+
+            return learningProgressProvider;
           },
         ),
       ],
