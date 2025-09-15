@@ -10,7 +10,6 @@ import 'widgets/date_header_widget.dart';
 import 'widgets/stats_cards_widget.dart';
 import 'widgets/quiz_section_widget.dart';
 import 'widgets/feature_cards_widget.dart';
-import 'widgets/continue_learning_widget.dart';
 
 /// 중심적인 메인 대시보드 화면 - 모든 기능에 접근할 수 있는 허브
 class MainDashboardScreen extends StatefulWidget {
@@ -51,27 +50,17 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
               SizedBox(height: 20.h),
 
-              // 🎯 PRIORITY 1: 이어서 학습하기 (가장 중요한 기능을 최상단에!)
-              const ContinueLearningWidget(),
-
-              SizedBox(height: 20.h),
-
-              // 📊 PRIORITY 2: 통합된 학습 대시보드 (아직 구현되지 않음)
-              // const LearningOverviewWidget(),
-
-              SizedBox(height: 20.h),
-
-              // 📊 PRIORITY 3: 출석 및 활동 통계
+              // 📊 출석 및 활동 통계
               const StatsCardsWidget(),
 
               SizedBox(height: 20.h),
 
-              // 🎯 PRIORITY 4: 빠른 기능 접근
+              // 🎯 빠른 기능 접근
               const FeatureCardsWidget(),
 
               SizedBox(height: 20.h),
 
-              // 📝 PRIORITY 5: 퀴즈 및 추가 학습
+              // 📝 퀴즈 및 추가 학습
               const QuizSectionWidget(),
 
               // 하단 여백
