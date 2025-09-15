@@ -51,6 +51,9 @@ class EducationProvider extends ChangeNotifier {
   bool _isUpdatingProgress = false;
   bool _isCompletingTheory = false;
 
+  // === 선택된 챕터 상태 ===
+  int? _selectedChapterId;
+
   // === Getters ===
 
   /// 챕터 목록
@@ -98,6 +101,16 @@ class EducationProvider extends ChangeNotifier {
 
   /// 현재 진행률 (0.0 ~ 1.0)
   double get progressRatio => _currentTheorySession?.progressRatio ?? 0.0;
+
+  /// 선택된 챕터 ID
+  int? get selectedChapterId => _selectedChapterId;
+
+  /// 선택된 챕터 정보 (없으면 null)
+  ChapterInfo? get selectedChapter =>
+      _selectedChapterId != null ? getChapterById(_selectedChapterId!) : null;
+
+  /// 선택된 챕터가 있는지 확인
+  bool get hasSelectedChapter => _selectedChapterId != null;
 
   /// 전체 교육 과정 통합 진행률 (0.0 ~ 1.0)
   /// 진행률 = (이론 완료 챕터 수 + 퀴즈 완료 챕터 수) / (전체 챕터 수 × 2)
@@ -237,6 +250,28 @@ class EducationProvider extends ChangeNotifier {
     } catch (e) {
       return null;
     }
+  }
+
+  /// 챕터 선택
+  ///
+  /// [chapterId]: 선택할 챕터 ID
+  void selectChapter(int chapterId) {
+    debugPrint('📌 [EDU_PROVIDER] 챕터 선택: $chapterId');
+    final chapter = getChapterById(chapterId);
+    if (chapter != null) {
+      _selectedChapterId = chapterId;
+      debugPrint('✅ [EDU_PROVIDER] 챕터 선택 완료: ${chapter.title}');
+      notifyListeners();
+    } else {
+      debugPrint('❌ [EDU_PROVIDER] 존재하지 않는 챕터 ID: $chapterId');
+    }
+  }
+
+  /// 챕터 선택 해제
+  void clearSelectedChapter() {
+    debugPrint('🔄 [EDU_PROVIDER] 챕터 선택 해제');
+    _selectedChapterId = null;
+    notifyListeners();
   }
 
   // === 이론 관련 메서드 ===

@@ -10,6 +10,8 @@ class CurrentLearningCard extends StatelessWidget {
   final VoidCallback? onTheoryPressed;
   final VoidCallback? onQuizPressed;
   final bool isTheoryCompleted; // 이론학습 완료 여부
+  final bool isSelectedChapter; // 선택된 챕터 여부
+  final VoidCallback? onClearSelection; // 선택 해제 콜백
 
   const CurrentLearningCard({
     super.key,
@@ -18,6 +20,8 @@ class CurrentLearningCard extends StatelessWidget {
     this.onTheoryPressed,
     this.onQuizPressed,
     this.isTheoryCompleted = false, // 기본값은 미완료
+    this.isSelectedChapter = false, // 기본값은 선택되지 않음
+    this.onClearSelection,
   });
 
   @override
@@ -42,23 +46,25 @@ class CurrentLearningCard extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(8.w),
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).primaryColor.withValues(alpha: 0.1),
+                    color: isSelectedChapter
+                        ? AppTheme.successColor.withValues(alpha: 0.1)
+                        : Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Icon(
-                    Icons.trending_up,
-                    color: theme.brightness == Brightness.dark
-                        ? Colors.white
-                        : Theme.of(context).primaryColor,
+                    isSelectedChapter ? Icons.star : Icons.trending_up,
+                    color: isSelectedChapter
+                        ? AppTheme.successColor
+                        : (theme.brightness == Brightness.dark
+                            ? Colors.white
+                            : Theme.of(context).primaryColor),
                     size: 24.sp,
                   ),
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
                   child: Text(
-                    '현재 진행 학습',
+                    isSelectedChapter ? '선택된 챕터' : '현재 진행 학습',
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: theme.brightness == Brightness.dark
                           ? Colors.white
@@ -67,6 +73,23 @@ class CurrentLearningCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                // 선택된 챕터일 때만 선택 해제 버튼 표시
+                if (isSelectedChapter && onClearSelection != null)
+                  GestureDetector(
+                    onTap: onClearSelection,
+                    child: Container(
+                      padding: EdgeInsets.all(6.w),
+                      decoration: BoxDecoration(
+                        color: AppTheme.grey300.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(6.r),
+                      ),
+                      child: Icon(
+                        Icons.close,
+                        size: 18.sp,
+                        color: AppTheme.grey600,
+                      ),
+                    ),
+                  ),
               ],
             ),
             SizedBox(height: 20.h), // 기존 16.h에서 확대
@@ -117,7 +140,7 @@ class CurrentLearningCard extends StatelessWidget {
                           onPressed: onQuizPressed ?? () => debugPrint('퀴즈 풀기 클릭'),
                         )
                       : Container(
-                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          height: 48.h, // ActionButton과 동일한 높이로 통일
                           decoration: BoxDecoration(
                             color: AppTheme.grey300.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(12.r),
@@ -126,29 +149,35 @@ class CurrentLearningCard extends StatelessWidget {
                               width: 1,
                             ),
                           ),
-                          child: Column(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
                                 Icons.lock_outline,
                                 color: AppTheme.grey500,
-                                size: 20.sp,
+                                size: 16.sp,
                               ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                '이론학습 먼저',
-                                style: TextStyle(
-                                  color: AppTheme.grey500,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              Text(
-                                '완료해주세요 📚',
-                                style: TextStyle(
-                                  color: AppTheme.grey500,
-                                  fontSize: 10.sp,
-                                ),
+                              SizedBox(width: 6.w),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    '이론학습 먼저',
+                                    style: TextStyle(
+                                      color: AppTheme.grey500,
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    '완료해주세요 📚',
+                                    style: TextStyle(
+                                      color: AppTheme.grey500,
+                                      fontSize: 9.sp,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
