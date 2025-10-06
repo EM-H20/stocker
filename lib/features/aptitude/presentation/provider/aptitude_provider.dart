@@ -1,6 +1,7 @@
 // features/aptitude/presentation/provider/aptitude_provider.dart
+
 import 'package:flutter/material.dart';
-import '../../domain/model/aptitude_type_summary.dart'; // ✅ [추가]
+import '../../domain/model/aptitude_type_summary.dart';
 import '../../domain/model/aptitude_question.dart';
 import '../../domain/model/aptitude_result.dart';
 import '../../domain/repository/aptitude_repository.dart';
@@ -12,42 +13,33 @@ class AptitudeProvider with ChangeNotifier {
   AptitudeProvider(this._repository);
 
   // --- 상태 변수 ---
-
-  /// 로딩 상태
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  /// 에러 메시지
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  /// 성향 분석 질문 목록
   List<AptitudeQuestion> _questions = [];
   List<AptitudeQuestion> get questions => _questions;
 
-  /// 사용자의 답변 목록 (questionId: value)
   final Map<int, int> _answers = {};
   Map<int, int> get answers => _answers;
 
-  /// 사용자의 이전 검사 결과
   AptitudeResult? _myResult;
   AptitudeResult? get myResult => _myResult;
 
-  /// 현재 검사 후 나온 결과
   AptitudeResult? _currentResult;
   AptitudeResult? get currentResult => _currentResult;
 
-  /// 현재 결과를 초기화하는 메서드
   void clearCurrentResult() {
+    debugPrint('🧹 [APTITUDE_PROVIDER] currentResult 초기화');
     _currentResult = null;
     notifyListeners();
   }
 
-  /// 사용자가 이전에 검사를 했는지 여부
   bool _hasPreviousResult = false;
   bool get hasPreviousResult => _hasPreviousResult;
 
-  /// 모든 성향 타입 요약 목록
   List<AptitudeTypeSummary> _allTypes = [];
   List<AptitudeTypeSummary> get allTypes => _allTypes;
 
@@ -55,15 +47,16 @@ class AptitudeProvider with ChangeNotifier {
 
   /// 초기 화면 진입 시, 이전 검사 결과 유무를 확인
   Future<void> checkPreviousResult() async {
+    debugPrint('🔍 [APTITUDE_PROVIDER] 이전 검사 결과 확인 시작');
     _setLoading(true);
     try {
-      // 내 결과 조회 API를 호출해보고, 성공하면 결과가 있는 것
       _myResult = await _repository.getMyResult();
       _hasPreviousResult = true;
+      debugPrint('✅ [APTITUDE_PROVIDER] 이전 검사 결과 있음: ${_myResult?.typeName}');
     } catch (e) {
-      // API 호출 실패 (404 Not Found 등)는 결과가 없는 것으로 간주
       _myResult = null;
       _hasPreviousResult = false;
+      debugPrint('ℹ️ [APTITUDE_PROVIDER] 이전 검사 결과 없음: $e');
     } finally {
       _setLoading(false);
     }
@@ -71,12 +64,15 @@ class AptitudeProvider with ChangeNotifier {
 
   /// 검사 시작 시, 질문 목록을 가져옴
   Future<bool> startTest() async {
+    debugPrint('🎯 [APTITUDE_PROVIDER] 검사 시작');
     _setLoading(true);
-    _answers.clear(); // 새 검사 시작 시 이전 답변 초기화
+    _answers.clear();
     try {
       _questions = await _repository.getQuestions();
+      debugPrint('✅ [APTITUDE_PROVIDER] 질문 ${_questions.length}개 로드');
       return _questions.isNotEmpty;
     } catch (e) {
+      debugPrint('❌ [APTITUDE_PROVIDER] 질문 로드 실패: $e');
       _errorMessage = '검사지를 불러오는 데 실패했습니다: ${e.toString()}';
       return false;
     } finally {
@@ -86,12 +82,20 @@ class AptitudeProvider with ChangeNotifier {
 
   /// 모든 성향 타입 목록을 가져옴
   Future<void> fetchAllTypes() async {
+    debugPrint('📋 [APTITUDE_PROVIDER] 모든 성향 목록 가져오기 시작');
     _setLoading(true);
     try {
       _allTypes = await _repository.getAllTypes();
+      debugPrint('✅ [APTITUDE_PROVIDER] 성향 ${_allTypes.length}개 로드');
+      
+      // 로드된 성향들 로그 출력
+      for (final type in _allTypes) {
+        debugPrint('   - ${type.typeCode}: ${type.typeName}');
+      }
     } catch (e) {
+      debugPrint('❌ [APTITUDE_PROVIDER] 성향 목록 로드 실패: $e');
       _errorMessage = '성향 목록을 불러오는 데 실패했습니다: ${e.toString()}';
-      _allTypes = []; // 실패 시 빈 리스트로 초기화
+      _allTypes = [];
     } finally {
       _setLoading(false);
     }
@@ -99,15 +103,39 @@ class AptitudeProvider with ChangeNotifier {
 
   /// 특정 타입의 상세 결과를 가져와 currentResult에 저장
   Future<bool> fetchResultByType(String typeCode) async {
-    _setLoading(true);
+    debugPrint('🔎 [APTITUDE_PROVIDER] fetchResultByType 시작: $typeCode');
+    
     try {
-      // 상세 결과를 currentResult에 저장
-      _currentResult = await _repository.getResultByType(typeCode);
-      return true;
+      _setLoading(true);
+      _errorMessage = null; // 이전 에러 메시지 초기화
+      
+      debugPrint('📡 [APTITUDE_PROVIDER] Repository 호출 중...');
+      
+      // 타임아웃과 함께 실행 (수정된 버전)
+      _currentResult = await _repository.getResultByType(typeCode).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          debugPrint('⏰ [APTITUDE_PROVIDER] 타임아웃 발생');
+          throw Exception('요청 시간이 초과되었습니다');
+        },
+      );
+      
+      if (_currentResult != null) {
+        debugPrint('✅ [APTITUDE_PROVIDER] 결과 로드 성공: ${_currentResult!.typeName}');
+        debugPrint('   거장: ${_currentResult!.master.name}');
+        return true;
+      } else {
+        debugPrint('⚠️ [APTITUDE_PROVIDER] 결과가 null');
+        _errorMessage = '결과를 불러올 수 없습니다';
+        return false;
+      }
     } catch (e) {
+      debugPrint('💥 [APTITUDE_PROVIDER] fetchResultByType 예외: $e');
       _errorMessage = '상세 결과를 불러오는 데 실패했습니다: ${e.toString()}';
+      _currentResult = null;
       return false;
     } finally {
+      debugPrint('🏁 [APTITUDE_PROVIDER] fetchResultByType 완료');
       _setLoading(false);
     }
   }
@@ -115,11 +143,13 @@ class AptitudeProvider with ChangeNotifier {
   /// 특정 질문에 대한 답변을 저장
   void answerQuestion(int questionId, int value) {
     _answers[questionId] = value;
+    debugPrint('💭 [APTITUDE_PROVIDER] 답변 저장: Q$questionId = $value');
     notifyListeners();
   }
 
   /// 모든 답변을 서버에 제출
   Future<bool> submitAnswers() async {
+    debugPrint('📤 [APTITUDE_PROVIDER] 답변 제출 시작');
     _setLoading(true);
     try {
       final answerList = _answers.entries.map((e) {
@@ -127,19 +157,22 @@ class AptitudeProvider with ChangeNotifier {
       }).toList();
 
       final request = AptitudeAnswerRequest(answers: answerList);
+      debugPrint('📤 [APTITUDE_PROVIDER] ${answerList.length}개 답변 제출');
 
-      // 이전에 결과가 있었는지 여부에 따라 다른 API 호출
       if (_hasPreviousResult) {
+        debugPrint('🔄 [APTITUDE_PROVIDER] 재검사 모드');
         _currentResult = await _repository.retest(request);
       } else {
+        debugPrint('🆕 [APTITUDE_PROVIDER] 신규 검사 모드');
         _currentResult = await _repository.submitResult(request);
       }
 
-      // 성공 후 상태 갱신
       _myResult = _currentResult;
       _hasPreviousResult = true;
+      debugPrint('✅ [APTITUDE_PROVIDER] 답변 제출 성공: ${_currentResult?.typeName}');
       return true;
     } catch (e) {
+      debugPrint('❌ [APTITUDE_PROVIDER] 답변 제출 실패: $e');
       _errorMessage = '결과 제출에 실패했습니다: ${e.toString()}';
       return false;
     } finally {
@@ -149,6 +182,7 @@ class AptitudeProvider with ChangeNotifier {
 
   /// 로딩 상태 변경 및 UI 업데이트 알림
   void _setLoading(bool value) {
+    debugPrint('⚡ [APTITUDE_PROVIDER] 로딩 상태 변경: $_isLoading → $value');
     _isLoading = value;
     notifyListeners();
   }

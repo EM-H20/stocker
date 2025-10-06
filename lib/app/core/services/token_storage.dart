@@ -66,6 +66,17 @@ class TokenStorage {
     return _storage.read(key: _userNicknameKey);
   }
 
+  /// 🆕 사용자 닉네임 저장 (새로 추가된 메서드)
+  static Future<void> setUserNickname(String nickname) async {
+    try {
+      await _storage.write(key: _userNicknameKey, value: nickname);
+      debugPrint('💾 [TOKEN_STORAGE] 닉네임 저장됨: $nickname');
+    } catch (e) {
+      debugPrint('❌ [TOKEN_STORAGE] 닉네임 저장 실패: $e');
+      rethrow;
+    }
+  }
+
   /// ✅ 모든 토큰/유저 데이터 삭제
   static Future<void> clear() async {
     await _storage.deleteAll();

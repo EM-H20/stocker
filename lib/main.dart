@@ -62,10 +62,10 @@ import 'app/core/network/dio.dart';
 import 'app/core/services/token_storage.dart';
 
 /// ✅ 더미(mock) 여부 설정 (euimin 스타일 유지)
-const useMock = false; // 백엔드 서버 없이 테스트용 - 실제 API 사용시 false
+const useMock = true; // 백엔드 서버 없이 테스트용 - 실제 API 사용시 false
 
 /// 🧪 테스트용 유저 자동 생성 (Mock 모드에서만)
-const createTestUserOnStart = false;
+const createTestUserOnStart = true;
 
 void main() async {
   await initializeDateFormatting();

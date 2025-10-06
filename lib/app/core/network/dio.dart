@@ -11,9 +11,9 @@ Future<void> setupDio() async {
   // 환경 변수에서 API URL 가져오기 (백엔드 8080 포트 기본값)
   final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://168.107.22.83:8080';
   final connectTimeout =
-      int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '15') ?? 15;
+      (int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '15') ?? 15)*1000;
   final receiveTimeout =
-      int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '15') ?? 15;
+      (int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '30') ?? 30)*1000;
 
   // URL 검증
   if (!_isValidUrl(baseUrl)) {

@@ -1,18 +1,15 @@
-//더미 데이터 반환
+// attendance_mock_repository.dart 수정
 
 import '../../domain/model/attendance_day.dart';
 import '../../domain/model/attendance_quiz.dart';
 import '../../domain/repository/attendance_repository.dart';
-import '../dto/quiz_submission_dto.dart';
 
 /// 테스트용 더미 데이터를 반환하는 Repository 구현체
 class AttendanceMockRepository implements AttendanceRepository {
   @override
   Future<List<AttendanceDay>> getAttendanceStatus(DateTime month) async {
-    // 0.3초 지연 후 더미 데이터 반환
     await Future.delayed(const Duration(milliseconds: 300));
 
-    // 현재 월의 1일, 5일, 10일에 출석한 것으로 가정
     return [
       AttendanceDay(
           date: DateTime(month.year, month.month, 1), isPresent: true),
@@ -25,21 +22,18 @@ class AttendanceMockRepository implements AttendanceRepository {
 
   @override
   Future<List<AttendanceQuiz>> getTodaysQuiz() async {
-    // 0.3초 지연 후 더미 퀴즈 3문제 반환
     await Future.delayed(const Duration(milliseconds: 300));
     return [
-      AttendanceQuiz(id: 1, question: '코스피는 대한민국을 대표하는 주가 지수이다.', answer: true),
-      AttendanceQuiz(
-          id: 2, question: '배당금은 주식을 보유만 해도 항상 지급된다.', answer: false),
-      AttendanceQuiz(
-          id: 3, question: '상한가, 하한가 제도는 모든 국가에 존재한다.', answer: false),
+      AttendanceQuiz(id: 1, question: '주식 투자에서 분산투자는 위험을 줄이는 효과적인 방법이다.', answer: true),
+      AttendanceQuiz(id: 2, question: 'ETF는 개별 주식보다 항상 더 안전한 투자 방법이다.', answer: false),
+      AttendanceQuiz(id: 3, question: '투자할 때는 모든 자금을 한 번에 투입하기보다는 시간을 나누어 투자하는 것이 좋다.', answer: true),
     ];
   }
 
   @override
-  Future<void> submitAttendance(QuizSubmissionDto submission) async {
-    // 0.5초 지연 후 성공한 것처럼 처리
+  Future<void> submitAttendance(Map<String, dynamic> submissionData) async {
     await Future.delayed(const Duration(milliseconds: 500));
+    // Mock에서는 성공한 것으로 처리
     return;
   }
 }

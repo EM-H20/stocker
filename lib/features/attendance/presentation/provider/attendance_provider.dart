@@ -87,31 +87,26 @@ class AttendanceProvider with ChangeNotifier {
       return false;
     }
   }
-
+  
+  /// 퀴즈 제출 및 출석 처리 (API 문서에 맞춘 형식)
   Future<bool> submitQuiz(List<QuizAnswerDto> userAnswers) async {
-    final userId = _authProvider.user?.id;
-    if (userId == null) {
-      _errorMessage = '로그인 정보가 필요합니다.';
-      _safeNotifyListeners();
-      return false;
-    }
-
     _isSubmitting = true;
-    _safeNotifyListeners();
+   _safeNotifyListeners();
 
     try {
-      final submission =
-          QuizSubmissionDto(userId: userId, answers: userAnswers);
-      await _repository.submitAttendance(submission);
-      _errorMessage = null;
+      // API 문서에 따르면 출석 제출은 단순히 { "isPresent": true } 형식
+      // 퀴즈 답변과 관계없이 퀴즈를 풀었다는 것 자체가 출석을 의미
+     await _repository.submitAttendance({"isPresent": true});
+    
+     _errorMessage = null;
       await fetchAttendanceStatus(_focusedMonth);
-      return true;
+     return true;
     } catch (e) {
       _errorMessage = '출석 처리 실패: ${e.toString()}';
       return false;
     } finally {
       _isSubmitting = false;
       _safeNotifyListeners();
-    }
+   }
   }
 }

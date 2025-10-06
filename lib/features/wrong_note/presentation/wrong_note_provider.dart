@@ -18,7 +18,7 @@ class WrongNoteProvider extends ChangeNotifier {
   Set<int> _retriedQuizIds = {};
 
   // 현재 삭제 처리 중인 퀴즈 ID들 (중복 삭제 방지)
-  Set<int> _deletingQuizIds = {};
+  final Set<int> _deletingQuizIds = {};
 
   // Getters
   List<WrongNoteItem> get wrongNotes => _wrongNotes;
@@ -288,7 +288,7 @@ class WrongNoteProvider extends ChangeNotifier {
         final currentCount = _wrongNotes.length;
         final actualRemoved = removedCount - currentCount;
 
-        debugPrint('✅ [WrongNote] 로컬 정리 완료 - ${actualRemoved}개 항목 제거됨');
+        debugPrint('✅ [WrongNote] 로컬 정리 완료 - $actualRemoved개 항목 제거됨');
         notifyListeners();
 
         // 🔓 404 처리 완료: 플래그 해제

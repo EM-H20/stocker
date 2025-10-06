@@ -1,7 +1,8 @@
+// attendance_api.dart 수정
+
 import 'package:dio/dio.dart';
 import '../dto/attendance_status_dto.dart';
 import '../dto/quiz_dto.dart';
-import '../dto/quiz_submission_dto.dart';
 import '../../../../app/core/services/token_storage.dart';
 
 /// 출석 관련 API를 호출하는 클래스
@@ -22,7 +23,6 @@ class AttendanceApi {
   }
 
   /// 당월 출석 이력 조회 API
-  /// API.md 명세: GET /api/attendance/history
   Future<AttendanceStatusDto> getAttendanceHistory() async {
     final options = await _getAuthOptions();
     final response = await _dio.get(
@@ -33,7 +33,6 @@ class AttendanceApi {
   }
 
   /// 출석 퀴즈 시작 (랜덤 3문제)
-  /// API.md 명세: GET /api/attendance/quiz/start
   Future<QuizDto> startAttendanceQuiz() async {
     final options = await _getAuthOptions();
     final response = await _dio.get(
@@ -43,13 +42,12 @@ class AttendanceApi {
     return QuizDto.fromJson(response.data);
   }
 
-  /// 출석 제출 API
-  /// API.md 명세: POST /api/attendance/quiz/submit
-  Future<void> submitAttendance(QuizSubmissionDto submission) async {
+  /// 출석 제출 API (API 문서에 맞춘 형식)
+  Future<void> submitAttendance(Map<String, dynamic> submissionData) async {
     final options = await _getAuthOptions();
     await _dio.post(
       '/api/attendance/quiz/submit',
-      data: submission.toJson(),
+      data: submissionData, // { "isPresent": true } 형식
       options: options,
     );
   }
