@@ -16,6 +16,7 @@ class AuthProvider with ChangeNotifier {
   String? _errorMessage;
   bool _isLoading = false;
   bool _isInitializing = true; // 앱 시작 시 토큰 확인 중인지 여부
+  bool _isUpdatingProfile = false; // 프로필 수정 중인지 여부
 
   // --- 이벤트 Notifier ---
   // 로그인 성공 이벤트를 외부(HomeShell)에 알리기 위한 장치
@@ -27,6 +28,7 @@ class AuthProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isInitializing => _isInitializing;
   bool get isLoggedIn => _user != null; // 로그인 상태를 쉽게 확인
+  bool get isUpdatingProfile => _isUpdatingProfile; // 프로필 수정 중 상태
 
   // --- 로직 메서드 ---
 
@@ -117,21 +119,100 @@ class AuthProvider with ChangeNotifier {
     return result;
   }
 
-  /// 회원가입
-  Future<bool> signup(String email, String password, String nickname) async {
+  /// 회원가입 (업데이트된 버전 - 추가 필드 포함)
+  Future<bool> signup(
+    String email, 
+    String password, 
+    String nickname, {
+    required int age,
+    required String occupation,
+    String provider = 'local',
+    String profileImageUrl = 'https://example.com/profile.png',
+  }) async {
     _setLoading(true);
     try {
-      final request =
-          SignupRequest(email: email, password: password, nickname: nickname);
+      final request = SignupRequest(
+        email: email,
+        password: password,
+        nickname: nickname,
+        age: age,
+        occupation: occupation,
+        provider: provider,
+        profileImageUrl: profileImageUrl,
+      );
+      
+      debugPrint('🔄 [AUTH_PROVIDER] 회원가입 요청: $request');
+      
       await _repository.signup(request);
       _errorMessage = null;
+      
+      debugPrint('✅ [AUTH_PROVIDER] 회원가입 성공');
       return true;
     } catch (e) {
+      debugPrint('❌ [AUTH_PROVIDER] 회원가입 실패: $e');
       _errorMessage = '회원가입 실패: ${e.toString()}';
       return false;
     } finally {
       _setLoading(false);
     }
+  }
+
+  /// 🆕 프로필 수정 (닉네임 수정 포함)
+  Future<bool> updateProfile({
+    String? nickname,
+    String? profileImageUrl,
+    int? age,
+    String? occupation,
+  }) async {
+    if (_user == null) {
+      _errorMessage = '로그인이 필요합니다';
+      return false;
+    }
+
+    _isUpdatingProfile = true;
+    notifyListeners();
+
+    try {
+      debugPrint('🔄 [AUTH_PROVIDER] 프로필 수정 시작...');
+      debugPrint('📝 [AUTH_PROVIDER] 변경 내용 - nickname: $nickname, age: $age, occupation: $occupation');
+
+      // Repository를 통해 프로필 수정 API 호출
+      final updatedUser = await _repository.updateProfile(
+        nickname: nickname,
+        profileImageUrl: profileImageUrl,
+        age: age,
+        occupation: occupation,
+      );
+
+      // 사용자 정보 업데이트
+      _user = updatedUser;
+      _errorMessage = null;
+
+      // 토큰 저장소에 닉네임 업데이트 (기존 토큰 유지하면서)
+      if (nickname != null) {
+        await TokenStorage.setUserNickname(nickname);
+        debugPrint('💾 [AUTH_PROVIDER] 닉네임이 토큰 저장소에 업데이트됨: $nickname');
+      }
+
+      debugPrint('✅ [AUTH_PROVIDER] 프로필 수정 성공');
+      notifyListeners();
+      return true;
+      
+    } catch (e) {
+      debugPrint('❌ [AUTH_PROVIDER] 프로필 수정 실패: $e');
+      _errorMessage = '프로필 수정 실패: ${e.toString()}';
+      notifyListeners();
+      return false;
+    } finally {
+      _isUpdatingProfile = false;
+      notifyListeners();
+    }
+  }
+
+  /// 🎯 닉네임만 수정하는 편의 메서드
+  Future<bool> updateNickname(String newNickname) async {
+    debugPrint('📝 [AUTH_PROVIDER] 닉네임 변경: ${_user?.nickname} → $newNickname');
+    return await updateProfile(nickname: newNickname);
   }
 
   /// 로그아웃

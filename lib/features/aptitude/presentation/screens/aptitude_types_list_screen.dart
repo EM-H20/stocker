@@ -28,17 +28,43 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
 
   // 각 성향 타입에 맞는 아이콘을 매핑하는 함수
   IconData _getIconForType(String typeCode) {
-    switch (typeCode) {
+    switch (typeCode.toUpperCase()) {
       case 'STABLE':
+      case 'CONSERVATIVE':
         return Icons.shield_outlined;
       case 'AGGRESSIVE':
         return Icons.trending_up;
       case 'NEUTRAL':
+      case 'BALANCED':
         return Icons.balance;
       case 'LONG_TERM':
+      case 'GROWTH':
         return Icons.hourglass_bottom;
+      case 'DIVIDEND':
+        return Icons.account_balance;
       default:
         return Icons.help_outline;
+    }
+  }
+
+  // 각 성향 타입에 맞는 색상을 매핑하는 함수
+  Color _getColorForType(String typeCode, BuildContext context) {
+    switch (typeCode.toUpperCase()) {
+      case 'STABLE':
+      case 'CONSERVATIVE':
+        return Colors.green;
+      case 'AGGRESSIVE':
+        return Colors.red;
+      case 'NEUTRAL':
+      case 'BALANCED':
+        return Colors.blue;
+      case 'LONG_TERM':
+      case 'GROWTH':
+        return Colors.purple;
+      case 'DIVIDEND':
+        return Colors.orange;
+      default:
+        return Theme.of(context).colorScheme.primary;
     }
   }
 
@@ -55,59 +81,160 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
           ? Center(
               child: SpinKitFadingCircle(
                   color: Theme.of(context).colorScheme.primary))
-          : ListView.builder(
-              padding: EdgeInsets.all(16.w),
-              itemCount: allTypes.length,
-              itemBuilder: (context, index) {
-                final type = allTypes[index];
-                return Card(
-                  margin: EdgeInsets.only(bottom: 16.h),
-                  elevation: 2.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: ListTile(
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
-                    leading: CircleAvatar(
-                      radius: 24.r,
-                      backgroundColor:
-                          Theme.of(context).colorScheme.primary.withAlpha(25),
-                      child: Icon(
-                        _getIconForType(type.typeCode),
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 28.r,
+          : allTypes.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64.r,
+                        color: Colors.grey,
                       ),
-                    ),
-                    title: Text(
-                      type.typeName,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 18.sp),
-                    ),
-                    subtitle: Text(
-                      type.description,
-                      style: TextStyle(
-                          color: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.color
-                              ?.withValues(alpha: 0.7)),
-                    ),
-                    trailing: Icon(Icons.arrow_forward_ios,
-                        size: 16.r, color: Theme.of(context).iconTheme.color),
-                    onTap: () async {
-                      final success =
-                          await provider.fetchResultByType(type.typeCode);
-                      if (!context.mounted) return;
-                      if (success) {
-                        // 상세 결과 화면으로 이동할 때, '나의 결과'가 아님을 알림 (extra: false)
-                        context.push(AppRoutes.aptitudeResult, extra: false);
-                      }
-                    },
+                      SizedBox(height: 16.h),
+                      Text(
+                        '성향 목록을 불러올 수 없습니다',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<AptitudeProvider>().fetchAllTypes();
+                        },
+                        child: const Text('다시 시도'),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
+                )
+              : ListView.builder(
+                  padding: EdgeInsets.all(16.w),
+                  itemCount: allTypes.length,
+                  itemBuilder: (context, index) {
+                    final type = allTypes[index];
+                    final typeColor = _getColorForType(type.typeCode, context);
+                    
+                    return Card(
+                      margin: EdgeInsets.only(bottom: 16.h),
+                      elevation: 2.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 16.h, horizontal: 20.w),
+                        leading: CircleAvatar(
+                          radius: 24.r,
+                          backgroundColor: typeColor.withAlpha(25),
+                          child: Icon(
+                            _getIconForType(type.typeCode),
+                            color: typeColor,
+                            size: 28.r,
+                          ),
+                        ),
+                        title: Text(
+                          type.typeName,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18.sp),
+                        ),
+                        subtitle: Padding(
+                          padding: EdgeInsets.only(top: 4.h),
+                          child: Text(
+                            type.description,
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.color
+                                  ?.withValues(alpha: 0.7),
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16.r,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
+                        onTap: () async {
+                          debugPrint('🎯 [APTITUDE_TYPES] ${type.typeName} 클릭됨');
+                          debugPrint('📝 [APTITUDE_TYPES] TypeCode: ${type.typeCode}');
+                          
+                          // 로딩 표시
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (_) => Center(
+                              child: Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(20.w),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SpinKitFadingCircle(
+                                        color: Theme.of(context).colorScheme.primary,
+                                        size: 40.r,
+                                      ),
+                                      SizedBox(height: 16.h),
+                                      Text(
+                                        '${type.typeName} 정보를 불러오는 중...',
+                                        style: TextStyle(fontSize: 14.sp),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+
+                          try {
+                            // currentResult 초기화 (이전 결과 제거)
+                            provider.clearCurrentResult();
+                            
+                            // 해당 성향의 상세 정보 가져오기
+                            final success = await provider.fetchResultByType(type.typeCode);
+                            
+                            // 로딩 다이얼로그 닫기
+                            if (context.mounted) {
+                              Navigator.of(context).pop();
+                            }
+                            
+                            if (success && context.mounted) {
+                              debugPrint('✅ [APTITUDE_TYPES] 데이터 로드 성공, 화면 이동');
+                              // 상세 결과 화면으로 이동 (다른 성향 보기 모드)
+                              context.push(AppRoutes.aptitudeResult, extra: false);
+                            } else if (context.mounted) {
+                              debugPrint('❌ [APTITUDE_TYPES] 데이터 로드 실패');
+                              // 에러 처리
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    provider.errorMessage ?? '정보를 불러오는데 실패했습니다'
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            debugPrint('💥 [APTITUDE_TYPES] 예외 발생: $e');
+                            // 로딩 다이얼로그 닫기
+                            if (context.mounted) {
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('오류가 발생했습니다: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }

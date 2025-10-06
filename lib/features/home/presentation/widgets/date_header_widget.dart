@@ -260,14 +260,20 @@ class DateHeaderWidget extends StatelessWidget {
 
         switch (value) {
           case 'profile':
-            // 프로필 페이지로 이동 (구현되면)
-            debugPrint('👤 [AUTH_MENU] 프로필 페이지로 이동');
-            // context.go(AppRoutes.profile);
+            // ✅ 마이페이지로 이동 (수정됨!)
+            debugPrint('👤 [AUTH_MENU] 마이페이지로 이동');
+            context.go(AppRoutes.mypage);
             break;
           case 'settings':
             // 설정 페이지로 이동 (구현되면)
             debugPrint('⚙️ [AUTH_MENU] 설정 페이지로 이동');
             // context.go(AppRoutes.settings);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('설정 기능은 준비 중입니다'),
+                duration: Duration(seconds: 2),
+              ),
+            );
             break;
           case 'logout':
             if (!authProvider.isLoading) {
