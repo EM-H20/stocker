@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../app/config/app_theme.dart';
 import '../wrong_note_screen.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 오답노트 상단 통계 카드 위젯
 ///
@@ -111,7 +112,7 @@ class WrongNoteStatsCard extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark
+                color: ThemeUtils.isDarkMode(context)
                     ? Colors.grey[400]
                     : AppTheme.grey600,
                 fontSize: 12.sp,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 import '../../../attendance/presentation/provider/attendance_provider.dart';
 import '../../../attendance/data/dto/quiz_submission_dto.dart';
 import 'quiz_item_widget.dart';
@@ -54,9 +55,11 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontSize: 24.sp,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : AppTheme.grey900,
+                          color: ThemeUtils.getColorByTheme(
+                            context,
+                            lightColor: AppTheme.grey900,
+                            darkColor: Colors.white,
+                          ),
                         ),
                   ),
                   if (!isLoading && quizzes.isNotEmpty)
@@ -93,9 +96,12 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16.r),
                   border: Border.all(
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppTheme.grey700.withValues(alpha: 0.3)
-                        : AppTheme.grey300.withValues(alpha: 0.5),
+                    color: ThemeUtils.getColorWithOpacity(
+                      context,
+                      lightColor: AppTheme.grey300,
+                      darkColor: AppTheme.grey700,
+                      opacity: ThemeUtils.isDarkMode(context) ? 0.3 : 0.5,
+                    ),
                     width: 1,
                   ),
                   boxShadow: [

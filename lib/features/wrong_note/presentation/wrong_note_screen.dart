@@ -7,6 +7,7 @@ import 'widgets/wrong_note_empty_state.dart';
 import 'wrong_note_provider.dart';
 import '../../quiz/presentation/quiz_provider.dart';
 import '../../../app/config/app_theme.dart';
+import '../../../app/core/utils/theme_utils.dart';
 
 /// 오답노트 메인 화면
 ///
@@ -181,9 +182,11 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
                       Text(
                         '오답노트',
                         style: TextStyle(
-                          color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
-                              : AppTheme.grey900,
+                          color: ThemeUtils.getColorByTheme(
+                            context,
+                            lightColor: AppTheme.grey900,
+                            darkColor: Colors.white,
+                          ),
                           fontSize: 28.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -253,10 +256,11 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
                             Text(
                               '💡 복습용 문제는 여기서 계속 확인하세요!',
                               style: TextStyle(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? Colors.white
-                                    : AppTheme.grey900,
+                                color: ThemeUtils.getColorByTheme(
+                                  context,
+                                  lightColor: AppTheme.grey900,
+                                  darkColor: Colors.white,
+                                ),
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -265,10 +269,11 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
                             Text(
                               '완전히 정리하려면 교육 → 해당 챕터 → 퀴즈풀기에서 정답을 맞춰주세요! 📚',
                               style: TextStyle(
-                                color: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? AppTheme.grey300
-                                    : AppTheme.grey600,
+                                color: ThemeUtils.getColorByTheme(
+                                  context,
+                                  lightColor: AppTheme.grey600,
+                                  darkColor: AppTheme.grey300,
+                                ),
                                 fontSize: 12.sp,
                                 height: 1.3,
                               ),

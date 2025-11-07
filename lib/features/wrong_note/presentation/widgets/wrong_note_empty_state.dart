@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../app/core/widgets/action_button.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 오답노트 빈 상태 위젯
 ///
@@ -24,7 +25,7 @@ class WrongNoteEmptyState extends StatelessWidget {
           Icon(
             Icons.quiz_outlined,
             size: 64.sp,
-            color: Theme.of(context).brightness == Brightness.dark
+            color: ThemeUtils.isDarkMode(context)
                 ? AppTheme.grey600
                 : AppTheme.grey500,
           ),
@@ -32,7 +33,7 @@ class WrongNoteEmptyState extends StatelessWidget {
           Text(
             '오답이 없습니다',
             style: TextStyle(
-              color: Theme.of(context).brightness == Brightness.dark
+              color: ThemeUtils.isDarkMode(context)
                   ? AppTheme.grey400
                   : AppTheme.grey700,
               fontSize: 18.sp,
@@ -43,7 +44,7 @@ class WrongNoteEmptyState extends StatelessWidget {
           Text(
             '퀴즈를 풀고 틀린 문제들을 복습해보세요',
             style: TextStyle(
-              color: Theme.of(context).brightness == Brightness.dark
+              color: ThemeUtils.isDarkMode(context)
                   ? AppTheme.grey500
                   : AppTheme.grey600,
               fontSize: 14.sp,

@@ -4,6 +4,7 @@ import '../../../../app/config/app_routes.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/navigation/navigation_guard.dart';
 import 'feature_card_widget.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 메인 대시보드 기능 카드들 위젯
 class FeatureCardsWidget extends StatelessWidget {
@@ -22,7 +23,7 @@ class FeatureCardsWidget extends StatelessWidget {
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.w600,
-                  color: Theme.of(context).brightness == Brightness.dark
+                  color: ThemeUtils.isDarkMode(context)
                       ? Colors.white
                       : AppTheme.grey900,
                 ),

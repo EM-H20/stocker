@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 퀴즈 선택지 위젯
 class QuizOptionWidget extends StatelessWidget {
@@ -25,7 +26,7 @@ class QuizOptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     // 색상 결정 로직
     Color backgroundColor;

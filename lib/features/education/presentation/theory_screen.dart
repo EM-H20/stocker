@@ -10,6 +10,7 @@ import 'widgets/education_error_widget.dart';
 import 'widgets/theory_page_widget.dart';
 import 'widgets/theory_navigation_widget.dart';
 import 'widgets/theory_empty_state_widget.dart';
+import '../../../app/core/utils/theme_utils.dart';
 
 class TheoryScreen extends StatefulWidget {
   const TheoryScreen({super.key, required this.chapterId});
@@ -80,7 +81,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
 
   /// AppBar 빌드
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return AppBar(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,

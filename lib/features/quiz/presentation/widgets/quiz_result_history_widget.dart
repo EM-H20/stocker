@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../domain/models/quiz_result.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 퀴즈 결과 이전 기록 위젯
 class QuizResultHistoryWidget extends StatelessWidget {
@@ -11,7 +12,7 @@ class QuizResultHistoryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return Container(
       width: double.infinity,
@@ -51,7 +52,7 @@ class QuizResultHistoryWidget extends StatelessWidget {
   }
 
   Widget _buildHistoryItem(BuildContext context, QuizResult result) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),

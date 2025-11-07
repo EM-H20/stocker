@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/config/app_routes.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 퀴즈 결과 액션 버튼들 위젯
 class QuizResultActionsWidget extends StatelessWidget {
@@ -16,7 +17,7 @@ class QuizResultActionsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return Column(
       children: [

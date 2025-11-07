@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 개별 퀴즈 아이템 위젯 (선택 상태 및 비활성화 지원)
 class QuizItemWidget extends StatelessWidget {
@@ -23,7 +24,7 @@ class QuizItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = ThemeUtils.isDarkMode(context);
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -125,7 +126,7 @@ class QuizItemWidget extends StatelessWidget {
     required VoidCallback? onTap,
     required Color color,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = ThemeUtils.isDarkMode(context);
     final isDisabled = onTap == null;
 
     return GestureDetector(

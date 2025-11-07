@@ -8,6 +8,7 @@ import '../../../../app/core/widgets/action_button.dart';
 import '../provider/attendance_provider.dart';
 import '../widgets/attendance_calendar.dart';
 import '../widgets/attendance_quiz_dialog.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -88,7 +89,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         isAlreadyAttended ? '오늘은 이미 출석했습니다' : '오늘의 퀴즈 풀고 출석하기',
                     icon: isAlreadyAttended ? Icons.check_circle : Icons.quiz,
                     color: isAlreadyAttended
-                        ? (Theme.of(context).brightness == Brightness.dark
+                        ? (ThemeUtils.isDarkMode(context)
                             ? AppTheme.grey600
                             : AppTheme.grey400)
                         : Theme.of(context).primaryColor,

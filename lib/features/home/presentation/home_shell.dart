@@ -8,6 +8,7 @@ import '../../../app/config/app_routes.dart';
 import '../../auth/presentation/auth_provider.dart';
 import '../../attendance/presentation/provider/attendance_provider.dart';
 import '../../attendance/presentation/widgets/attendance_quiz_dialog.dart';
+import '../../../app/core/utils/theme_utils.dart';
 
 /// BottomNavigationBar와 탭별 화면 전환을 담당하는 메인 Shell (StatelessWidget 유지)
 class HomeShell extends StatelessWidget {
@@ -35,7 +36,7 @@ class HomeShell extends StatelessWidget {
       type: BottomNavigationBarType.fixed,
       currentIndex: _getCurrentIndex(location),
       onTap: (index) => _onTabTapped(context, index),
-      selectedItemColor: Theme.of(context).brightness == Brightness.dark
+      selectedItemColor: ThemeUtils.isDarkMode(context)
           ? const Color(0xFF64B5F6) // 다크모드: 더 밝은 파란색
           : Theme.of(context).primaryColor, // 라이트모드: 기본 테마 색상
       unselectedItemColor: Colors.grey,

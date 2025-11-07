@@ -6,6 +6,7 @@ import '../../../note/domain/model/note.dart';
 import '../../../note/presentation/provider/note_provider.dart';
 import '../../../../app/config/app_routes.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 노트 섹션 위젯 - 실제 Note 기능과 연결됨
 class NoteSection extends StatelessWidget {
@@ -51,7 +52,7 @@ class NoteSection extends StatelessWidget {
                         child: Icon(
                           Icons.add,
                           size: 24.sp,
-                          color: Theme.of(context).brightness == Brightness.dark
+                          color: ThemeUtils.isDarkMode(context)
                               ? AppTheme.primaryColor.withValues(alpha: 0.85)
                               : AppTheme.primaryColor,
                         ),

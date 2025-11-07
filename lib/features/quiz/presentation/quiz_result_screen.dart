@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../app/config/app_routes.dart';
 import '../../../app/config/app_theme.dart';
 import 'quiz_provider.dart';
+import '../../../app/core/utils/theme_utils.dart';
 
 class QuizResultScreen extends StatefulWidget {
   const QuizResultScreen({super.key, required this.chapterId});
@@ -59,7 +60,7 @@ class _QuizResultScreenState extends State<QuizResultScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -290,7 +291,7 @@ class _QuizResultScreenState extends State<QuizResultScreen>
   }
 
   Widget _buildErrorState() {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
     final textColor = isDarkMode ? Colors.white : AppTheme.grey900;
     
     return Center(

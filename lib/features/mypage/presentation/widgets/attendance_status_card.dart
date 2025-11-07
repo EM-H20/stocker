@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/config/app_routes.dart';
 import '../../../attendance/presentation/provider/attendance_provider.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 출석현황 카드 위젯
 class AttendanceStatusCard extends StatelessWidget {
@@ -44,7 +45,7 @@ class AttendanceStatusCard extends StatelessWidget {
                 child: Text(
                   '전체 보기',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).brightness == Brightness.dark
+                        color: ThemeUtils.isDarkMode(context)
                             ? AppTheme.primaryColor.withValues(alpha: 0.8)
                             : AppTheme.primaryColor,
                         fontWeight: FontWeight.w500,

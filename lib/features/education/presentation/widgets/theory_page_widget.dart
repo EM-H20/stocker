@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../domain/models/theory_info.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 이론 페이지 위젯 - 개별 이론 내용을 표시
 class TheoryPageWidget extends StatelessWidget {
@@ -16,7 +17,7 @@ class TheoryPageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w),

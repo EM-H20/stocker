@@ -7,6 +7,7 @@ import '../../../wrong_note/presentation/wrong_note_provider.dart';
 import '../../../note/presentation/provider/note_provider.dart';
 import '../../../aptitude/presentation/provider/aptitude_provider.dart';
 import '../../../education/presentation/education_provider.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 메인 대시보드 통계 카드들 위젯
 class StatsCardsWidget extends StatelessWidget {
@@ -28,7 +29,7 @@ class StatsCardsWidget extends StatelessWidget {
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
+          color: ThemeUtils.isDarkMode(context)
               ? AppTheme.grey700.withValues(alpha: 0.3)
               : AppTheme.grey300.withValues(alpha: 0.5),
           width: 1,
@@ -64,7 +65,7 @@ class StatsCardsWidget extends StatelessWidget {
                   Text(
                     '학습 현황',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).brightness == Brightness.dark
+                          color: ThemeUtils.isDarkMode(context)
                               ? AppTheme.grey400
                               : AppTheme.grey600,
                         ),
@@ -110,7 +111,7 @@ class StatsCardsWidget extends StatelessWidget {
                     '출석 $attendedDays일',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).brightness == Brightness.dark
+                          color: ThemeUtils.isDarkMode(context)
                               ? Colors.white
                               : AppTheme.grey900,
                         ),
@@ -140,7 +141,7 @@ class StatsCardsWidget extends StatelessWidget {
                     '오답노트 $wrongNotes개',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).brightness == Brightness.dark
+                          color: ThemeUtils.isDarkMode(context)
                               ? Colors.white
                               : AppTheme.grey900,
                         ),
@@ -177,7 +178,7 @@ class StatsCardsWidget extends StatelessWidget {
                                 '교육 진행률',
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).brightness == Brightness.dark
+                                      color: ThemeUtils.isDarkMode(context)
                                           ? Colors.white
                                           : AppTheme.grey900,
                                     ),
@@ -197,7 +198,7 @@ class StatsCardsWidget extends StatelessWidget {
                               Expanded(
                                 child: LinearProgressIndicator(
                                   value: educationProgress / 100,
-                                  backgroundColor: Theme.of(context).brightness == Brightness.dark
+                                  backgroundColor: ThemeUtils.isDarkMode(context)
                                       ? Colors.grey[700]
                                       : AppTheme.grey300.withValues(alpha: 0.5),
                                   valueColor: AlwaysStoppedAnimation<Color>(AppTheme.infoColor),
@@ -208,7 +209,7 @@ class StatsCardsWidget extends StatelessWidget {
                               Text(
                                 '$completedChapters/$totalChapters',
                                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(context).brightness == Brightness.dark
+                                      color: ThemeUtils.isDarkMode(context)
                                           ? AppTheme.grey400
                                           : AppTheme.grey600,
                                     ),
@@ -245,7 +246,7 @@ class StatsCardsWidget extends StatelessWidget {
                         '나의 투자성향: ${aptitudeProvider.myResult!.typeName}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w600,
-                              color: Theme.of(context).brightness == Brightness.dark
+                              color: ThemeUtils.isDarkMode(context)
                                   ? Colors.white
                                   : AppTheme.grey700,
                             ),

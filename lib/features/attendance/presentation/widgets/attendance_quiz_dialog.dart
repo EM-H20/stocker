@@ -9,6 +9,7 @@ import '../../../../app/core/widgets/action_button.dart';
 import '../../data/dto/quiz_submission_dto.dart';
 import '../../domain/model/attendance_quiz.dart';
 import '../provider/attendance_provider.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 출석 퀴즈 팝업 다이얼로그 (StatefulWidget)
 class AttendanceQuizDialog extends StatefulWidget {
@@ -77,7 +78,7 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AttendanceProvider>();
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return AlertDialog(
       title: Text('오늘의 출석 퀴즈 (${_currentIndex + 1}/${widget.quizzes.length})'),
@@ -153,7 +154,7 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
   }
 
   Widget _buildAnswerButton(BuildContext context, {required bool isO}) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
     Color buttonColor;
     IconData buttonIcon;
 

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/config/app_routes.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 import '../../../auth/presentation/auth_provider.dart';
 
 /// 📅 간단한 헤더 위젯 (인사말 + 사용자 메뉴)
@@ -40,9 +41,11 @@ class DateHeaderWidget extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontSize: 22.sp,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : AppTheme.grey900,
+                        color: ThemeUtils.getColorByTheme(
+                          context,
+                          lightColor: AppTheme.grey900,
+                          darkColor: Colors.white,
+                        ),
                       ),
                 ),
                 SizedBox(height: 2.h),
@@ -50,9 +53,11 @@ class DateHeaderWidget extends StatelessWidget {
                   '${now.month}월 ${now.day}일, 학습을 시작해볼까요?',
                   style: TextStyle(
                     fontSize: 14.sp,
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? AppTheme.grey400
-                        : AppTheme.grey600,
+                    color: ThemeUtils.getColorByTheme(
+                      context,
+                      lightColor: AppTheme.grey600,
+                      darkColor: AppTheme.grey400,
+                    ),
                   ),
                 ),
               ],
@@ -181,18 +186,24 @@ class DateHeaderWidget extends StatelessWidget {
               Icon(
                 Icons.person_outline,
                 size: 18.sp,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : AppTheme.grey700,
+                color: ThemeUtils.getColorWithOpacity(
+                  context,
+                  lightColor: AppTheme.grey700,
+                  darkColor: Colors.white,
+                  opacity: ThemeUtils.isDarkMode(context) ? 0.8 : 1.0,
+                ),
               ),
               SizedBox(width: 8.w),
               Text(
                 '내 정보',
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white.withValues(alpha: 0.9)
-                      : AppTheme.grey800,
+                  color: ThemeUtils.getColorWithOpacity(
+                    context,
+                    lightColor: AppTheme.grey800,
+                    darkColor: Colors.white,
+                    opacity: ThemeUtils.isDarkMode(context) ? 0.9 : 1.0,
+                  ),
                 ),
               ),
             ],
@@ -205,18 +216,24 @@ class DateHeaderWidget extends StatelessWidget {
               Icon(
                 Icons.settings_outlined,
                 size: 18.sp,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : AppTheme.grey700,
+                color: ThemeUtils.getColorWithOpacity(
+                  context,
+                  lightColor: AppTheme.grey700,
+                  darkColor: Colors.white,
+                  opacity: ThemeUtils.isDarkMode(context) ? 0.8 : 1.0,
+                ),
               ),
               SizedBox(width: 8.w),
               Text(
                 '설정',
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white.withValues(alpha: 0.9)
-                      : AppTheme.grey800,
+                  color: ThemeUtils.getColorWithOpacity(
+                    context,
+                    lightColor: AppTheme.grey800,
+                    darkColor: Colors.white,
+                    opacity: ThemeUtils.isDarkMode(context) ? 0.9 : 1.0,
+                  ),
                 ),
               ),
             ],

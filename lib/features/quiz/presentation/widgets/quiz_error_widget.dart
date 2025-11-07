@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
+import '../../../../app/core/utils/theme_utils.dart';
 
 /// 퀴즈 에러 상태 위젯
 class QuizErrorWidget extends StatelessWidget {
@@ -18,7 +19,7 @@ class QuizErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return Center(
       child: Column(
