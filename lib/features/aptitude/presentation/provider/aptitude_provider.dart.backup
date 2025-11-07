@@ -101,45 +101,17 @@ class AptitudeProvider with ChangeNotifier {
     }
   }
 
-  /// ✅ [최적화] 특정 타입의 상세 결과를 가져와 currentResult에 저장
-  /// 이미 로드된 allTypes 데이터를 재사용하여 불필요한 API 호출 방지!
+  /// 특정 타입의 상세 결과를 가져와 currentResult에 저장
   Future<bool> fetchResultByType(String typeCode) async {
     debugPrint('🔎 [APTITUDE_PROVIDER] fetchResultByType 시작: $typeCode');
     
     try {
       _setLoading(true);
-      _errorMessage = null;
+      _errorMessage = null; // 이전 에러 메시지 초기화
       
-      // ✅ [최적화] 이미 로드된 allTypes 데이터가 있으면 그걸 사용!
-      if (_allTypes.isNotEmpty) {
-        debugPrint('💾 [APTITUDE_PROVIDER] 캐시된 데이터에서 검색 중...');
-        
-        try {
-          final matchedType = _allTypes.firstWhere(
-            (type) => type.typeCode.toUpperCase() == typeCode.toUpperCase(),
-          );
-          
-          debugPrint('✅ [APTITUDE_PROVIDER] 캐시에서 발견: ${matchedType.typeName}');
-          
-          // 캐시된 데이터로 즉시 결과 생성 (API 호출 없음!)
-          _currentResult = AptitudeResult(
-            typeName: matchedType.typeName,
-            typeDescription: matchedType.description,
-            master: _getDefaultMasterForType(typeCode), // 기본 거장 정보
-          );
-          
-          debugPrint('✅ [APTITUDE_PROVIDER] 캐시 데이터로 결과 생성 완료 - API 호출 없음!');
-          _setLoading(false);
-          return true;
-        } catch (e) {
-          debugPrint('⚠️ [APTITUDE_PROVIDER] 캐시에서 찾기 실패: $e');
-          // 캐시에서 못 찾으면 아래 API 호출로 넘어감
-        }
-      }
+      debugPrint('📡 [APTITUDE_PROVIDER] Repository 호출 중...');
       
-      // 캐시가 없거나 찾기 실패하면 API 호출 (기존 로직)
-      debugPrint('📡 [APTITUDE_PROVIDER] 캐시 없음 - Repository 호출 중...');
-      
+      // 타임아웃과 함께 실행 (수정된 버전)
       _currentResult = await _repository.getResultByType(typeCode).timeout(
         const Duration(seconds: 30),
         onTimeout: () {
@@ -149,7 +121,7 @@ class AptitudeProvider with ChangeNotifier {
       );
       
       if (_currentResult != null) {
-        debugPrint('✅ [APTITUDE_PROVIDER] API로 결과 로드 성공: ${_currentResult!.typeName}');
+        debugPrint('✅ [APTITUDE_PROVIDER] 결과 로드 성공: ${_currentResult!.typeName}');
         debugPrint('   거장: ${_currentResult!.master.name}');
         return true;
       } else {
@@ -165,62 +137,6 @@ class AptitudeProvider with ChangeNotifier {
     } finally {
       debugPrint('🏁 [APTITUDE_PROVIDER] fetchResultByType 완료');
       _setLoading(false);
-    }
-  }
-  
-  /// ✅ [추가] 타입 코드에 맞는 기본 거장 정보 반환
-  /// Mock Repository의 로직을 재사용하여 일관성 유지
-  InvestmentMaster _getDefaultMasterForType(String typeCode) {
-    switch (typeCode.toUpperCase()) {
-      case 'STABLE':
-        return InvestmentMaster(
-          name: '워렌 버핏',
-          imageUrl: 'https://placehold.co/100x100/4285F4/FFFFFF?text=WB',
-          description: '오마하의 현인으로 불리는 워렌 버핏은 가치 투자의 대가입니다.',
-          portfolio: {'Apple': 45.6, '은행주': 25.0, '기타': 29.4},
-        );
-      case 'AGGRESSIVE':
-        return InvestmentMaster(
-          name: '조지 소로스',
-          imageUrl: 'https://placehold.co/100x100/EA4335/FFFFFF?text=GS',
-          description: '퀀텀 펀드의 창립자로 알려진 조지 소로스는 거시경제 분석을 통한 투기적 투자로 유명합니다.',
-          portfolio: {'선물': 35.0, '주식': 25.0, '원자재': 20.0, '현금': 20.0},
-        );
-      case 'NEUTRAL':
-        return InvestmentMaster(
-          name: '레이 달리오',
-          imageUrl: 'https://placehold.co/100x100/34A853/FFFFFF?text=RD',
-          description: '브리지워터 어소시에이츠의 창립자인 레이 달리오는 올웨더 포트폴리오로 유명합니다.',
-          portfolio: {'주식': 30.0, '채권': 40.0, '원자재': 15.0, '기타': 15.0},
-        );
-      case 'CONSERVATIVE':
-        return InvestmentMaster(
-          name: '벤저민 그레이엄',
-          imageUrl: 'https://placehold.co/100x100/9C27B0/FFFFFF?text=BG',
-          description: '가치 투자의 아버지로 불리는 벤저민 그레이엄입니다.',
-          portfolio: {'가치주': 50.0, '채권': 30.0, '배당주': 15.0, '현금': 5.0},
-        );
-      case 'GROWTH':
-        return InvestmentMaster(
-          name: '캐시 우드',
-          imageUrl: 'https://placehold.co/100x100/FF9800/FFFFFF?text=CW',
-          description: 'ARK 인베스트의 CEO인 캐시 우드는 파괴적 혁신 기업에 투자하는 것으로 유명합니다.',
-          portfolio: {'Tesla': 15.0, 'Nvidia': 12.0, '혁신기업': 60.0, '기타': 13.0},
-        );
-      case 'DIVIDEND':
-        return InvestmentMaster(
-          name: '존 보글',
-          imageUrl: 'https://placehold.co/100x100/607D8B/FFFFFF?text=JB',
-          description: '뱅가드 그룹의 창립자인 존 보글은 인덱스 펀드의 아버지로 불립니다.',
-          portfolio: {'배당주': 40.0, 'REIT': 25.0, '유틸리티': 20.0, '채권': 15.0},
-        );
-      default:
-        return InvestmentMaster(
-          name: '투자 전문가',
-          imageUrl: 'https://placehold.co/100x100/999999/FFFFFF?text=??',
-          description: '당신의 투자 성향에 맞는 전문가',
-          portfolio: {'주식': 50.0, '채권': 30.0, '현금': 20.0},
-        );
     }
   }
 
