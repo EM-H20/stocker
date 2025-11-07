@@ -11,6 +11,7 @@ import 'widgets/theory_page_widget.dart';
 import 'widgets/theory_navigation_widget.dart';
 import 'widgets/theory_empty_state_widget.dart';
 import '../../../app/core/utils/theme_utils.dart';
+import '../../../app/core/widgets/loading_widget.dart';
 
 class TheoryScreen extends StatefulWidget {
   const TheoryScreen({super.key, required this.chapterId});
@@ -108,11 +109,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
 
   /// 로딩 상태 위젯
   Widget _buildLoadingState() {
-    return const Center(
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.successColor),
-      ),
-    );
+    return const Center(child: LoadingWidget());
   }
 
   /// 이론 콘텐츠 빌드

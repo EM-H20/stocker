@@ -9,6 +9,7 @@ import 'widgets/global_progress_bar.dart';
 import 'package:stocker/app/config/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import 'education_provider.dart';
+import '../../../app/core/widgets/loading_widget.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -152,7 +153,7 @@ class _EducationScreenState extends State<EducationScreen> {
               Consumer<EducationProvider>(
                 builder: (context, provider, child) {
                   if (provider.isLoadingChapters) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: LoadingWidget());
                   }
 
                   if (provider.chaptersError != null) {

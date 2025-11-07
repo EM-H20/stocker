@@ -7,6 +7,7 @@ import '../../../note/presentation/provider/note_provider.dart';
 import '../../../../app/config/app_routes.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/utils/theme_utils.dart';
+import '../../../../app/core/widgets/loading_widget.dart';
 
 /// 노트 섹션 위젯 - 실제 Note 기능과 연결됨
 class NoteSection extends StatelessWidget {
@@ -63,7 +64,7 @@ class NoteSection extends StatelessWidget {
               ),
               SizedBox(height: 12.h),
               if (noteProvider.isLoading)
-                const Center(child: CircularProgressIndicator())
+                const Center(child: LoadingWidget())
               else if (displayNotes.isEmpty)
                 _buildEmptyState(context)
               else

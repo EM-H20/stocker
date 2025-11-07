@@ -6,6 +6,7 @@ import '../../../app/config/app_routes.dart';
 import '../../../app/config/app_theme.dart';
 import 'quiz_provider.dart';
 import '../../../app/core/utils/theme_utils.dart';
+import '../../../app/core/widgets/loading_widget.dart';
 
 class QuizResultScreen extends StatefulWidget {
   const QuizResultScreen({super.key, required this.chapterId});
@@ -86,9 +87,7 @@ class _QuizResultScreenState extends State<QuizResultScreen>
       body: Consumer<QuizProvider>(
         builder: (context, provider, child) {
           if (provider.isLoadingResults) {
-            return Center(
-              child: CircularProgressIndicator(color: AppTheme.successColor),
-            );
+            return Center(child: LoadingWidget());
           }
 
           if (provider.resultsError != null || provider.quizResults.isEmpty) {

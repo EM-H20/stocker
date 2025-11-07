@@ -14,6 +14,7 @@ import 'widgets/quiz_option_widget.dart';
 import 'widgets/quiz_explanation_widget.dart';
 import 'widgets/quiz_navigation_widget.dart';
 import 'widgets/quiz_error_widget.dart';
+import '../../../app/core/widgets/loading_widget.dart';
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key, required this.chapterId, this.singleQuizId, this.isReadOnly = false});
@@ -156,9 +157,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
   /// 로딩 상태 위젯
   Widget _buildLoadingState() {
-    return const Center(
-      child: CircularProgressIndicator(color: AppTheme.successColor),
-    );
+    return const Center(child: LoadingWidget());
   }
 
   /// 빈 상태 위젯
