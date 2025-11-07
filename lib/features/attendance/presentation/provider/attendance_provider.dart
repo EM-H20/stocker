@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../domain/model/attendance_quiz.dart';
 import '../../domain/repository/attendance_repository.dart';
-import '../../../auth/presentation/auth_provider.dart';
 import '../../data/dto/quiz_submission_dto.dart';
 
 class AttendanceProvider with ChangeNotifier {
   final AttendanceRepository _repository;
-  final AuthProvider _authProvider;
 
-  AttendanceProvider(this._repository, this._authProvider);
+  AttendanceProvider(this._repository);
 
   // dispose 상태 체크를 위한 플래그
   bool _disposed = false;

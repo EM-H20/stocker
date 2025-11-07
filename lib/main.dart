@@ -199,13 +199,10 @@ class StockerApp extends StatelessWidget {
         ),
 
         // Attendance Provider (subin 새 기능)
-        ChangeNotifierProxyProvider<AuthProvider, AttendanceProvider>(
+        ChangeNotifierProvider(
           create: (context) => AttendanceProvider(
             context.read<AttendanceRepository>(),
-            context.read<AuthProvider>(),
           ),
-          update: (context, auth, _) =>
-              AttendanceProvider(context.read<AttendanceRepository>(), auth),
         ),
 
         // Aptitude Provider (subin 새 기능)
