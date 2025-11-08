@@ -49,10 +49,10 @@ import 'app/config/app_router.dart';
 // import 'features/aptitude/data/repository/aptitude_api_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/aptitude/data/repository/aptitude_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/aptitude/presentation/provider/aptitude_provider.dart'; // 🔥 Riverpod으로 이동됨
-import 'features/learning/presentation/provider/learning_progress_provider.dart';
-import 'features/learning/data/repository/learning_progress_mock_repository.dart';
-import 'features/learning/data/repository/learning_progress_api_repository.dart';
-import 'features/learning/data/source/learning_progress_api.dart';
+// import 'features/learning/presentation/provider/learning_progress_provider.dart'; // 🔥 Riverpod으로 교체됨
+// import 'features/learning/data/repository/learning_progress_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/learning/data/repository/learning_progress_api_repository.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/learning/data/source/learning_progress_api.dart'; // 🔥 Riverpod으로 이동됨
 
 // 노트 기능 (subin 새 기능)
 // import 'features/note/domain/repository/note_repository.dart'; // 🔥 Riverpod으로 이동됨
@@ -231,148 +231,22 @@ class StockerApp extends StatelessWidget {
         //   create: (context) => NoteProvider(context.read<NoteRepository>()),
         // ),
 
-        // Learning Progress Provider (Repository 패턴 적용) - 🚀 새로운 안전한 구조
-        legacy_provider.ChangeNotifierProvider(
-          create: (context) {
-            debugPrint(
-                '🎯 [PROVIDER] Creating LearningProgressProvider (useMock: $useMock)');
+        // 🔥 [RIVERPOD] LearningProgressNotifier - Repository 패턴으로 Riverpod 변환 완료!
+        // LearningProgressProvider는 더 이상 사용되지 않음 (Riverpod으로 교체됨)
+        // Repository Provider는 app/core/providers/riverpod/repository_providers.dart 참고
+        // 사용법: ref.read(learningProgressNotifierProvider.notifier).completeChapter(chapterId)
 
-            LearningProgressProvider learningProgressProvider;
-            if (useMock) {
-              // Mock 환경: Mock Repository 사용
-              final mockRepository = LearningProgressMockRepository();
-              learningProgressProvider =
-                  LearningProgressProvider(mockRepository);
-            } else {
-              // Real 환경: API Repository 사용
-              final learningProgressApi = LearningProgressApi(dio);
-              // 🔥 TODO: EducationProvider → EducationNotifier로 변경 필요
-              // final educationProvider = context.read<EducationProvider>();
-              final apiRepository = LearningProgressApiRepository(
-                  learningProgressApi, null); // 임시로 null 전달
-              learningProgressProvider =
-                  LearningProgressProvider(apiRepository);
-            }
+        // 🔥 콜백 시스템은 모든 Provider → Notifier 변환 완료 후 재활성화 예정
+        // 현재 비활성화된 콜백들:
+        // - EducationNotifier → LearningProgressNotifier: completeChapter
+        // - QuizNotifier → EducationNotifier: updateQuizCompletion
+        // - QuizNotifier → WrongNoteNotifier: submitWrongAnswers
 
-            // 🔥 단 한 번만 실행되는 콜백 등록 로직을 여기에 배치!
-            debugPrint(
-                '🔗 [PROVIDER] Setting up one-time Provider callbacks...');
-
-            // 🔥 TODO: EducationProvider → EducationNotifier로 변경 필요
-            // final educationProvider = context.read<EducationProvider>();
-            // 🔥 TODO: QuizProvider → QuizNotifier로 변경 필요
-            // final quizProvider = context.read<QuizProvider>();
-            // 🔥 TODO: WrongNoteProvider → WrongNoteNotifier로 변경 필요
-            // final wrongNoteProvider = context.read<WrongNoteProvider>();
-
-            // 🎯 콜백 등록 (create에서 단 한 번만 실행됨!)
-
-            // 🔥 TODO: EducationNotifier로 변환 후 다시 활성화 필요
-            // // 1. EducationProvider -> LearningProgressProvider 콜백
-            // educationProvider.addOnChapterCompletedCallback((int chapterId) {
-            //   debugPrint(
-            //       '🎉 [CALLBACK] 챕터 $chapterId 완료 - LearningProgress에 알림');
-            //   learningProgressProvider.completeChapter(chapterId);
-            // });
-
-            // // 2. QuizProvider -> EducationProvider 콜백
-            // quizProvider.addOnQuizCompletedCallback((chapterId, result) {
-            //   debugPrint(
-            //       '🎯 [CALLBACK] 퀴즈 $chapterId 완료 - Education에 알림 (${result.scorePercentage}%)');
-            //   educationProvider.updateQuizCompletion(chapterId,
-            //       isPassed: result.isPassed);
-            // });
-
-            // 🔥 TODO: QuizNotifier로 변환 후 다시 활성화 필요
-            // // 3. QuizProvider -> WrongNoteProvider 일반 퀴즈 콜백
-            // quizProvider.addOnQuizCompletedCallback((chapterId, result) async {
-            //   debugPrint(
-            //       '📝 [GENERAL_QUIZ_CALLBACK] 일반 퀴즈 $chapterId 완료 - 오답노트 업데이트 시작...');
-            //   try {
-            //     final currentSession = quizProvider.currentQuizSession;
-            //     if (currentSession != null &&
-            //         !currentSession.isSingleQuizMode) {
-            //       debugPrint(
-            //           '✅ [GENERAL_QUIZ_CALLBACK] 일반 퀴즈 모드 확인됨. 계속 진행...');
-            //
-            //       final wrongItems = <Map<String, dynamic>>[];
-            //       for (int i = 0; i < currentSession.quizList.length; i++) {
-            //         final quiz = currentSession.quizList[i];
-            //         final userAnswer = currentSession.userAnswers[i];
-            //
-            //         if (userAnswer != null &&
-            //             userAnswer != quiz.correctAnswerIndex) {
-            //           wrongItems.add({
-            //             'quiz_id': quiz.id,
-            //             'selected_option': userAnswer + 1, // 0-based -> 1-based
-            //           });
-            //         }
-            //       }
-            //
-            //       await wrongNoteProvider.submitQuizResults(
-            //           chapterId, wrongItems);
-            //       debugPrint(
-            //           '✅ [GENERAL_QUIZ_CALLBACK] 오답노트 업데이트 완료 - ${wrongItems.length}개 오답 항목');
-            //     }
-            //   } catch (e) {
-            //     debugPrint('❌ [GENERAL_QUIZ_CALLBACK] 오답노트 업데이트 실패: $e');
-            //   }
-            // });
-
-            // 🔥 TODO: QuizNotifier로 변환 후 다시 활성화 필요
-            // // 4. QuizProvider -> WrongNoteProvider 단일 퀴즈 콜백 (핵심!)
-            // quizProvider.addOnSingleQuizCompletedCallback(
-            //     (chapterId, quizId, isCorrect, selectedOption) async {
-            //   final isReadOnlyMode = quizProvider.isReadOnlyMode;
-            //   debugPrint(
-            //       '🎯 [SINGLE_QUIZ_CALLBACK] 단일 퀴즈 완료 - Chapter: $chapterId, Quiz: $quizId, 정답: $isCorrect, ReadOnly: $isReadOnlyMode');
-            //
-            //   if (isReadOnlyMode) {
-            //     // 📖 읽기 전용 모드: DB 수정 없이 프론트엔드 상태만 업데이트
-            //     debugPrint(
-            //         '📖 [SINGLE_QUIZ_CALLBACK] 읽기 전용 모드 - DB 수정 없이 프론트엔드 상태만 업데이트');
-            //     if (isCorrect) {
-            //       // 🛡️ ReadOnly 모드에서는 로컬 상태만 업데이트하고 절대 삭제하지 않음
-            //       wrongNoteProvider.markAsRetriedLocally(quizId);
-            //       debugPrint(
-            //           '✅ [SINGLE_QUIZ_CALLBACK] Quiz $quizId 로컬 재시도 마크 완료 (DB 수정 없음, 삭제 없음!)');
-            //     } else {
-            //       // ReadOnly 모드에서 오답일 경우도 DB에 추가하지 않음
-            //       debugPrint(
-            //           '📖 [SINGLE_QUIZ_CALLBACK] ReadOnly 모드에서 오답 - DB 추가 없음');
-            //     }
-            //     return; // 읽기 전용 모드에서는 여기서 완전 종료
-            //   }
-            //
-            //   // 🔄 일반 모드: 기존 로직 유지 (DB 수정 포함)
-            //   if (isCorrect) {
-            //     // ✅ 정답: 오답노트에서 삭제하지 않고 재시도 마크만 업데이트
-            //     try {
-            //       await wrongNoteProvider.markAsRetried(quizId);
-            //       debugPrint(
-            //           '✅ [SINGLE_QUIZ_CALLBACK] Quiz $quizId 재시도 완료 마크 - 복습용으로 유지됨');
-            //     } catch (e) {
-            //       debugPrint(
-            //           '❌ [SINGLE_QUIZ_CALLBACK] Quiz $quizId 재시도 마크 실패: $e');
-            //     }
-            //   } else {
-            //     // ❌ 오답: 오답노트에 추가 (기존과 동일)
-            //     try {
-            //       await wrongNoteProvider.submitSingleQuizResult(
-            //           chapterId, quizId, selectedOption);
-            //       debugPrint(
-            //           '✅ [SINGLE_QUIZ_CALLBACK] 오답노트에 Quiz $quizId 추가 완료');
-            //     } catch (e) {
-            //       debugPrint('❌ [SINGLE_QUIZ_CALLBACK] Quiz $quizId 추가 실패: $e');
-            //     }
-            //   }
-            // });
-
-            debugPrint('✅ [PROVIDER] 모든 콜백 등록 완료 (단 한 번만 실행됨!)');
-
-            return learningProgressProvider;
-          },
-        ),
+        // 🔥 TODO: 모든 Provider → Notifier 변환 완료 후 콜백 시스템 재활성화 필요
+        // 주석 처리된 콜백들:
+        // - QuizProvider -> EducationProvider: updateQuizCompletion
+        // - QuizProvider -> WrongNoteProvider: 일반 퀴즈 오답 제출
+        // - QuizProvider -> WrongNoteProvider: 단일 퀴즈 오답 처리
       ],
       child: ScreenUtilInit(
         designSize: const Size(393, 852),
