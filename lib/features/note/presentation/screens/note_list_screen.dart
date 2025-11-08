@@ -1,11 +1,11 @@
 // FILE: lib/features/note/presentation/screens/note_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/config/app_routes.dart';
+import '../../../../app/core/widgets/loading_widget.dart';
 import '../constants/note_templates.dart';
 import '../provider/note_provider.dart';
 import '../widgets/note_card.dart';
@@ -62,10 +62,9 @@ class _NoteListScreenState extends State<NoteListScreen> {
         ),
       ),
       body: provider.isLoading
-          ? Center(
-              child: SpinKitFadingCircle(
-                color: Theme.of(context).primaryColor,
-                size: 50.w,
+          ? const Center(
+              child: LoadingWidget(
+                message: '노트를 불러오는 중...',
               ),
             )
           : notes.isEmpty

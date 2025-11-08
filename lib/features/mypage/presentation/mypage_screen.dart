@@ -6,6 +6,7 @@ import '../../note/presentation/provider/note_provider.dart';
 import '../../aptitude/presentation/provider/aptitude_provider.dart';
 import '../../attendance/presentation/provider/attendance_provider.dart';
 import '../../auth/presentation/auth_provider.dart'; // AuthProvider 추가
+import '../../../app/core/widgets/loading_widget.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/aptitude_analysis_card.dart';
 import 'widgets/attendance_status_card.dart';
@@ -124,22 +125,8 @@ class _MypageScreenState extends State<MypageScreen> {
                   // 로딩 상태 표시
                   if (authProvider.isUpdatingProfile) ...[
                     SizedBox(height: 8.h),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 16.w,
-                          height: 16.h,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        SizedBox(width: 8.w),
-                        Text(
-                          '닉네임 변경 중...',
-                          style: TextStyle(
-                            fontSize: 12.sp,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
+                    const LoadingWidget.small(
+                      message: '닉네임 변경 중...',
                     ),
                   ],
                   

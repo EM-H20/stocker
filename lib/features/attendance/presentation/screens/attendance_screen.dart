@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
+import '../../../../app/core/widgets/loading_widget.dart';
 import '../provider/attendance_provider.dart';
 import '../widgets/attendance_calendar.dart';
 import '../widgets/attendance_quiz_dialog.dart';
@@ -79,9 +79,8 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                 const AttendanceCalendar(),
                 const Spacer(),
                 if (provider.isQuizLoading)
-                  SpinKitFadingCircle(
-                    color: Theme.of(context).primaryColor,
-                    size: 50.r,
+                  const LoadingWidget(
+                    message: '퀴즈를 불러오는 중...',
                   )
                 else
                   ActionButton(
