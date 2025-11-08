@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
+import '../../../../app/core/widgets/app_card.dart';
 
 // 현재 진행 학습 정보 카드 위젯
 class CurrentLearningCard extends StatelessWidget {
@@ -29,17 +30,12 @@ class CurrentLearningCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     // 현재 진행 학습 정보 카드 위젯
-    return Card(
-      elevation: 4,
-      color: Theme.of(context).cardColor,
-      shadowColor: Theme.of(context).shadowColor.withValues(alpha: 0.3),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+    return AppCard(
+      padding: EdgeInsets.all(20.w),
       margin: EdgeInsets.zero,
-      child: Padding(
-        padding: EdgeInsets.all(20.w), // 기존 20.w에서 확대
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
             // 챕터 헤더
             Row(
               children: [
@@ -187,7 +183,6 @@ class CurrentLearningCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }

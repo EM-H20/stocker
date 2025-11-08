@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/config/app_routes.dart';
 import '../../../wrong_note/presentation/wrong_note_provider.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/widgets/app_card.dart';
 
 /// 오답노트 카드 위젯
 class WrongNoteCard extends StatelessWidget {
@@ -52,25 +53,9 @@ class WrongNoteCard extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 12.h),
-              Container(
-                width: double.infinity,
+              AppCard(
                 padding: EdgeInsets.all(20.w),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: Theme.of(context).dividerColor,
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color:
-                          Theme.of(context).shadowColor.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
+                borderRadius: 12.0,
                 child: Row(
                   children: [
                     Expanded(

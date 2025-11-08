@@ -6,6 +6,7 @@ import '../../../../app/core/widgets/action_button.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/config/app_routes.dart';
 import '../../data/models/wrong_note_response.dart';
+import '../../../../app/core/widgets/app_card.dart';
 
 /// 개별 오답 카드 위젯
 ///
@@ -27,31 +28,15 @@ class WrongAnswerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
+    return AppCard(
       margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark
-            ? AppTheme.darkSurface
-            : Colors.grey[50],
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: theme.brightness == Brightness.dark
-              ? AppTheme.grey600.withValues(alpha: 0.3)
-              : AppTheme.grey300.withValues(alpha: 0.5),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: theme.brightness == Brightness.dark
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.grey.withValues(alpha: 0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-            spreadRadius: 0,
-          ),
-        ],
-      ),
+      backgroundColor: theme.brightness == Brightness.dark
+          ? AppTheme.darkSurface
+          : Colors.grey[50],
+      borderColor: theme.brightness == Brightness.dark
+          ? AppTheme.grey600.withValues(alpha: 0.3)
+          : AppTheme.grey300.withValues(alpha: 0.5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
