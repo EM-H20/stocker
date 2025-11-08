@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
 import '../wrong_note_screen.dart';
 import '../../../../app/core/utils/theme_utils.dart';
+import '../../../../app/core/widgets/app_card.dart';
 
 /// 오답노트 상단 통계 카드 위젯
 ///
@@ -20,31 +21,15 @@ class WrongNoteStatsCard extends StatelessWidget {
     final retriedCount = wrongAnswers.where((item) => item.isRetried).length;
     final pendingCount = totalWrong - retriedCount;
 
-    return Container(
+    return AppCard(
       margin: EdgeInsets.all(16.w),
       padding: EdgeInsets.all(20.w),
-      decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark
-            ? AppTheme.darkSurface
-            : Colors.grey[50],
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: theme.brightness == Brightness.dark
-              ? AppTheme.grey600.withValues(alpha: 0.3)
-              : AppTheme.grey300.withValues(alpha: 0.5),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: theme.brightness == Brightness.dark
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.grey.withValues(alpha: 0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-            spreadRadius: 0,
-          ),
-        ],
-      ),
+      backgroundColor: theme.brightness == Brightness.dark
+          ? AppTheme.darkSurface
+          : Colors.grey[50],
+      borderColor: theme.brightness == Brightness.dark
+          ? AppTheme.grey600.withValues(alpha: 0.3)
+          : AppTheme.grey300.withValues(alpha: 0.5),
       child: Row(
         children: [
           // 아이콘

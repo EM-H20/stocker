@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/widgets/app_card.dart';
 
 /// 현재 진행 챕터 정보 카드 위젯
 ///
@@ -25,15 +26,10 @@ class ChapterInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Card(
-      elevation: theme.cardTheme.elevation,
-      color: Theme.of(context).cardColor,
-      shape: theme.cardTheme.shape,
-      child: Padding(
-        padding: EdgeInsets.all(20.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    return AppCard.standard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
             // 챕터 헤더
             Row(
               children: [
@@ -82,7 +78,6 @@ class ChapterInfoCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
     );
   }
 }
