@@ -30,7 +30,6 @@ dependencies:
   shared_preferences: ^2.5.3       # 유저 설정값 등 간단 캐시 저장
 
   # 상태 관리
-  provider: ^6.1.5                 # 전역 상태 관리 (Riverpod 마이그레이션 중 - 곧 제거 예정)
   flutter_riverpod: ^2.6.1         # Riverpod 상태 관리
   riverpod_annotation: ^2.6.1      # Riverpod 코드 생성 annotation
   freezed_annotation: ^2.4.4       # Immutable state 클래스 생성

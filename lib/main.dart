@@ -1,7 +1,6 @@
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart' as legacy_provider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
@@ -46,41 +45,38 @@ class StockerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return legacy_provider.MultiProvider(
-      providers: [],
-      child: ScreenUtilInit(
-        designSize: const Size(393, 852),
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (context, child) {
-          return Consumer(
-            builder: (context, ref, child) {
-              final currentThemeMode = ref.watch(themeModeProvider);
+    return ScreenUtilInit(
+      designSize: const Size(393, 852),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final currentThemeMode = ref.watch(themeModeProvider);
 
-              return MaterialApp.router(
-                title: 'Stocker',
-                debugShowCheckedModeBanner: false,
-                theme: AppTheme.lightTheme,
-                darkTheme: AppTheme.darkTheme,
-                themeMode: currentThemeMode,
-                locale: const Locale('ko'),
-                localizationsDelegates: const [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                  quill.FlutterQuillLocalizations.delegate,
-                ],
-                supportedLocales: [
-                  const Locale('en'),
-                  const Locale('ko'),
-                  ...quill.FlutterQuillLocalizations.supportedLocales,
-                ],
-                routerConfig: AppRouter.router,
-              );
-            },
-          );
-        },
-      ),
+            return MaterialApp.router(
+              title: 'Stocker',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: currentThemeMode,
+              locale: const Locale('ko'),
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+                quill.FlutterQuillLocalizations.delegate,
+              ],
+              supportedLocales: [
+                const Locale('en'),
+                const Locale('ko'),
+                ...quill.FlutterQuillLocalizations.supportedLocales,
+              ],
+              routerConfig: AppRouter.router,
+            );
+          },
+        );
+      },
     );
   }
 }

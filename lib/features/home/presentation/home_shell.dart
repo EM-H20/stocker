@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:provider/provider.dart' as legacy_provider; // 🔥 Riverpod으로 완전 전환
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔥 Riverpod 추가
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'tap_item.dart';
 import '../../../app/config/app_routes.dart';
-// import '../../auth/presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
-import '../../auth/presentation/riverpod/auth_notifier.dart'; // 🔥 Riverpod AuthNotifier
-// import '../../attendance/presentation/provider/attendance_provider.dart'; // 🔥 Riverpod으로 교체됨
-import '../../attendance/presentation/riverpod/attendance_notifier.dart'; // 🔥 Riverpod AttendanceNotifier
+import '../../auth/presentation/riverpod/auth_notifier.dart';
+import '../../attendance/presentation/riverpod/attendance_notifier.dart';
 import '../../attendance/presentation/widgets/attendance_quiz_dialog.dart';
 import '../../../app/core/utils/theme_utils.dart';
 

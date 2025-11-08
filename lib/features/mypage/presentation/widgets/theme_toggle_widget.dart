@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../app/config/app_theme.dart';
-import '../../../../app/core/providers/theme_provider.dart';
+import '../../../../app/core/providers/riverpod/theme_notifier.dart';
 
 /// 테마 선택 토글 위젯
-class ThemeToggleWidget extends StatelessWidget {
+class ThemeToggleWidget extends ConsumerWidget {
   const ThemeToggleWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 🔥 Riverpod: ref.watch로 상태 구독
+    final currentThemeMode = ref.watch(themeNotifierProvider);
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
       child: Column(
@@ -22,88 +25,85 @@ class ThemeToggleWidget extends StatelessWidget {
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           SizedBox(height: 12.h),
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              return Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(16.w),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: Theme.of(context).dividerColor,
-                    width: 1,
-                  ),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16.w),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: Theme.of(context).dividerColor,
+                width: 1,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '화면 테마',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '화면 테마',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                    SizedBox(height: 12.h),
-                    Row(
-                      children: AppThemeMode.values.map((mode) {
-                        final isSelected =
-                            themeProvider.currentThemeMode == mode;
+                SizedBox(height: 12.h),
+                Row(
+                  children: AppThemeMode.values.map((mode) {
+                    final isSelected = currentThemeMode == mode;
 
-                        return Expanded(
-                          child: GestureDetector(
-                            onTap: () => themeProvider.setThemeMode(mode),
-                            child: Container(
-                              margin: EdgeInsets.symmetric(horizontal: 2.w),
-                              padding: EdgeInsets.symmetric(vertical: 12.h),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppTheme.primaryColor
-                                    : Theme.of(context).cardColor,
-                                borderRadius: BorderRadius.circular(8.r),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? AppTheme.primaryColor
-                                      : Theme.of(context).dividerColor,
-                                ),
-                              ),
-                              child: Text(
-                                mode.displayName,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: isSelected
-                                      ? Colors.white
-                                      : Theme.of(
-                                          context,
-                                        ).textTheme.bodyMedium?.color,
-                                  fontSize: 12.sp,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.w500,
-                                ),
-                              ),
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => ref
+                            .read(themeNotifierProvider.notifier)
+                            .setThemeMode(mode),
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 2.w),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppTheme.primaryColor
+                                : Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(8.r),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppTheme.primaryColor
+                                  : Theme.of(context).dividerColor,
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ),
-                    SizedBox(height: 8.h),
-                    Text(
-                      _getThemeDescription(themeProvider.currentThemeMode),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(
-                              context,
-                            )
-                                .textTheme
-                                .bodySmall
-                                ?.color
-                                ?.withValues(alpha: 0.7),
+                          child: Text(
+                            mode.displayName,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.white
+                                  : Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium?.color,
+                              fontSize: 12.sp,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                            ),
                           ),
-                    ),
-                  ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-              );
-            },
+                SizedBox(height: 8.h),
+                Text(
+                  _getThemeDescription(currentThemeMode),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(
+                          context,
+                        )
+                            .textTheme
+                            .bodySmall
+                            ?.color
+                            ?.withValues(alpha: 0.7),
+                      ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
