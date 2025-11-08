@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart' as legacy_provider;
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
 import '../../../../app/core/widgets/error_message_widget.dart';
 import '../../../attendance/presentation/provider/attendance_provider.dart';
 import '../../../wrong_note/presentation/wrong_note_provider.dart';
 import '../../../aptitude/presentation/provider/aptitude_provider.dart';
-import '../../../education/presentation/education_provider.dart';
+import '../../../education/presentation/riverpod/education_notifier.dart';
 import '../../../../app/core/utils/theme_utils.dart';
 
 /// 메인 대시보드 통계 카드들 위젯
-class StatsCardsWidget extends StatefulWidget {
+class StatsCardsWidget extends ConsumerStatefulWidget {
   const StatsCardsWidget({super.key});
 
   @override
-  State<StatsCardsWidget> createState() => _StatsCardsWidgetState();
+  ConsumerState<StatsCardsWidget> createState() => _StatsCardsWidgetState();
 }
 
-class _StatsCardsWidgetState extends State<StatsCardsWidget> {
+class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
   @override
   void initState() {
     super.initState();
@@ -31,7 +32,7 @@ class _StatsCardsWidgetState extends State<StatsCardsWidget> {
 
       context.read<AttendanceProvider>().initialize();
       context.read<WrongNoteProvider>().loadWrongNotes();
-      context.read<EducationProvider>().loadChapters();
+      ref.read(educationNotifierProvider.notifier).loadChapters();
       context.read<AptitudeProvider>().checkPreviousResult();
     });
   }
@@ -46,6 +47,9 @@ class _StatsCardsWidgetState extends State<StatsCardsWidget> {
 
   /// 통계 정보 카드
   Widget _buildStatsCard(BuildContext context) {
+    // Riverpod으로 EducationState 가져오기
+    final educationState = ref.watch(educationNotifierProvider);
+
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
@@ -65,14 +69,14 @@ class _StatsCardsWidgetState extends State<StatsCardsWidget> {
           ),
         ],
       ),
-      child: Consumer4<AttendanceProvider, WrongNoteProvider, AptitudeProvider,
-          EducationProvider>(
+      child: legacy_provider.Consumer3<AttendanceProvider, WrongNoteProvider,
+          AptitudeProvider>(
         builder: (context, attendanceProvider, wrongNoteProvider,
-            aptitudeProvider, educationProvider, child) {
+            aptitudeProvider, child) {
           // 로딩 상태 체크
           final isAnyLoading = attendanceProvider.isLoading ||
               wrongNoteProvider.isLoading ||
-              educationProvider.isLoadingChapters ||
+              educationState.isLoadingChapters ||
               aptitudeProvider.isLoading;
 
           if (isAnyLoading) {
@@ -82,7 +86,7 @@ class _StatsCardsWidgetState extends State<StatsCardsWidget> {
           // 에러 상태 체크
           final hasError = attendanceProvider.errorMessage != null ||
               wrongNoteProvider.errorMessage != null ||
-              educationProvider.chaptersError != null ||
+              educationState.chaptersError != null ||
               aptitudeProvider.errorMessage != null;
 
           if (hasError) {
@@ -90,7 +94,7 @@ class _StatsCardsWidgetState extends State<StatsCardsWidget> {
               context,
               attendanceProvider,
               wrongNoteProvider,
-              educationProvider,
+              educationState,
               aptitudeProvider,
             );
           }
@@ -101,9 +105,9 @@ class _StatsCardsWidgetState extends State<StatsCardsWidget> {
 
           // 교육 진행률 데이터
           final completedChapters =
-              educationProvider.getCompletedChapterCount();
-          final totalChapters = educationProvider.chapters.length;
-          final educationProgress = educationProvider.globalProgressPercentage;
+              educationState.getCompletedChapterCount();
+          final totalChapters = educationState.chapters.length;
+          final educationProgress = educationState.globalProgressPercentage;
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +205,7 @@ class _StatsCardsWidgetState extends State<StatsCardsWidget> {
               ),
 
               // 교육 진행률 (로딩 중이 아니고 챕터가 있을 때만)
-              if (!educationProvider.isLoadingChapters &&
+              if (!educationState.isLoadingChapters &&
                   totalChapters > 0) ...[
                 SizedBox(height: 8.h),
                 Row(
@@ -344,7 +348,7 @@ class _StatsCardsWidgetState extends State<StatsCardsWidget> {
     BuildContext context,
     AttendanceProvider attendanceProvider,
     WrongNoteProvider wrongNoteProvider,
-    EducationProvider educationProvider,
+    dynamic educationState,
     AptitudeProvider aptitudeProvider,
   ) {
     return Column(
@@ -355,7 +359,7 @@ class _StatsCardsWidgetState extends State<StatsCardsWidget> {
           onRetry: () {
             attendanceProvider.initialize();
             wrongNoteProvider.loadWrongNotes();
-            educationProvider.loadChapters();
+            ref.read(educationNotifierProvider.notifier).loadChapters();
             aptitudeProvider.checkPreviousResult();
           },
         ),

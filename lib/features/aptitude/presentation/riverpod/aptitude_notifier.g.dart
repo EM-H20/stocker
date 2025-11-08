@@ -6,11 +6,9 @@ part of 'aptitude_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$aptitudeNotifierHash() => r'82ebe2f50126272d904fb5bdc5ba6aac74998ff8';
+String _$aptitudeNotifierHash() => r'80fd61aa8d149752f27f81688e4a9571d02947f7';
 
-/// 🔥 Riverpod 기반 성향분석 상태 관리 Notifier
-///
-/// Copied from [AptitudeNotifier].
+/// See also [AptitudeNotifier].
 @ProviderFor(AptitudeNotifier)
 final aptitudeNotifierProvider =
     AutoDisposeNotifierProvider<AptitudeNotifier, AptitudeState>.internal(
