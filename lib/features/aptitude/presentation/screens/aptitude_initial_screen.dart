@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import '../../../../app/core/widgets/loading_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -43,9 +43,10 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
       body: Padding(
         padding: EdgeInsets.all(24.w),
         child: provider.isLoading
-            ? Center(
-                child: SpinKitFadingCircle(
-                    color: Theme.of(context).colorScheme.primary))
+            ? const Center(
+                child: LoadingWidget(
+                  message: '투자 성향 정보를 불러오는 중...',
+                ))
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
+import '../../../../app/core/widgets/loading_widget.dart';
 import '../../data/dto/quiz_submission_dto.dart';
 import '../../domain/model/attendance_quiz.dart';
 import '../provider/attendance_provider.dart';
@@ -138,9 +138,8 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
             ),
             SizedBox(height: 20.h),
             if (provider.isSubmitting)
-              SpinKitFadingCircle(
-                color: AppTheme.successColor,
-                size: 40.r,
+              const LoadingWidget(
+                message: '제출 중...',
               ),
           ],
         ),

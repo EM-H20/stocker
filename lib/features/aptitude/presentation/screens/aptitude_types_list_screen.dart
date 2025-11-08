@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import '../../../../app/core/widgets/loading_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -78,9 +78,10 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
         title: const Text('모든 투자 성향 둘러보기'),
       ),
       body: provider.isLoading
-          ? Center(
-              child: SpinKitFadingCircle(
-                  color: Theme.of(context).colorScheme.primary))
+          ? const Center(
+              child: LoadingWidget(
+                message: '투자 성향 유형을 불러오는 중...',
+              ))
           : allTypes.isEmpty
               ? Center(
                   child: Column(
@@ -173,9 +174,8 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      SpinKitFadingCircle(
-                                        color: Theme.of(context).colorScheme.primary,
-                                        size: 40.r,
+                                      const LoadingWidget.small(
+                                        message: '분석 중...',
                                       ),
                                       SizedBox(height: 16.h),
                                       Text(
