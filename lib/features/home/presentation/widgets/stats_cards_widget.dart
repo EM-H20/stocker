@@ -5,8 +5,8 @@ import 'package:provider/provider.dart' as legacy_provider;
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
 import '../../../../app/core/widgets/error_message_widget.dart';
-import '../../../attendance/presentation/provider/attendance_provider.dart';
-import '../../../wrong_note/presentation/wrong_note_provider.dart';
+import '../../../attendance/presentation/riverpod/attendance_notifier.dart';
+import '../../../wrong_note/presentation/riverpod/wrong_note_notifier.dart';
 import '../../../aptitude/presentation/provider/aptitude_provider.dart';
 import '../../../education/presentation/riverpod/education_notifier.dart';
 import '../../../../app/core/utils/theme_utils.dart';
@@ -30,8 +30,8 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      context.read<AttendanceProvider>().initialize();
-      context.read<WrongNoteProvider>().loadWrongNotes();
+      // 🔥 Riverpod: AttendanceNotifier, WrongNoteNotifier는 build()에서 자동 초기화됨
+      ref.read(wrongNoteNotifierProvider.notifier).loadWrongNotes();
       ref.read(educationNotifierProvider.notifier).loadChapters();
       context.read<AptitudeProvider>().checkPreviousResult();
     });
@@ -69,13 +69,15 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
           ),
         ],
       ),
-      child: legacy_provider.Consumer3<AttendanceProvider, WrongNoteProvider,
-          AptitudeProvider>(
-        builder: (context, attendanceProvider, wrongNoteProvider,
-            aptitudeProvider, child) {
+      child: legacy_provider.Consumer<AptitudeProvider>(
+        builder: (context, aptitudeProvider, child) {
+          // 🔥 Riverpod: ref.watch로 상태 가져오기
+          final attendanceState = ref.watch(attendanceNotifierProvider);
+          final wrongNoteState = ref.watch(wrongNoteNotifierProvider);
+
           // 로딩 상태 체크
-          final isAnyLoading = attendanceProvider.isLoading ||
-              wrongNoteProvider.isLoading ||
+          final isAnyLoading = attendanceState.isLoading ||
+              wrongNoteState.isLoading ||
               educationState.isLoadingChapters ||
               aptitudeProvider.isLoading;
 
@@ -84,24 +86,24 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
           }
 
           // 에러 상태 체크
-          final hasError = attendanceProvider.errorMessage != null ||
-              wrongNoteProvider.errorMessage != null ||
+          final hasError = attendanceState.errorMessage != null ||
+              wrongNoteState.errorMessage != null ||
               educationState.chaptersError != null ||
               aptitudeProvider.errorMessage != null;
 
           if (hasError) {
             return _buildErrorState(
               context,
-              attendanceProvider,
-              wrongNoteProvider,
+              attendanceState,
+              wrongNoteState,
               educationState,
               aptitudeProvider,
             );
           }
 
           final attendedDays =
-              attendanceProvider.attendanceStatus.values.where((v) => v).length;
-          final wrongNotes = wrongNoteProvider.wrongNotes.length;
+              attendanceState.attendanceStatus.values.where((v) => v).length;
+          final wrongNotes = wrongNoteState.wrongNotes.length;
 
           // 교육 진행률 데이터
           final completedChapters =
@@ -346,8 +348,8 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
   /// 에러 상태 위젯
   Widget _buildErrorState(
     BuildContext context,
-    AttendanceProvider attendanceProvider,
-    WrongNoteProvider wrongNoteProvider,
+    dynamic attendanceState,
+    dynamic wrongNoteState,
     dynamic educationState,
     AptitudeProvider aptitudeProvider,
   ) {
@@ -357,8 +359,8 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
         ErrorMessageWidget(
           message: '학습 현황을 불러오지 못했습니다',
           onRetry: () {
-            attendanceProvider.initialize();
-            wrongNoteProvider.loadWrongNotes();
+            // 🔥 Riverpod: Notifier는 자동으로 재시도
+            ref.read(wrongNoteNotifierProvider.notifier).loadWrongNotes();
             ref.read(educationNotifierProvider.notifier).loadChapters();
             aptitudeProvider.checkPreviousResult();
           },

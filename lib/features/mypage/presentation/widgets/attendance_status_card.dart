@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/config/app_routes.dart';
-import '../../../attendance/presentation/provider/attendance_provider.dart';
+import '../../../attendance/presentation/riverpod/attendance_notifier.dart';
 import '../../../../app/core/utils/theme_utils.dart';
 
 /// 출석현황 카드 위젯
-class AttendanceStatusCard extends StatelessWidget {
+class AttendanceStatusCard extends ConsumerWidget {
   const AttendanceStatusCard({super.key});
 
   // 현재 주의 시작 날짜 계산 (월요일 기준)
@@ -25,7 +25,14 @@ class AttendanceStatusCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 🔥 Riverpod: ref.watch로 상태 구독
+    final attendanceState = ref.watch(attendanceNotifierProvider);
+    final now = DateTime.now();
+    final startOfWeek = _getStartOfWeek(now);
+    final weekInfo = _getWeekInfo(startOfWeek);
+    final attendanceStatus = attendanceState.attendanceStatus;
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
       child: Column(
@@ -55,77 +62,68 @@ class AttendanceStatusCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 12.h),
-          Consumer<AttendanceProvider>(
-            builder: (context, attendanceProvider, child) {
-              final now = DateTime.now();
-              final startOfWeek = _getStartOfWeek(now);
-              final weekInfo = _getWeekInfo(startOfWeek);
-              final attendanceStatus = attendanceProvider.attendanceStatus;
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                weekInfo,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.color
+                          ?.withValues(alpha: 0.7),
+                    ),
+              ),
+              SizedBox(height: 16.h),
+              // 출석 현황 원형 표시
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(7, (index) {
+                  final currentDay = startOfWeek.add(Duration(days: index));
+                  final dayKey = DateTime.utc(
+                      currentDay.year, currentDay.month, currentDay.day);
+                  final isAttended = attendanceStatus[dayKey] ?? false;
+                  final isToday = _isSameDay(currentDay, now);
+                  final isPastDay = currentDay
+                      .isBefore(DateTime(now.year, now.month, now.day));
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    weekInfo,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.color
-                              ?.withValues(alpha: 0.7),
+                  return Column(
+                    children: [
+                      Container(
+                        width: 32.w,
+                        height: 32.w,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isToday
+                              ? Theme.of(context).primaryColor
+                              : isAttended
+                                  ? AppTheme.successColor
+                                  : isPastDay
+                                      ? Colors.red.withValues(alpha: 0.7)
+                                      : Theme.of(context).disabledColor,
                         ),
-                  ),
-                  SizedBox(height: 16.h),
-                  // 출석 현황 원형 표시
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(7, (index) {
-                      final currentDay = startOfWeek.add(Duration(days: index));
-                      final dayKey = DateTime.utc(
-                          currentDay.year, currentDay.month, currentDay.day);
-                      final isAttended = attendanceStatus[dayKey] ?? false;
-                      final isToday = _isSameDay(currentDay, now);
-                      final isPastDay = currentDay
-                          .isBefore(DateTime(now.year, now.month, now.day));
-
-                      return Column(
-                        children: [
-                          Container(
-                            width: 32.w,
-                            height: 32.w,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isToday
-                                  ? Theme.of(context).primaryColor
-                                  : isAttended
-                                      ? AppTheme.successColor
-                                      : isPastDay
-                                          ? Colors.red.withValues(alpha: 0.7)
-                                          : Theme.of(context).disabledColor,
-                            ),
-                            child: Center(
-                              child: Text(
-                                '${currentDay.day}',
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: (isToday || isAttended || isPastDay)
-                                      ? Colors.white
-                                      : Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.color,
-                                ),
-                              ),
+                        child: Center(
+                          child: Text(
+                            '${currentDay.day}',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                              color: (isToday || isAttended || isPastDay)
+                                  ? Colors.white
+                                  : Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color,
                             ),
                           ),
-                        ],
-                      );
-                    }),
-                  ),
-                ],
-              );
-            },
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ],
           ),
         ],
       ),
