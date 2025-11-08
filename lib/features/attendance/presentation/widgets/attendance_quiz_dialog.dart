@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
 import '../../data/dto/quiz_submission_dto.dart';
 import '../../domain/model/attendance_quiz.dart';
-import '../provider/attendance_provider.dart';
+import '../riverpod/attendance_notifier.dart';
 import '../../../../app/core/utils/theme_utils.dart';
 
-/// 출석 퀴즈 팝업 다이얼로그 (StatefulWidget)
-class AttendanceQuizDialog extends StatefulWidget {
+/// 출석 퀴즈 팝업 다이얼로그 (ConsumerStatefulWidget)
+class AttendanceQuizDialog extends ConsumerStatefulWidget {
   final List<AttendanceQuiz> quizzes;
 
   const AttendanceQuizDialog({super.key, required this.quizzes});
 
   @override
-  State<AttendanceQuizDialog> createState() => _AttendanceQuizDialogState();
+  ConsumerState<AttendanceQuizDialog> createState() => _AttendanceQuizDialogState();
 }
 
-class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
+class _AttendanceQuizDialogState extends ConsumerState<AttendanceQuizDialog> {
   int _currentIndex = 0;
   bool? _selectedAnswer;
   bool _showResult = false;
@@ -58,16 +58,17 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
 
   Future<void> _submitAttendance() async {
     if (!mounted) return;
-    final provider = context.read<AttendanceProvider>();
-    final success = await provider.submitQuiz(_userAnswers);
+    final notifier = ref.read(attendanceNotifierProvider.notifier);
+    final success = await notifier.submitQuiz(_userAnswers);
 
     if (mounted) {
+      final attendanceState = ref.read(attendanceNotifierProvider);
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(success
               ? '출석이 완료되었습니다!'
-              : provider.errorMessage ?? '출석 처리 중 오류가 발생했습니다.'),
+              : attendanceState.errorMessage ?? '출석 처리 중 오류가 발생했습니다.'),
           backgroundColor:
               success ? AppTheme.successColor : AppTheme.errorColor,
         ),
@@ -77,7 +78,7 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<AttendanceProvider>();
+    final attendanceState = ref.watch(attendanceNotifierProvider);
     final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return AlertDialog(
@@ -137,7 +138,7 @@ class _AttendanceQuizDialogState extends State<AttendanceQuizDialog> {
               ],
             ),
             SizedBox(height: 20.h),
-            if (provider.isSubmitting)
+            if (attendanceState.isSubmitting)
               const LoadingWidget(
                 message: '제출 중...',
               ),

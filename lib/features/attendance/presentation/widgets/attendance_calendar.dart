@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../app/config/app_theme.dart';
-import '../provider/attendance_provider.dart';
+import '../riverpod/attendance_notifier.dart';
 
 /// 출석 달력을 표시하는 위젯
-class AttendanceCalendar extends StatelessWidget {
+class AttendanceCalendar extends ConsumerWidget {
   const AttendanceCalendar({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final provider = context.watch<AttendanceProvider>();
-    final attendanceStatus = provider.attendanceStatus;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final attendanceState = ref.watch(attendanceNotifierProvider);
+    final attendanceStatus = attendanceState.attendanceStatus;
 
     return TableCalendar(
       locale: 'ko_KR', // 한글 로케일 설정
@@ -76,9 +76,9 @@ class AttendanceCalendar extends StatelessWidget {
           shape: BoxShape.circle,
         ),
       ),
-      // 월이 변경될 때마다 Provider를 통해 API 호출
+      // 월이 변경될 때마다 Riverpod를 통해 API 호출
       onPageChanged: (focusedDay) {
-        provider.fetchAttendanceStatus(focusedDay);
+        ref.read(attendanceNotifierProvider.notifier).fetchAttendanceStatus(focusedDay);
       },
       // 출석한 날에 이벤트 마커(점) 표시
       eventLoader: (day) {

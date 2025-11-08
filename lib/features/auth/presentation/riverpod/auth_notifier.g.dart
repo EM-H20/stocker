@@ -25,7 +25,7 @@ final authNotifierProvider =
 
 typedef _$AuthNotifier = AutoDisposeAsyncNotifier<AuthState>;
 String _$loginSuccessNotifierHash() =>
-    r'2acd11fbb286819eb08ac644f6518e180fecf8a9';
+    r'9be893ab84941aa089fb13708c77ad5bb6555f97';
 
 /// 🔥 로그인 성공 이벤트 Notifier
 /// HomeShell에서 출석 퀴즈 모달을 띄우기 위한 이벤트 Provider

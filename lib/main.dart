@@ -37,8 +37,8 @@ import 'features/note/presentation/provider/note_provider.dart';
 // import 'features/auth/data/repository/auth_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 
 // 출석 기능 (subin에서 강화)
-import 'features/attendance/presentation/provider/attendance_provider.dart';
-import 'features/attendance/domain/repository/attendance_repository.dart';
+// import 'features/attendance/presentation/provider/attendance_provider.dart'; // 🔥 Riverpod으로 교체됨
+// import 'features/attendance/domain/repository/attendance_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/attendance/data/source/attendance_api.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/attendance/data/repository/attendance_api_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/attendance/data/repository/attendance_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
@@ -213,12 +213,12 @@ class StockerApp extends StatelessWidget {
           },
         ),
 
-        // Attendance Provider (subin 새 기능)
-        legacy_provider.ChangeNotifierProvider(
-          create: (context) => AttendanceProvider(
-            context.read<AttendanceRepository>(),
-          ),
-        ),
+        // 🔥 Attendance Provider는 Riverpod으로 이동됨 (AttendanceNotifier)
+        // legacy_provider.ChangeNotifierProvider(
+        //   create: (context) => AttendanceProvider(
+        //     context.read<AttendanceRepository>(),
+        //   ),
+        // ),
 
         // Aptitude Provider (subin 새 기능)
         legacy_provider.ChangeNotifierProvider(
