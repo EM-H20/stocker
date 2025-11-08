@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../domain/model/aptitude_question.dart';
 import '../../domain/model/aptitude_result.dart';
-import '../../domain/model/aptitude_type_summary.dart';
 import '../../domain/repository/aptitude_repository.dart';
 import '../../data/dto/aptitude_answer_request.dart';
 import '../../../../app/core/providers/riverpod/repository_providers.dart';
 import 'aptitude_state.dart';
 
 part 'aptitude_notifier.g.dart';
-
-/// 🔥 Riverpod 기반 성향분석 상태 관리 Notifier
 @riverpod
 class AptitudeNotifier extends _$AptitudeNotifier {
   @override

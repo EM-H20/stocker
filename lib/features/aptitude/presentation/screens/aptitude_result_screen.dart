@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
 import '../riverpod/aptitude_notifier.dart';
-import '../riverpod/aptitude_state.dart';
 import '../widgets/master_portfolio_chart.dart';
 import '../../domain/model/aptitude_result.dart';
 

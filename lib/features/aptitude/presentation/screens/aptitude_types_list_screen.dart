@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
 import '../riverpod/aptitude_notifier.dart';
-import '../riverpod/aptitude_state.dart';
 
 /// 모든 투자 성향 종류를 보여주는 목록 화면
 class AptitudeTypesListScreen extends ConsumerStatefulWidget {

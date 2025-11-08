@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
 import '../riverpod/aptitude_notifier.dart';
-import '../riverpod/aptitude_state.dart';
 
 class AptitudeInitialScreen extends ConsumerStatefulWidget {
   const AptitudeInitialScreen({super.key});

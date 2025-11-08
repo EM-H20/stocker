@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
 import '../riverpod/aptitude_notifier.dart';
-import '../riverpod/aptitude_state.dart';
 import '../widgets/quiz_option_button.dart';
 
 /// 24개의 성향 분석 질문에 답변하는 화면
