@@ -47,10 +47,6 @@ import 'package:stocker/main.dart' show useMock;
 
 part 'repository_providers.g.dart';
 
-/// 🔥 Riverpod 기반 Repository Providers
-/// Mock/Real API 전환을 위한 Repository 제공자들
-
-/// 인증 Repository Provider
 @riverpod
 AuthRepository authRepository(Ref ref) {
   return useMock
@@ -58,7 +54,6 @@ AuthRepository authRepository(Ref ref) {
       : AuthApiRepository(AuthApi(dio));
 }
 
-/// 출석 Repository Provider
 @riverpod
 AttendanceRepository attendanceRepository(Ref ref) {
   return useMock
@@ -66,7 +61,6 @@ AttendanceRepository attendanceRepository(Ref ref) {
       : AttendanceApiRepository(AttendanceApi(dio));
 }
 
-/// 성향분석 Repository Provider
 @riverpod
 AptitudeRepository aptitudeRepository(Ref ref) {
   return useMock
@@ -74,7 +68,6 @@ AptitudeRepository aptitudeRepository(Ref ref) {
       : AptitudeApiRepository(AptitudeApi(dio));
 }
 
-/// 노트 Repository Provider
 @riverpod
 NoteRepository noteRepository(Ref ref) {
   return useMock
@@ -82,7 +75,6 @@ NoteRepository noteRepository(Ref ref) {
       : NoteApiRepository(NoteApi(dio));
 }
 
-/// 교육 Repository Provider
 @riverpod
 Object educationRepository(Ref ref) {
   const storage = FlutterSecureStorage();
@@ -91,7 +83,6 @@ Object educationRepository(Ref ref) {
       : EducationRepository(EducationApi(dio), storage);
 }
 
-/// 퀴즈 Repository Provider
 @riverpod
 Object quizRepository(Ref ref) {
   const storage = FlutterSecureStorage();
@@ -100,7 +91,6 @@ Object quizRepository(Ref ref) {
       : QuizRepository(QuizApi(dio), storage);
 }
 
-/// 오답노트 Repository Provider
 @riverpod
 Object wrongNoteRepository(Ref ref) {
   return useMock
@@ -108,7 +98,6 @@ Object wrongNoteRepository(Ref ref) {
       : WrongNoteRepository(WrongNoteApi(dio));
 }
 
-/// 학습 진도 Repository Provider
 @riverpod
 LearningProgressRepository learningProgressRepository(Ref ref) {
   return useMock
