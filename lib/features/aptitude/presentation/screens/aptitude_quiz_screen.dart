@@ -3,21 +3,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
-import '../provider/aptitude_provider.dart';
+import '../riverpod/aptitude_notifier.dart';
+import '../riverpod/aptitude_state.dart';
 import '../widgets/quiz_option_button.dart';
 
 /// 24개의 성향 분석 질문에 답변하는 화면
-class AptitudeQuizScreen extends StatefulWidget {
+class AptitudeQuizScreen extends ConsumerStatefulWidget {
   const AptitudeQuizScreen({super.key});
 
   @override
-  State<AptitudeQuizScreen> createState() => _AptitudeQuizScreenState();
+  ConsumerState<AptitudeQuizScreen> createState() => _AptitudeQuizScreenState();
 }
 
-class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
+class _AptitudeQuizScreenState extends ConsumerState<AptitudeQuizScreen> {
   // 여러 페이지의 질문을 관리하기 위한 PageController
   final PageController _pageController = PageController();
 
@@ -26,7 +27,7 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
     super.initState();
     // 화면이 처음 빌드된 후, Provider를 통해 검사 질문지를 불러옵니다.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AptitudeProvider>().startTest();
+      ref.read(aptitudeNotifierProvider.notifier).startTest();
     });
   }
 
@@ -38,17 +39,18 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
 
   /// 결과 제출 로직
   Future<void> _submit() async {
-    final provider = context.read<AptitudeProvider>();
-    final success = await provider.submitAnswers();
+    final notifier = ref.read(aptitudeNotifierProvider.notifier);
+    final success = await notifier.submitAnswers();
 
     if (mounted && success) {
       // pushReplacement를 사용하여 뒤로가기 시 퀴즈 화면으로 돌아오지 않도록 함
       context.pushReplacement(AppRoutes.aptitudeResult);
     } else if (mounted) {
       // 실패 시 에러 메시지 표시
+      final state = ref.read(aptitudeNotifierProvider);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(provider.errorMessage ?? '결과 제출에 실패했습니다.'),
+          content: Text(state.errorMessage ?? '결과 제출에 실패했습니다.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -57,16 +59,16 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Provider를 watch하여 상태 변경 시 UI를 다시 그리도록 함
-    final provider = context.watch<AptitudeProvider>();
-    final questions = provider.questions;
+    // Riverpod을 watch하여 상태 변경 시 UI를 다시 그리도록 함
+    final state = ref.watch(aptitudeNotifierProvider);
+    final questions = state.questions;
     final totalQuestions = questions.length;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('투자 성향 분석'),
       ),
-      body: provider.isLoading && questions.isEmpty
+      body: state.isLoading && questions.isEmpty
           ? const Center(
               child: LoadingWidget(
               message: '투자 성향 테스트를 불러오는 중...',
@@ -78,11 +80,11 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                   padding: EdgeInsets.all(16.w),
                   child: LinearPercentIndicator(
                     percent: totalQuestions > 0
-                        ? (provider.answers.length / totalQuestions)
+                        ? (state.answers.length / totalQuestions)
                         : 0,
                     lineHeight: 12.h,
                     center: Text(
-                      '${provider.answers.length} / $totalQuestions',
+                      '${state.answers.length} / $totalQuestions',
                       style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 10.sp,
@@ -131,11 +133,11 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                                 padding: EdgeInsets.only(bottom: 12.h),
                                 child: QuizOptionButton(
                                   text: choice.text,
-                                  isSelected: provider.answers[question.id] ==
+                                  isSelected: state.answers[question.id] ==
                                       choice.value,
                                   onPressed: () {
-                                    // 답변을 Provider에 저장
-                                    provider.answerQuestion(
+                                    // 답변을 Notifier에 저장
+                                    ref.read(aptitudeNotifierProvider.notifier).answerQuestion(
                                         question.id, choice.value);
 
                                     // 마지막 문제가 아니면 다음 페이지로 자동 이동
@@ -160,7 +162,7 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                 Padding(
                   padding: EdgeInsets.all(24.w),
                   child: ElevatedButton(
-                    onPressed: (provider.answers.length == totalQuestions &&
+                    onPressed: (state.answers.length == totalQuestions &&
                             totalQuestions > 0)
                         ? _submit
                         : null, // 모든 질문에 답하지 않으면 버튼 비활성화
@@ -173,7 +175,7 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
                               ? Colors.grey[300]
                               : Colors.grey[700],
                     ),
-                    child: provider.isLoading
+                    child: state.isLoading
                         ? CircularProgressIndicator(
                             color: Theme.of(context).colorScheme.onPrimary,
                             strokeWidth: 2.0)

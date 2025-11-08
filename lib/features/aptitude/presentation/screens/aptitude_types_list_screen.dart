@@ -2,27 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
-import '../provider/aptitude_provider.dart';
+import '../riverpod/aptitude_notifier.dart';
+import '../riverpod/aptitude_state.dart';
 
 /// 모든 투자 성향 종류를 보여주는 목록 화면
-class AptitudeTypesListScreen extends StatefulWidget {
+class AptitudeTypesListScreen extends ConsumerStatefulWidget {
   const AptitudeTypesListScreen({super.key});
 
   @override
-  State<AptitudeTypesListScreen> createState() =>
+  ConsumerState<AptitudeTypesListScreen> createState() =>
       _AptitudeTypesListScreenState();
 }
 
-class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
+class _AptitudeTypesListScreenState extends ConsumerState<AptitudeTypesListScreen> {
   @override
   void initState() {
     super.initState();
     // 화면이 처음 빌드될 때, Provider를 통해 모든 성향 타입 목록을 가져옵니다.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AptitudeProvider>().fetchAllTypes();
+      ref.read(aptitudeNotifierProvider.notifier).fetchAllTypes();
     });
   }
 
@@ -70,14 +71,14 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<AptitudeProvider>();
-    final allTypes = provider.allTypes;
+    final state = ref.watch(aptitudeNotifierProvider);
+    final allTypes = state.allTypes;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('모든 투자 성향 둘러보기'),
       ),
-      body: provider.isLoading
+      body: state.isLoading
           ? const Center(
               child: LoadingWidget(
               message: '투자 성향 유형을 불러오는 중...',
@@ -103,7 +104,7 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                       SizedBox(height: 16.h),
                       ElevatedButton(
                         onPressed: () {
-                          context.read<AptitudeProvider>().fetchAllTypes();
+                          ref.read(aptitudeNotifierProvider.notifier).fetchAllTypes();
                         },
                         child: const Text('다시 시도'),
                       ),
@@ -193,11 +194,11 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
 
                           try {
                             // currentResult 초기화 (이전 결과 제거)
-                            provider.clearCurrentResult();
+                            ref.read(aptitudeNotifierProvider.notifier).clearCurrentResult();
 
                             // 해당 성향의 상세 정보 가져오기
                             final success =
-                                await provider.fetchResultByType(type.typeCode);
+                                await ref.read(aptitudeNotifierProvider.notifier).fetchResultByType(type.typeCode);
 
                             // 로딩 다이얼로그 닫기
                             if (context.mounted) {
@@ -212,9 +213,10 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                             } else if (context.mounted) {
                               debugPrint('❌ [APTITUDE_TYPES] 데이터 로드 실패');
                               // 에러 처리
+                              final currentState = ref.read(aptitudeNotifierProvider);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(provider.errorMessage ??
+                                  content: Text(currentState.errorMessage ??
                                       '정보를 불러오는데 실패했습니다'),
                                   backgroundColor: Colors.red,
                                 ),

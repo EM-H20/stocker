@@ -44,11 +44,11 @@ import 'app/config/app_router.dart';
 // import 'features/attendance/data/repository/attendance_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 
 // 성향분석 기능 (subin에서 완전 구현)
-import 'features/aptitude/domain/repository/aptitude_repository.dart';
+// import 'features/aptitude/domain/repository/aptitude_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/aptitude/data/source/aptitude_api.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/aptitude/data/repository/aptitude_api_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/aptitude/data/repository/aptitude_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
-import 'features/aptitude/presentation/provider/aptitude_provider.dart';
+// import 'features/aptitude/presentation/provider/aptitude_provider.dart'; // 🔥 Riverpod으로 이동됨
 import 'features/learning/presentation/provider/learning_progress_provider.dart';
 import 'features/learning/data/repository/learning_progress_mock_repository.dart';
 import 'features/learning/data/repository/learning_progress_api_repository.dart';
@@ -220,11 +220,11 @@ class StockerApp extends StatelessWidget {
         //   ),
         // ),
 
-        // Aptitude Provider (subin 새 기능)
-        legacy_provider.ChangeNotifierProvider(
-          create: (context) =>
-              AptitudeProvider(context.read<AptitudeRepository>()),
-        ),
+        // 🔥 Aptitude Provider는 Riverpod으로 이동됨 (AptitudeNotifier)
+        // legacy_provider.ChangeNotifierProvider(
+        //   create: (context) =>
+        //       AptitudeProvider(context.read<AptitudeRepository>()),
+        // ),
 
         // 🔥 Note Provider는 Riverpod으로 이동됨 (NoteNotifier)
         // legacy_provider.ChangeNotifierProvider(

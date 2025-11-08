@@ -2,30 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
-import '../provider/aptitude_provider.dart';
+import '../riverpod/aptitude_notifier.dart';
+import '../riverpod/aptitude_state.dart';
 
-class AptitudeInitialScreen extends StatefulWidget {
+class AptitudeInitialScreen extends ConsumerStatefulWidget {
   const AptitudeInitialScreen({super.key});
 
   @override
-  State<AptitudeInitialScreen> createState() => _AptitudeInitialScreenState();
+  ConsumerState<AptitudeInitialScreen> createState() => _AptitudeInitialScreenState();
 }
 
-class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
+class _AptitudeInitialScreenState extends ConsumerState<AptitudeInitialScreen> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AptitudeProvider>().checkPreviousResult();
+      ref.read(aptitudeNotifierProvider.notifier).checkPreviousResult();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<AptitudeProvider>();
+    final state = ref.watch(aptitudeNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +43,7 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
       ),
       body: Padding(
         padding: EdgeInsets.all(24.w),
-        child: provider.isLoading
+        child: state.isLoading
             ? const Center(
                 child: LoadingWidget(
                 message: '투자 성향 정보를 불러오는 중...',
@@ -108,7 +109,7 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                               minimumSize: const Size(double.infinity, 50),
                             ),
                             child: Text(
-                              provider.hasPreviousResult
+                              state.hasPreviousResult
                                   ? '재검사하고 새로운 성향 찾기'
                                   : '투자 성향 분석 시작하기',
                               style: const TextStyle(
@@ -122,14 +123,14 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
                     ),
                   ),
                   SizedBox(height: 24.h),
-                  if (provider.hasPreviousResult)
+                  if (state.hasPreviousResult)
                     TextButton(
                       onPressed: () {
                         debugPrint(
                             '📋 [APTITUDE_INITIAL] 이전 결과 다시보기 버튼 클릭 - 기존 결과로 이동');
                         // ✅ [수정] 결과 화면으로 이동
                         // currentResult를 초기화해서 myResult를 보도록 함
-                        provider.clearCurrentResult();
+                        ref.read(aptitudeNotifierProvider.notifier).clearCurrentResult();
                         context.push(AppRoutes.aptitudeResult);
                       },
                       child: Text(

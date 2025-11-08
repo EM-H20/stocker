@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
-import '../provider/aptitude_provider.dart';
+import '../riverpod/aptitude_notifier.dart';
+import '../riverpod/aptitude_state.dart';
 import '../widgets/master_portfolio_chart.dart';
 import '../../domain/model/aptitude_result.dart';
 
-class AptitudeResultScreen extends StatelessWidget {
+class AptitudeResultScreen extends ConsumerWidget {
   /// 이 화면이 '나의 결과'를 보여주는지, '다른 성향'을 보여주는지 구분하는 플래그
   final bool isMyResult;
 
   const AptitudeResultScreen({super.key, this.isMyResult = true});
 
   @override
-  Widget build(BuildContext context) {
-    final AptitudeResult? result =
-        context.select((AptitudeProvider p) => p.currentResult ?? p.myResult);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(aptitudeNotifierProvider);
+    final AptitudeResult? result = state.currentResult ?? state.myResult;
 
     if (result == null) {
       return const Scaffold(
