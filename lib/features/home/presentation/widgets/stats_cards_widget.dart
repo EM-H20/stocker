@@ -2,16 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/widgets/loading_widget.dart';
+import '../../../../app/core/widgets/error_message_widget.dart';
 import '../../../attendance/presentation/provider/attendance_provider.dart';
 import '../../../wrong_note/presentation/wrong_note_provider.dart';
-import '../../../note/presentation/provider/note_provider.dart';
 import '../../../aptitude/presentation/provider/aptitude_provider.dart';
 import '../../../education/presentation/education_provider.dart';
 import '../../../../app/core/utils/theme_utils.dart';
 
 /// 메인 대시보드 통계 카드들 위젯
-class StatsCardsWidget extends StatelessWidget {
+class StatsCardsWidget extends StatefulWidget {
   const StatsCardsWidget({super.key});
+
+  @override
+  State<StatsCardsWidget> createState() => _StatsCardsWidgetState();
+}
+
+class _StatsCardsWidgetState extends State<StatsCardsWidget> {
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      context.read<AttendanceProvider>().initialize();
+      context.read<WrongNoteProvider>().loadWrongNotes();
+      context.read<EducationProvider>().loadChapters();
+      context.read<AptitudeProvider>().checkPreviousResult();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,10 +65,36 @@ class StatsCardsWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: Consumer5<AttendanceProvider, WrongNoteProvider, NoteProvider,
-          AptitudeProvider, EducationProvider>(
-        builder: (context, attendanceProvider, wrongNoteProvider, noteProvider,
+      child: Consumer4<AttendanceProvider, WrongNoteProvider, AptitudeProvider,
+          EducationProvider>(
+        builder: (context, attendanceProvider, wrongNoteProvider,
             aptitudeProvider, educationProvider, child) {
+          // 로딩 상태 체크
+          final isAnyLoading = attendanceProvider.isLoading ||
+              wrongNoteProvider.isLoading ||
+              educationProvider.isLoadingChapters ||
+              aptitudeProvider.isLoading;
+
+          if (isAnyLoading) {
+            return _buildLoadingState(context);
+          }
+
+          // 에러 상태 체크
+          final hasError = attendanceProvider.errorMessage != null ||
+              wrongNoteProvider.errorMessage != null ||
+              educationProvider.chaptersError != null ||
+              aptitudeProvider.errorMessage != null;
+
+          if (hasError) {
+            return _buildErrorState(
+              context,
+              attendanceProvider,
+              wrongNoteProvider,
+              educationProvider,
+              aptitudeProvider,
+            );
+          }
+
           final attendedDays =
               attendanceProvider.attendanceStatus.values.where((v) => v).length;
           final wrongNotes = wrongNoteProvider.wrongNotes.length;
@@ -274,6 +323,44 @@ class StatsCardsWidget extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  /// 로딩 상태 위젯
+  Widget _buildLoadingState(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(height: 40.h),
+        const LoadingWidget.small(
+          message: '학습 현황 불러오는 중...',
+        ),
+        SizedBox(height: 40.h),
+      ],
+    );
+  }
+
+  /// 에러 상태 위젯
+  Widget _buildErrorState(
+    BuildContext context,
+    AttendanceProvider attendanceProvider,
+    WrongNoteProvider wrongNoteProvider,
+    EducationProvider educationProvider,
+    AptitudeProvider aptitudeProvider,
+  ) {
+    return Column(
+      children: [
+        SizedBox(height: 20.h),
+        ErrorMessageWidget(
+          message: '학습 현황을 불러오지 못했습니다',
+          onRetry: () {
+            attendanceProvider.initialize();
+            wrongNoteProvider.loadWrongNotes();
+            educationProvider.loadChapters();
+            aptitudeProvider.checkPreviousResult();
+          },
+        ),
+        SizedBox(height: 20.h),
+      ],
     );
   }
 }

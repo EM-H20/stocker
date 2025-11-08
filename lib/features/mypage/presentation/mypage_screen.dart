@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import '../../wrong_note/presentation/wrong_note_provider.dart';
 import '../../note/presentation/provider/note_provider.dart';
-import '../../aptitude/presentation/provider/aptitude_provider.dart';
-import '../../attendance/presentation/provider/attendance_provider.dart';
-import '../../auth/presentation/auth_provider.dart'; // AuthProvider 추가
+import '../../auth/presentation/auth_provider.dart';
 import '../../../app/core/widgets/loading_widget.dart';
 import 'widgets/profile_header.dart';
 import 'widgets/aptitude_analysis_card.dart';
@@ -13,6 +10,7 @@ import 'widgets/attendance_status_card.dart';
 import 'widgets/wrong_note_card.dart';
 import 'widgets/note_section.dart';
 import 'widgets/theme_toggle_widget.dart';
+import '../../home/presentation/widgets/stats_cards_widget.dart';
 
 class MypageScreen extends StatefulWidget {
   const MypageScreen({super.key});
@@ -26,11 +24,8 @@ class _MypageScreenState extends State<MypageScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 모든 provider 초기화
+      // NoteProvider만 초기화 (다른 Provider는 StatsCardsWidget에서 처리)
       context.read<NoteProvider>().fetchAllNotes();
-      context.read<WrongNoteProvider>().loadWrongNotes();
-      context.read<AptitudeProvider>().checkPreviousResult();
-      context.read<AttendanceProvider>().initialize();
     });
   }
 
@@ -55,6 +50,11 @@ class _MypageScreenState extends State<MypageScreen> {
               ),
 
               SizedBox(height: 8.h),
+
+              // 학습 현황 통계
+              const StatsCardsWidget(),
+
+              SizedBox(height: 16.h),
 
               // 투자성향 분석
               const AptitudeAnalysisCard(),

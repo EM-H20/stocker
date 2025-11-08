@@ -18,23 +18,13 @@ import '../../features/aptitude/presentation/screens/aptitude_quiz_screen.dart';
 import '../../features/aptitude/presentation/screens/aptitude_result_screen.dart';
 import '../../features/note/presentation/screens/note_list_screen.dart';
 import '../../features/note/presentation/screens/note_editor_screen.dart';
-import '../../features/home/presentation/main_dashboard_screen.dart';
 
 /// 앱 전체의 라우팅을 관리하는 GoRouter 설정
 class AppRouter {
   static final GoRouter _router = GoRouter(
-    initialLocation: AppRoutes.home, // 홈(메인 대시보드)을 초기 화면으로
+    initialLocation: AppRoutes.education, // 🎓 교육 탭을 초기 화면으로
     debugLogDiagnostics: true, // ✅ GoRouter 내부 디버깅 로그 활성화
     routes: [
-      // 메인 대시보드 화면 (홈)
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) {
-          debugPrint('🏠 [ROUTER] 홈(메인 대시보드) 페이지 로드');
-          return const MainDashboardScreen();
-        },
-      ),
-
       // 로그인 화면 (완전한 애니메이션 제거)
       GoRoute(
         path: AppRoutes.login,

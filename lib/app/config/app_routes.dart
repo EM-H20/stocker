@@ -1,13 +1,13 @@
 /// 앱 전체에서 사용할 라우팅 경로 상수 정의
 ///
-/// 🎯 새로운 정보구조 설계 원칙:
-/// 1. Linear Learning Path: 학습자가 순차적으로 진행할 수 있는 경로
-/// 2. Clear Hierarchy: 현재 위치를 명확히 알 수 있는 depth 구조
-/// 3. Progressive Flow: Theory → Quiz → Result → Next Chapter
-/// 4. Hub & Spoke Optimization: 필요한 곳에만 대시보드 복귀
+/// 🎯 정보구조 설계 원칙:
+/// 1. Direct Access: 앱 시작 시 바로 학습 화면으로 진입
+/// 2. Bottom Navigation: 4개 주요 기능 탭 (Education, Attendance, WrongNote, Mypage)
+/// 3. Linear Learning Path: 학습자가 순차적으로 진행할 수 있는 경로
+/// 4. Clear Hierarchy: 현재 위치를 명확히 알 수 있는 depth 구조
 class AppRoutes {
   // ============= 기본 경로 =============
-  static const String home = '/'; // 📊 대시보드 (진도 요약 + 빠른 접근)
+  static const String home = '/'; // (Deprecated - Education으로 리다이렉트)
   static const String splash = '/splash';
 
   // ============= 인증 관련 =============
