@@ -127,5 +127,25 @@ final quizRepositoryProvider = AutoDisposeProvider<Object>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef QuizRepositoryRef = AutoDisposeProviderRef<Object>;
+String _$wrongNoteRepositoryHash() =>
+    r'b471e05c6609f57bb314a1de0ba8b8e4fb5e4e6c';
+
+/// 오답노트 Repository Provider
+///
+/// Copied from [wrongNoteRepository].
+@ProviderFor(wrongNoteRepository)
+final wrongNoteRepositoryProvider = AutoDisposeProvider<Object>.internal(
+  wrongNoteRepository,
+  name: r'wrongNoteRepositoryProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$wrongNoteRepositoryHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef WrongNoteRepositoryRef = AutoDisposeProviderRef<Object>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'widgets/wrong_answer_card.dart';
 import 'widgets/wrong_note_empty_state.dart';
-import 'wrong_note_provider.dart';
-import '../../quiz/presentation/quiz_provider.dart';
+import 'riverpod/wrong_note_notifier.dart';
+import '../../quiz/presentation/riverpod/quiz_notifier.dart';
 import '../../../app/config/app_theme.dart';
 import '../../../app/core/utils/theme_utils.dart';
 import '../../../app/core/widgets/loading_widget.dart';
@@ -15,14 +15,14 @@ import '../../../app/core/widgets/error_message_widget.dart';
 ///
 /// 사용자가 틀린 퀴즈 문제들을 모아서 복습할 수 있는 화면입니다.
 /// 챕터별로 분류되어 있으며, 다시 풀기 기능을 제공합니다.
-class WrongNoteScreen extends StatefulWidget {
+class WrongNoteScreen extends ConsumerStatefulWidget {
   const WrongNoteScreen({super.key});
 
   @override
-  State<WrongNoteScreen> createState() => _WrongNoteScreenState();
+  ConsumerState<WrongNoteScreen> createState() => _WrongNoteScreenState();
 }
 
-class _WrongNoteScreenState extends State<WrongNoteScreen>
+class _WrongNoteScreenState extends ConsumerState<WrongNoteScreen>
     with WidgetsBindingObserver {
   bool _hasLoadedOnce = false; // 🎯 중복 로드 방지 플래그
   DateTime? _lastQuizCompletionTime; // 🕐 마지막 퀴즈 완료 시간 추적
@@ -73,13 +73,13 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
     debugPrint('🔍 [WrongNote] 안전한 로드 시작');
 
     // 🚨 ReadOnly 모드에서 돌아온 직후인지 확인
-    final quizProvider = context.read<QuizProvider>();
-    if (quizProvider.isReadOnlyMode) {
+    final quizState = ref.read(quizNotifierProvider);
+    if (quizState.isReadOnlyMode) {
       debugPrint('🛡️ [WrongNote] ReadOnly 모드 활성 - 로드 스킵 (상태 안정화 대기)');
       return;
     }
 
-    await context.read<WrongNoteProvider>().loadWrongNotes();
+    await ref.read(wrongNoteNotifierProvider.notifier).loadWrongNotes();
     debugPrint('✅ [WrongNote] 안전한 로드 완료');
   }
 
@@ -91,13 +91,15 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(wrongNoteNotifierProvider);
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: Consumer<WrongNoteProvider>(
-          builder: (context, provider, child) {
+        child: Builder(
+          builder: (context) {
             // 로딩 중일 때
-            if (provider.isLoading) {
+            if (state.isLoading) {
               return const Center(
                 child: LoadingWidget(
                   message: '오답노트를 불러오는 중...',
@@ -106,17 +108,17 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
             }
 
             // 에러가 있을 때
-            if (provider.hasError) {
+            if (state.hasError) {
               return ErrorMessageWidget.server(
-                message: _getUserFriendlyErrorMessage(provider.errorMessage),
+                message: _getUserFriendlyErrorMessage(state.errorMessage),
                 onRetry: () {
-                  provider.clearError();
+                  ref.read(wrongNoteNotifierProvider.notifier).clearError();
                   _loadWrongNotesWithCheck();
                 },
               );
             }
 
-            final wrongNotes = provider.wrongNotes;
+            final wrongNotes = state.wrongNotes;
 
             // 오답노트가 비어있을 때
             if (wrongNotes.isEmpty) {
@@ -255,12 +257,14 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
                         padding: EdgeInsets.only(bottom: 12.h),
                         child: WrongAnswerCard(
                           wrongNote: wrongNote,
-                          isRetried: provider.retriedQuizIds
+                          isRetried: state.retriedQuizIds
                               .contains(wrongNote.quizId),
                           onRetry: () =>
-                              provider.markAsRetried(wrongNote.quizId),
+                              ref.read(wrongNoteNotifierProvider.notifier)
+                                  .markAsRetried(wrongNote.quizId),
                           onRemove: () =>
-                              provider.removeWrongNote(wrongNote.quizId),
+                              ref.read(wrongNoteNotifierProvider.notifier)
+                                  .removeWrongNote(wrongNote.quizId),
                         ),
                       );
                     },

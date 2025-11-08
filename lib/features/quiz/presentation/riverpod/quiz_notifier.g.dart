@@ -6,7 +6,7 @@ part of 'quiz_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$quizNotifierHash() => r'2d8af69bd9a9cd69e41d70ee6f7e3de7cad5976c';
+String _$quizNotifierHash() => r'ba052347dadf1b9904c22f42e9fa716ad2f1842e';
 
 /// 🔥 Riverpod 기반 퀴즈 상태 관리 Notifier
 ///

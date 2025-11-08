@@ -8,6 +8,7 @@ import '../../../../features/aptitude/domain/repository/aptitude_repository.dart
 import '../../../../features/note/domain/repository/note_repository.dart';
 import '../../../../features/education/domain/education_repository.dart';
 import '../../../../features/quiz/domain/quiz_repository.dart';
+import '../../../../features/wrong_note/domain/wrong_note_repository.dart';
 
 // Mock implementations
 import '../../../../features/auth/data/repository/auth_mock_repository.dart';
@@ -16,6 +17,7 @@ import '../../../../features/aptitude/data/repository/aptitude_mock_repository.d
 import '../../../../features/note/data/repository/note_mock_repository.dart';
 import '../../../../features/education/domain/education_mock_repository.dart';
 import '../../../../features/quiz/domain/quiz_mock_repository.dart';
+import '../../../../features/wrong_note/data/wrong_note_mock_repository.dart';
 
 // API implementations
 import '../../../../features/auth/data/repository/auth_api_repository.dart';
@@ -30,6 +32,7 @@ import '../../../../features/aptitude/data/source/aptitude_api.dart';
 import '../../../../features/note/data/source/note_api.dart';
 import '../../../../features/education/data/education_api.dart';
 import '../../../../features/quiz/data/quiz_api.dart';
+import '../../../../features/wrong_note/data/wrong_note_api.dart';
 
 // Storage
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -91,4 +94,12 @@ Object quizRepository(Ref ref) {
   return useMock
       ? QuizMockRepository()
       : QuizRepository(QuizApi(dio), storage);
+}
+
+/// 오답노트 Repository Provider
+@riverpod
+Object wrongNoteRepository(Ref ref) {
+  return useMock
+      ? WrongNoteMockRepository()
+      : WrongNoteRepository(WrongNoteApi(dio));
 }

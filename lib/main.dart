@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart' as legacy_provider; // 🔥 Provider에 prefix 추가 (공존 기간)
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔥 Riverpod 추가!
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // 🔥 Riverpod Repository Providers에서 사용
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,7 +15,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:stocker/features/quiz/domain/quiz_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'package:stocker/features/quiz/data/quiz_api.dart'; // 🔥 Riverpod으로 이동됨
 // import 'package:stocker/features/quiz/domain/quiz_repository.dart'; // 🔥 Riverpod으로 이동됨
-import 'package:stocker/features/wrong_note/data/wrong_note_mock_repository.dart';
+// import 'package:stocker/features/wrong_note/data/wrong_note_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'package:stocker/app/core/providers/theme_provider.dart'; // 🔥 Riverpod으로 교체됨
 import 'package:stocker/app/core/providers/riverpod/theme_notifier.dart'; // 🔥 Riverpod ThemeNotifier
 import 'app/config/app_theme.dart';
@@ -23,9 +23,9 @@ import 'app/config/app_router.dart';
 // import 'features/home/presentation/home_navigation_provider.dart'; // 🔥 Riverpod으로 교체됨
 // import 'features/education/presentation/education_provider.dart'; // 🔥 Riverpod으로 교체됨
 // import 'features/quiz/presentation/quiz_provider.dart'; // 🔥 Riverpod으로 교체됨
-import 'features/wrong_note/presentation/wrong_note_provider.dart';
-import 'features/wrong_note/data/wrong_note_api.dart';
-import 'features/wrong_note/domain/wrong_note_repository.dart';
+// import 'features/wrong_note/presentation/wrong_note_provider.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/wrong_note/data/wrong_note_api.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/wrong_note/domain/wrong_note_repository.dart'; // 🔥 Riverpod으로 이동됨
 
 // subin 브랜치 새로운 기능들 (Repository & API)
 // import 'features/auth/presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
@@ -197,21 +197,21 @@ class StockerApp extends StatelessWidget {
         //   },
         // ),
 
-        // WrongNote 상태 관리 (euimin 기능)
-        legacy_provider.ChangeNotifierProvider(
-          create: (_) {
-            debugPrint(
-                '🎯 [PROVIDER] Creating WrongNoteProvider (useMock: $useMock)');
-            if (useMock) {
-              final mockRepository = WrongNoteMockRepository();
-              return WrongNoteProvider.withMock(mockRepository);
-            } else {
-              final wrongNoteApi = WrongNoteApi(dio); // 글로벌 dio 사용
-              final wrongNoteRepository = WrongNoteRepository(wrongNoteApi);
-              return WrongNoteProvider(wrongNoteRepository);
-            }
-          },
-        ),
+        // 🔥 WrongNote Provider는 Riverpod으로 이동됨 (WrongNoteNotifier)
+        // legacy_provider.ChangeNotifierProvider(
+        //   create: (_) {
+        //     debugPrint(
+        //         '🎯 [PROVIDER] Creating WrongNoteProvider (useMock: $useMock)');
+        //     if (useMock) {
+        //       final mockRepository = WrongNoteMockRepository();
+        //       return WrongNoteProvider.withMock(mockRepository);
+        //     } else {
+        //       final wrongNoteApi = WrongNoteApi(dio); // 글로벌 dio 사용
+        //       final wrongNoteRepository = WrongNoteRepository(wrongNoteApi);
+        //       return WrongNoteProvider(wrongNoteRepository);
+        //     }
+        //   },
+        // ),
 
         // 🔥 Attendance Provider는 Riverpod으로 이동됨 (AttendanceNotifier)
         // legacy_provider.ChangeNotifierProvider(
@@ -262,7 +262,8 @@ class StockerApp extends StatelessWidget {
             // final educationProvider = context.read<EducationProvider>();
             // 🔥 TODO: QuizProvider → QuizNotifier로 변경 필요
             // final quizProvider = context.read<QuizProvider>();
-            final wrongNoteProvider = context.read<WrongNoteProvider>();
+            // 🔥 TODO: WrongNoteProvider → WrongNoteNotifier로 변경 필요
+            // final wrongNoteProvider = context.read<WrongNoteProvider>();
 
             // 🎯 콜백 등록 (create에서 단 한 번만 실행됨!)
 
