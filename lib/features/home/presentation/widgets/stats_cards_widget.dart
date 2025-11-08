@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart' as legacy_provider;
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
 import '../../../../app/core/widgets/error_message_widget.dart';
 import '../../../attendance/presentation/riverpod/attendance_notifier.dart';
 import '../../../wrong_note/presentation/riverpod/wrong_note_notifier.dart';
-import '../../../aptitude/presentation/provider/aptitude_provider.dart';
+import '../../../aptitude/presentation/riverpod/aptitude_notifier.dart';
 import '../../../education/presentation/riverpod/education_notifier.dart';
 import '../../../../app/core/utils/theme_utils.dart';
 
@@ -30,10 +29,10 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
-      // 🔥 Riverpod: AttendanceNotifier, WrongNoteNotifier는 build()에서 자동 초기화됨
+      // 🔥 Riverpod: 모든 Notifier 초기화
       ref.read(wrongNoteNotifierProvider.notifier).loadWrongNotes();
       ref.read(educationNotifierProvider.notifier).loadChapters();
-      context.read<AptitudeProvider>().checkPreviousResult();
+      ref.read(aptitudeNotifierProvider.notifier).checkPreviousResult();
     });
   }
 
@@ -69,17 +68,18 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
           ),
         ],
       ),
-      child: legacy_provider.Consumer<AptitudeProvider>(
-        builder: (context, aptitudeProvider, child) {
-          // 🔥 Riverpod: ref.watch로 상태 가져오기
+      child: Builder(
+        builder: (context) {
+          // 🔥 Riverpod: ref.watch로 모든 상태 가져오기
           final attendanceState = ref.watch(attendanceNotifierProvider);
           final wrongNoteState = ref.watch(wrongNoteNotifierProvider);
+          final aptitudeState = ref.watch(aptitudeNotifierProvider);
 
           // 로딩 상태 체크
           final isAnyLoading = attendanceState.isLoading ||
               wrongNoteState.isLoading ||
               educationState.isLoadingChapters ||
-              aptitudeProvider.isLoading;
+              aptitudeState.isLoading;
 
           if (isAnyLoading) {
             return _buildLoadingState(context);
@@ -89,7 +89,7 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
           final hasError = attendanceState.errorMessage != null ||
               wrongNoteState.errorMessage != null ||
               educationState.chaptersError != null ||
-              aptitudeProvider.errorMessage != null;
+              aptitudeState.errorMessage != null;
 
           if (hasError) {
             return _buildErrorState(
@@ -97,7 +97,7 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
               attendanceState,
               wrongNoteState,
               educationState,
-              aptitudeProvider,
+              aptitudeState,
             );
           }
 
@@ -127,7 +127,7 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
                         ),
                   ),
                   // 성향분석 결과가 있으면 표시
-                  if (aptitudeProvider.myResult != null)
+                  if (aptitudeState.myResult != null)
                     Container(
                       padding:
                           EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
@@ -136,7 +136,7 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Text(
-                        aptitudeProvider.myResult!.typeName,
+                        aptitudeState.myResult!.typeName,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppTheme.warningColor,
                               fontWeight: FontWeight.w600,
@@ -294,7 +294,7 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
               ],
 
               // 성향분석 결과가 있으면 표시
-              if (aptitudeProvider.myResult != null) ...[
+              if (aptitudeState.myResult != null) ...[
                 SizedBox(height: 8.h),
                 Row(
                   children: [
@@ -313,7 +313,7 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
                     SizedBox(width: 8.w),
                     Expanded(
                       child: Text(
-                        '나의 투자성향: ${aptitudeProvider.myResult!.typeName}',
+                        '나의 투자성향: ${aptitudeState.myResult!.typeName}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: ThemeUtils.isDarkMode(context)
@@ -351,7 +351,7 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
     dynamic attendanceState,
     dynamic wrongNoteState,
     dynamic educationState,
-    AptitudeProvider aptitudeProvider,
+    dynamic aptitudeState,
   ) {
     return Column(
       children: [
@@ -359,10 +359,10 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
         ErrorMessageWidget(
           message: '학습 현황을 불러오지 못했습니다',
           onRetry: () {
-            // 🔥 Riverpod: Notifier는 자동으로 재시도
+            // 🔥 Riverpod: 모든 Notifier 재시도
             ref.read(wrongNoteNotifierProvider.notifier).loadWrongNotes();
             ref.read(educationNotifierProvider.notifier).loadChapters();
-            aptitudeProvider.checkPreviousResult();
+            ref.read(aptitudeNotifierProvider.notifier).checkPreviousResult();
           },
         ),
         SizedBox(height: 20.h),
