@@ -1,8 +1,8 @@
 # Riverpod Migration Progress
 
 **시작일**: 2025-11-08
-**현재 Phase**: Phase 0 완료
-**전체 진행률**: 5% (Phase 0/5)
+**현재 Phase**: Phase 1 진행 중 (ThemeNotifier 완료!)
+**전체 진행률**: 15% (Phase 0 완료 + Phase 1 33%)
 
 ---
 
@@ -50,9 +50,52 @@
 
 ---
 
-## 📋 다음 단계: Phase 1 - 단순 Provider 변환
+## 🎨 Phase 1: 단순 Provider 변환 (진행 중!)
 
-### Phase 1 계획 (예상 2~3일)
+### ✅ 완료된 작업
+
+#### Task 1.1: ThemeProvider → ThemeNotifier 변환 (완료!)
+- [x] **파일 생성**: `lib/app/core/providers/riverpod/theme_notifier.dart`
+  - @riverpod annotation 기반 ThemeNotifier 클래스
+  - SharedPreferences 통한 테마 저장/로드
+  - AppThemeMode enum 재사용
+
+- [x] **코드 생성**: `theme_notifier.g.dart` 자동 생성
+  - AutoDisposeNotifier<AppThemeMode> 타입
+  - themeNotifierProvider 자동 생성
+  - themeModeProvider, isDarkModeProvider 추가
+
+- [x] **UI 변환**: main.dart
+  ```dart
+  // Before
+  legacy_provider.Consumer<ThemeProvider>(
+    builder: (context, themeProvider, child) {
+      return MaterialApp.router(themeMode: themeProvider.themeMode);
+    },
+  )
+
+  // After
+  Consumer(
+    builder: (context, ref, child) {
+      final currentThemeMode = ref.watch(themeModeProvider);
+      return MaterialApp.router(themeMode: currentThemeMode);
+    },
+  )
+  ```
+
+- [x] **기존 Provider 제거**: ThemeProvider 주석 처리 및 import 제거
+
+**검증 결과**:
+- ✅ `flutter analyze` 통과
+- ✅ 컴파일 에러 0개
+- ✅ build_runner 코드 생성 성공
+- ⏳ 앱 실행 테스트 대기
+
+---
+
+### 🔄 진행 중인 작업
+
+### Phase 1 계획 (예상 2~3일, 현재 33% 완료)
 1. **ThemeProvider → ThemeNotifier**
    - 가장 단순, 의존성 없음
    - @riverpod annotation 사용
@@ -82,11 +125,14 @@
 | Phase | 이름 | 상태 | 진행률 |
 |-------|------|------|--------|
 | 0 | 환경 준비 | ✅ 완료 | 100% |
-| 1 | 단순 Provider 변환 | ⏳ 대기 | 0% |
+| 1 | 단순 Provider 변환 | 🔄 진행중 | 33% (1/3) |
 | 2 | 복잡 Provider 변환 | ⏳ 대기 | 0% |
 | 3 | UI 레이어 전환 | ⏳ 대기 | 0% |
 | 4 | Mock/Real 개선 | ⏳ 대기 | 0% |
 | 5 | 최종 정리 | ⏳ 대기 | 0% |
+
+**변환 완료**: ThemeProvider ✅
+**다음 대상**: HomeNavigationProvider, Repository Providers
 
 ---
 
@@ -134,5 +180,50 @@ flutter pub run build_runner watch
 
 ---
 
-**마지막 업데이트**: 2025-11-08 20:10
+---
+
+## 📝 Phase 1 학습 포인트
+
+### 1. @riverpod annotation 사용법
+```dart
+@riverpod
+class ThemeNotifier extends _$ThemeNotifier {
+  @override
+  AppThemeMode build() {
+    return AppThemeMode.system; // 초기값
+  }
+
+  void setThemeMode(AppThemeMode mode) {
+    state = mode; // 자동 notifyListeners!
+  }
+}
+```
+
+### 2. Provider 파생 패턴
+```dart
+// 메인 Notifier
+@riverpod
+class ThemeNotifier extends _$ThemeNotifier { ... }
+
+// 파생 Provider (변환 로직)
+@riverpod
+ThemeMode themeMode(Ref ref) {
+  final appThemeMode = ref.watch(themeNotifierProvider);
+  return convertToThemeMode(appThemeMode);
+}
+```
+
+### 3. build_runner 사용
+```bash
+# 코드 생성
+dart run build_runner build --delete-conflicting-outputs
+
+# watch 모드 (자동 감지)
+dart run build_runner watch
+```
+
+---
+
+**마지막 업데이트**: 2025-11-08 20:20
 **작성자**: Claude Code 🤖
+**현재 브랜치**: feature/riverpod-phase0-setup

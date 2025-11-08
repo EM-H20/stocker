@@ -20,7 +20,7 @@ import 'package:stocker/features/wrong_note/data/wrong_note_mock_repository.dart
 import 'package:stocker/app/core/providers/riverpod/theme_notifier.dart'; // 🔥 Riverpod ThemeNotifier
 import 'app/config/app_theme.dart';
 import 'app/config/app_router.dart';
-import 'features/home/presentation/home_navigation_provider.dart';
+// import 'features/home/presentation/home_navigation_provider.dart'; // 🔥 Riverpod으로 교체됨
 import 'features/education/presentation/education_provider.dart';
 import 'features/quiz/presentation/quiz_provider.dart';
 import 'features/wrong_note/presentation/wrong_note_provider.dart';
@@ -130,8 +130,8 @@ class StockerApp extends StatelessWidget {
         //   create: (_) => ThemeProvider()..initialize(),
         // ),
 
-        // 홈 네비게이션 상태 관리
-        legacy_provider.ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
+        // 🔥 홈 네비게이션 상태 관리는 Riverpod으로 이동됨 (HomeNavigationNotifier)
+        // legacy_provider.ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
 
         // Auth Provider (subin에서 개선된 버전)
         legacy_provider.ChangeNotifierProvider(
