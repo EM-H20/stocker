@@ -1,20 +1,22 @@
 import 'package:go_router/go_router.dart';
 import '../../../app/config/app_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart'; // 🔥 Riverpod으로 교체됨
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔥 Riverpod 추가
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../app/core/widgets/action_button.dart';
-import '../presentation/auth_provider.dart';
+// import '../presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
+import '../presentation/riverpod/auth_notifier.dart'; // 🔥 Riverpod AuthNotifier
 
-class SignupScreen extends StatefulWidget {
+class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
@@ -56,7 +58,8 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _handleSignup() async {
-    final authProvider = context.read<AuthProvider>();
+    // 🔥 Riverpod: ref.read()로 AuthNotifier 접근
+    final authNotifier = ref.read(authNotifierProvider.notifier);
 
     if (!mounted) return;
 
@@ -83,7 +86,7 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
-    final success = await authProvider.signup(
+    final success = await authNotifier.signup(
       emailController.text.trim(),
       passwordController.text.trim(),
       nicknameController.text.trim(),
@@ -106,9 +109,12 @@ class _SignupScreenState extends State<SignupScreen> {
       );
       context.go(AppRoutes.login);
     } else {
+      // 🔥 Riverpod: 최신 상태를 다시 읽어옴
+      final currentState = ref.read(authNotifierProvider).value;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(authProvider.errorMessage ?? '회원가입에 실패했습니다.'),
+          content: Text(currentState?.errorMessage ?? '회원가입에 실패했습니다.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -117,7 +123,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+    // 🔥 Riverpod: ref.watch()로 AuthState 구독
+    final authState = ref.watch(authNotifierProvider);
 
     final isPasswordMatch = passwordController.text.isNotEmpty &&
         passwordController.text == confirmPasswordController.text;
@@ -128,7 +135,7 @@ class _SignupScreenState extends State<SignupScreen> {
         nicknameController.text.trim().isNotEmpty &&
         ageController.text.trim().isNotEmpty &&
         occupationController.text.trim().isNotEmpty &&
-        !authProvider.isLoading;
+        !(authState.value?.isLoading ?? false);
 
     return Scaffold(
       body: SafeArea(
@@ -284,8 +291,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
               // 회원가입 버튼
               ActionButton(
-                text: authProvider.isLoading ? '처리중...' : '회원가입',
-                icon: authProvider.isLoading
+                text: (authState.value?.isLoading ?? false) ? '처리중...' : '회원가입',
+                icon: (authState.value?.isLoading ?? false)
                     ? Icons.hourglass_empty
                     : Icons.person_add,
                 color: canSubmit ? Colors.blue : Colors.grey,

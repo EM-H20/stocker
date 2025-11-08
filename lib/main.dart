@@ -28,9 +28,10 @@ import 'features/wrong_note/data/wrong_note_api.dart';
 import 'features/wrong_note/domain/wrong_note_repository.dart';
 
 // subin 브랜치 새로운 기능들 (Repository & API)
-import 'features/auth/presentation/auth_provider.dart';
+// import 'features/auth/presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
+// import 'features/auth/presentation/riverpod/auth_notifier.dart'; // 🔥 Riverpod AuthNotifier (UI에서 직접 사용)
 import 'features/note/presentation/provider/note_provider.dart';
-import 'features/auth/domain/auth_repository.dart';
+// import 'features/auth/domain/auth_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/auth/data/source/auth_api.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/auth/data/repository/auth_api_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/auth/data/repository/auth_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
@@ -59,8 +60,8 @@ import 'features/note/domain/repository/note_repository.dart';
 // import 'features/note/data/repository/note_api_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/note/data/repository/note_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 
-// 🔥 Riverpod Repository Providers (Phase 2에서 사용 예정)
-// import 'app/core/providers/riverpod/repository_providers.dart';
+// 🔥 Riverpod Repository Providers (Phase 2에서 사용!)
+import 'app/core/providers/riverpod/repository_providers.dart';
 
 // Network (subin에서 개선)
 import 'app/core/network/dio.dart';
@@ -137,28 +138,29 @@ class StockerApp extends StatelessWidget {
         // 🔥 홈 네비게이션 상태 관리는 Riverpod으로 이동됨 (HomeNavigationNotifier)
         // legacy_provider.ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
 
-        // Auth Provider (subin에서 개선된 버전)
-        legacy_provider.ChangeNotifierProvider(
-          create: (context) {
-            debugPrint(
-                '🔐 [PROVIDER] Creating AuthProvider (useMock: $useMock)');
-            final authProvider = AuthProvider(context.read<AuthRepository>());
-
-            // Mock/Real 환경 모두에서 초기화 실행
-            debugPrint('🔄 [PROVIDER] AuthProvider 초기화 시작...');
-            authProvider.initialize().then((_) {
-              // 🔧 [수정] 강제 자동 로그인 비활성화 - 첫 화면을 로그인 화면으로 복원
-              // 나중에 사용자 설정에 따른 선택적 자동 로그인 구현 가능
-              // if (!authProvider.isLoggedIn && !useMock) {
-              //   debugPrint('🚨 [PROVIDER] 로그인되지 않음 - 테스트 로그인 수행');
-              //   authProvider.quickTestLogin();
-              // }
-              debugPrint('ℹ️ [PROVIDER] 초기화 완료 - 로그인 화면부터 시작');
-            });
-
-            return authProvider;
-          },
-        ),
+        // 🔥 Auth Provider는 Riverpod으로 이동됨 (AuthNotifier)
+        // AuthNotifier는 AsyncNotifier로 build() 메서드에서 자동 초기화됨
+        // legacy_provider.ChangeNotifierProvider(
+        //   create: (context) {
+        //     debugPrint(
+        //         '🔐 [PROVIDER] Creating AuthProvider (useMock: $useMock)');
+        //     final authProvider = AuthProvider(context.read<AuthRepository>());
+        //
+        //     // Mock/Real 환경 모두에서 초기화 실행
+        //     debugPrint('🔄 [PROVIDER] AuthProvider 초기화 시작...');
+        //     authProvider.initialize().then((_) {
+        //       // 🔧 [수정] 강제 자동 로그인 비활성화 - 첫 화면을 로그인 화면으로 복원
+        //       // 나중에 사용자 설정에 따른 선택적 자동 로그인 구현 가능
+        //       // if (!authProvider.isLoggedIn && !useMock) {
+        //       //   debugPrint('🚨 [PROVIDER] 로그인되지 않음 - 테스트 로그인 수행');
+        //       //   authProvider.quickTestLogin();
+        //       // }
+        //       debugPrint('ℹ️ [PROVIDER] 초기화 완료 - 로그인 화면부터 시작');
+        //     });
+        //
+        //     return authProvider;
+        //   },
+        // ),
 
         // Education 상태 관리 (euimin Mock/Real API 분기 패턴 유지)
         legacy_provider.ChangeNotifierProvider(

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as legacy_provider; // 🔥 Provider에 prefix 추가 (충돌 방지)
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔥 Riverpod 추가
 
 import 'tap_item.dart';
 import '../../../app/config/app_routes.dart';
-import '../../auth/presentation/auth_provider.dart';
+// import '../../auth/presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
+import '../../auth/presentation/riverpod/auth_notifier.dart'; // 🔥 Riverpod AuthNotifier
 import '../../attendance/presentation/provider/attendance_provider.dart';
 import '../../attendance/presentation/widgets/attendance_quiz_dialog.dart';
 import '../../../app/core/utils/theme_utils.dart';
@@ -100,75 +102,66 @@ class HomeShell extends StatelessWidget {
   }
 }
 
-// ✅ [추가] 로그인 성공 이벤트를 감지하는 역할을 하는 별도의 StatefulWidget
-class _HomeShellListener extends StatefulWidget {
+// ✅ [Riverpod 변환] 로그인 성공 이벤트를 감지하는 ConsumerStatefulWidget
+class _HomeShellListener extends ConsumerStatefulWidget {
   final Widget child;
   const _HomeShellListener({required this.child});
 
   @override
-  State<_HomeShellListener> createState() => __HomeShellListenerState();
+  ConsumerState<_HomeShellListener> createState() => __HomeShellListenerState();
 }
 
-class __HomeShellListenerState extends State<_HomeShellListener> {
-  // ✅ [수정] Provider 참조를 안전하게 저장할 변수들
-  AuthProvider? _authProvider;
+class __HomeShellListenerState extends ConsumerState<_HomeShellListener> {
+  // 🔥 Riverpod에서는 Provider 참조를 저장할 필요 없음 - ref.watch/ref.read 사용
   AttendanceProvider? _attendanceProvider;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // ✅ [수정] didChangeDependencies에서 Provider 참조를 안전하게 저장
-    _authProvider = context.read<AuthProvider>();
-    _attendanceProvider = context.read<AttendanceProvider>();
-
-    // 리스너 등록 (저장된 참조 사용)
-    _authProvider?.loginSuccessNotifier
-        .addListener(_showAttendanceQuizIfNeeded);
-  }
-
-  @override
-  void dispose() {
-    // ✅ [수정] dispose에서는 저장된 참조를 사용 (context 사용하지 않음)
-    // 이렇게 하면 위젯이 비활성화된 후에도 안전하게 리스너를 제거할 수 있습니다
-    _authProvider?.loginSuccessNotifier
-        .removeListener(_showAttendanceQuizIfNeeded);
-    super.dispose();
+    // AttendanceProvider는 아직 Provider이므로 기존 방식 유지
+    _attendanceProvider = legacy_provider.Provider.of<AttendanceProvider>(context, listen: false);
   }
 
   // 로그인 성공 시, 출석 퀴즈 팝업을 띄우는 핵심 로직
   Future<void> _showAttendanceQuizIfNeeded() async {
-    // ✅ [수정] mounted 체크와 Provider null 체크 추가
-    if (!mounted || _authProvider == null || _attendanceProvider == null) {
+    // ✅ mounted 체크와 Provider null 체크 추가
+    if (!mounted || _attendanceProvider == null) {
       return;
     }
 
-    if (_authProvider!.loginSuccessNotifier.value == true) {
-      final today = DateTime.utc(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final today = DateTime.utc(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
-      if (_attendanceProvider!.attendanceStatus[today] != true) {
-        await _attendanceProvider!.setQuizLoading(true); // ✅ 퀴즈 로딩 시작
-        final success = await _attendanceProvider!.fetchTodaysQuiz();
+    if (_attendanceProvider!.attendanceStatus[today] != true) {
+      await _attendanceProvider!.setQuizLoading(true); // ✅ 퀴즈 로딩 시작
+      final success = await _attendanceProvider!.fetchTodaysQuiz();
 
-        // ✅ [수정] context 사용 전에 mounted 다시 확인
-        if (mounted && success && _attendanceProvider!.quizzes.isNotEmpty) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (_) => ChangeNotifierProvider.value(
-              value: _attendanceProvider!,
-              child:
-                  AttendanceQuizDialog(quizzes: _attendanceProvider!.quizzes),
-            ),
-          );
-        }
-        await _attendanceProvider!.setQuizLoading(false); // ✅ 퀴즈 로딩 종료
+      // ✅ context 사용 전에 mounted 다시 확인
+      if (mounted && success && _attendanceProvider!.quizzes.isNotEmpty) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => legacy_provider.ChangeNotifierProvider.value(
+            value: _attendanceProvider!,
+            child:
+                AttendanceQuizDialog(quizzes: _attendanceProvider!.quizzes),
+          ),
+        );
       }
+      await _attendanceProvider!.setQuizLoading(false); // ✅ 퀴즈 로딩 종료
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // 🔥 Riverpod ref.listen으로 로그인 성공 이벤트 감지
+    ref.listen(loginSuccessNotifierProvider, (prev, next) {
+      if (next == true) {
+        debugPrint('🎉 [HOME_SHELL] 로그인 성공 이벤트 감지 - 출석 퀴즈 확인 중...');
+        _showAttendanceQuizIfNeeded();
+      }
+    });
+
     // 이 위젯은 UI를 직접 그리지 않고, 자식 위젯(Scaffold)을 그대로 반환합니다.
     return widget.child;
   }

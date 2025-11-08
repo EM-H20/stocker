@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart'; // 🔥 Riverpod으로 교체됨
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔥 Riverpod 추가
 import 'package:go_router/go_router.dart';
 import '../../../app/config/app_routes.dart';
 import '../../../app/core/widgets/action_button.dart';
-import '../../auth/presentation/auth_provider.dart';
+// import '../../auth/presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
+import '../../auth/presentation/riverpod/auth_notifier.dart'; // 🔥 Riverpod AuthNotifier
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 🔥 Riverpod: ref.watch()로 AuthState 구독
+    final authState = ref.watch(authNotifierProvider);
 
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
 
-    // ✅ [수정] 로그인 로직을 별도의 비동기 함수로 분리합니다.
+    // ✅ [Riverpod 변환] 로그인 로직을 별도의 비동기 함수로 분리합니다.
     Future<void> handleLogin() async {
       // 위젯이 여전히 유효한지 먼저 확인합니다.
       if (!context.mounted) return;
 
-      final isSuccess = await authProvider.login(
+      // 🔥 Riverpod: ref.read()로 AuthNotifier의 login 메서드 호출
+      final authNotifier = ref.read(authNotifierProvider.notifier);
+      final isSuccess = await authNotifier.login(
         emailController.text.trim(),
         passwordController.text.trim(),
       );
@@ -30,6 +35,9 @@ class LoginScreen extends StatelessWidget {
         if (isSuccess) {
           debugPrint('✅ [LOGIN] 로그인 성공 - 홈으로 이동');
 
+          // 🔥 Riverpod: 최신 상태를 다시 읽어옴
+          final currentState = ref.read(authNotifierProvider).value;
+
           // 로그인 성공 시 홈으로 이동 (교육 페이지 대신 홈으로)
           context.go(AppRoutes.home);
 
@@ -37,17 +45,20 @@ class LoginScreen extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content:
-                  Text('${authProvider.user?.nickname ?? "사용자"}님 환영합니다! 🎉'),
+                  Text('${currentState?.user?.nickname ?? "사용자"}님 환영합니다! 🎉'),
               backgroundColor: Colors.green,
               duration: const Duration(seconds: 2),
             ),
           );
         } else {
-          debugPrint('❌ [LOGIN] 로그인 실패: ${authProvider.errorMessage}');
+          debugPrint('❌ [LOGIN] 로그인 실패');
+
+          // 🔥 Riverpod: 최신 상태를 다시 읽어옴
+          final currentState = ref.read(authNotifierProvider).value;
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authProvider.errorMessage ?? '로그인에 실패했습니다.'),
+              content: Text(currentState?.errorMessage ?? '로그인에 실패했습니다.'),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 3),
             ),
@@ -124,7 +135,8 @@ class LoginScreen extends StatelessWidget {
                   text: '로그인',
                   icon: Icons.login,
                   color: Colors.blue,
-                  onPressed: authProvider.isLoading ? null : handleLogin,
+                  // 🔥 Riverpod: authState.value?.isLoading으로 로딩 상태 확인
+                  onPressed: (authState.value?.isLoading ?? false) ? null : handleLogin,
                 ),
                 const SizedBox(height: 16),
                 Row(
