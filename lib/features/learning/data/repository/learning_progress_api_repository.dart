@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../domain/repository/learning_progress_repository.dart';
 import '../source/learning_progress_api.dart';
-import '../../../education/presentation/education_provider.dart';
 
 /// 실제 API와 연동되는 학습 진도 Repository
 class LearningProgressApiRepository implements LearningProgressRepository {
   final LearningProgressApi _api;
-  final EducationProvider? _educationProvider;
 
   // 로컬 캐시 (API 호출 최소화)
   Map<String, dynamic>? _cachedProgress;
   List<Map<String, dynamic>>? _cachedChapters;
 
-  LearningProgressApiRepository(this._api, [this._educationProvider]);
+  LearningProgressApiRepository(this._api);
 
   @override
   Future<Map<String, dynamic>?> getLastLearningPosition() async {
@@ -216,25 +214,7 @@ class LearningProgressApiRepository implements LearningProgressRepository {
         return _cachedChapters!;
       }
 
-      // EducationProvider에서 실제 챕터 데이터 가져오기
-      if (_educationProvider != null &&
-          _educationProvider.chapters.isNotEmpty) {
-        debugPrint(
-            '✅ [LearningProgressApiRepo] EducationProvider에서 실제 챕터 데이터 사용');
-        _cachedChapters = _educationProvider.chapters
-            .map((chapter) => {
-                  'id': chapter.id,
-                  'title': chapter.title,
-                  'description':
-                      chapter.description ?? '${chapter.title} 학습 내용',
-                })
-            .toList();
-        return _cachedChapters!;
-      }
-
-      debugPrint(
-          '⚠️ [LearningProgressApiRepo] EducationProvider 데이터 없음 - Fallback 사용');
-      // Fallback: 기본 챕터 데이터
+      // 기본 챕터 데이터 (EducationNotifier에서 실제 데이터 관리)
       _cachedChapters = [
         {'id': 1, 'title': '주식의 기본 개념', 'description': '주식 투자의 첫걸음'},
         {'id': 2, 'title': '투자의 기본 원리', 'description': '현명한 투자를 위한 기초'},
