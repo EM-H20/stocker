@@ -1,8 +1,8 @@
 # Riverpod Migration Progress
 
 **시작일**: 2025-11-08
-**현재 Phase**: Phase 1 진행 중 (ThemeNotifier 완료!)
-**전체 진행률**: 15% (Phase 0 완료 + Phase 1 33%)
+**현재 Phase**: Phase 1 진행 중 (ThemeNotifier, HomeNavigationNotifier 완료!)
+**전체 진행률**: 20% (Phase 0 완료 + Phase 1 67%)
 
 ---
 
@@ -93,20 +93,59 @@
 
 ---
 
+#### Task 1.2: HomeNavigationProvider → HomeNavigationNotifier 변환 (완료!)
+- [x] **파일 생성**: `lib/features/home/presentation/riverpod/home_navigation_notifier.dart`
+  - @riverpod annotation 기반 HomeNavigationNotifier 클래스
+  - TabItem enum 재사용 (education, attendance, wrongNote, mypage)
+  - 4개 메서드: changeTab, changeTabByIndex, isCurrentTab, currentIndex getter
+
+- [x] **코드 생성**: `home_navigation_notifier.g.dart` 자동 생성
+  - AutoDisposeNotifier<TabItem> 타입
+  - homeNavigationNotifierProvider 자동 생성
+  - 초기값: TabItem.education
+
+- [x] **main.dart 업데이트**
+  - HomeNavigationProvider 등록 주석 처리
+  - import 주석 처리
+
+- [x] **테스트 업데이트**: widget_test.dart
+  ```dart
+  test('Navigation notifier works correctly', () {
+    final container = ProviderContainer();
+    final notifier = container.read(homeNavigationNotifierProvider.notifier);
+
+    // 초기 상태 확인
+    expect(container.read(homeNavigationNotifierProvider), equals(TabItem.education));
+
+    // 탭 변경 테스트
+    notifier.changeTabByIndex(1);
+    expect(container.read(homeNavigationNotifierProvider), equals(TabItem.attendance));
+  });
+  ```
+
+**검증 결과**:
+- ✅ `flutter analyze` 통과
+- ✅ Navigation notifier 테스트 통과
+- ✅ 컴파일 에러 0개
+- ✅ build_runner 코드 생성 성공
+- ⏳ 앱 실행 테스트 대기
+
+---
+
 ### 🔄 진행 중인 작업
 
-### Phase 1 계획 (예상 2~3일, 현재 33% 완료)
-1. **ThemeProvider → ThemeNotifier**
+### Phase 1 계획 (예상 2~3일, 현재 67% 완료)
+1. ✅ **ThemeProvider → ThemeNotifier** (완료)
    - 가장 단순, 의존성 없음
    - @riverpod annotation 사용
    - build_runner 코드 생성
    - UI 변환 및 테스트
 
-2. **HomeNavigationProvider → HomeNavigationNotifier**
+2. ✅ **HomeNavigationProvider → HomeNavigationNotifier** (완료)
    - 단순 상태 관리
-   - 빠른 변환 가능
+   - 빠른 변환 완료
 
-3. **Repository Provider 변환**
+3. ⏳ **Repository Provider 변환** (다음 단계)
    - AuthRepository
    - AttendanceRepository
    - AptitudeRepository
@@ -125,14 +164,14 @@
 | Phase | 이름 | 상태 | 진행률 |
 |-------|------|------|--------|
 | 0 | 환경 준비 | ✅ 완료 | 100% |
-| 1 | 단순 Provider 변환 | 🔄 진행중 | 33% (1/3) |
+| 1 | 단순 Provider 변환 | 🔄 진행중 | 67% (2/3) |
 | 2 | 복잡 Provider 변환 | ⏳ 대기 | 0% |
 | 3 | UI 레이어 전환 | ⏳ 대기 | 0% |
 | 4 | Mock/Real 개선 | ⏳ 대기 | 0% |
 | 5 | 최종 정리 | ⏳ 대기 | 0% |
 
-**변환 완료**: ThemeProvider ✅
-**다음 대상**: HomeNavigationProvider, Repository Providers
+**변환 완료**: ThemeProvider ✅, HomeNavigationProvider ✅
+**다음 대상**: Repository Providers (AuthRepository, AttendanceRepository, AptitudeRepository, NoteRepository)
 
 ---
 
@@ -224,6 +263,7 @@ dart run build_runner watch
 
 ---
 
-**마지막 업데이트**: 2025-11-08 20:20
+**마지막 업데이트**: 2025-11-08 21:30
 **작성자**: Claude Code 🤖
 **현재 브랜치**: feature/riverpod-phase0-setup
+**최근 커밋**: feat: Phase 1 Task 1.2 - HomeNavigationProvider → HomeNavigationNotifier 변환 완료
