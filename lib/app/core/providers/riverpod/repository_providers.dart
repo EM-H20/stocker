@@ -1,0 +1,67 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Repository interfaces
+import '../../../../features/auth/domain/auth_repository.dart';
+import '../../../../features/attendance/domain/repository/attendance_repository.dart';
+import '../../../../features/aptitude/domain/repository/aptitude_repository.dart';
+import '../../../../features/note/domain/repository/note_repository.dart';
+
+// Mock implementations
+import '../../../../features/auth/data/repository/auth_mock_repository.dart';
+import '../../../../features/attendance/data/repository/attendance_mock_repository.dart';
+import '../../../../features/aptitude/data/repository/aptitude_mock_repository.dart';
+import '../../../../features/note/data/repository/note_mock_repository.dart';
+
+// API implementations
+import '../../../../features/auth/data/repository/auth_api_repository.dart';
+import '../../../../features/attendance/data/repository/attendance_api_repository.dart';
+import '../../../../features/aptitude/data/repository/aptitude_api_repository.dart';
+import '../../../../features/note/data/repository/note_api_repository.dart';
+
+// API sources
+import '../../../../features/auth/data/source/auth_api.dart';
+import '../../../../features/attendance/data/source/attendance_api.dart';
+import '../../../../features/aptitude/data/source/aptitude_api.dart';
+import '../../../../features/note/data/source/note_api.dart';
+
+// Network
+import 'package:stocker/app/core/network/dio.dart' show dio;
+import 'package:stocker/main.dart' show useMock;
+
+part 'repository_providers.g.dart';
+
+/// 🔥 Riverpod 기반 Repository Providers
+/// Mock/Real API 전환을 위한 Repository 제공자들
+
+/// 인증 Repository Provider
+@riverpod
+AuthRepository authRepository(Ref ref) {
+  return useMock
+      ? AuthMockRepository()
+      : AuthApiRepository(AuthApi(dio));
+}
+
+/// 출석 Repository Provider
+@riverpod
+AttendanceRepository attendanceRepository(Ref ref) {
+  return useMock
+      ? AttendanceMockRepository()
+      : AttendanceApiRepository(AttendanceApi(dio));
+}
+
+/// 성향분석 Repository Provider
+@riverpod
+AptitudeRepository aptitudeRepository(Ref ref) {
+  return useMock
+      ? AptitudeMockRepository()
+      : AptitudeApiRepository(AptitudeApi(dio));
+}
+
+/// 노트 Repository Provider
+@riverpod
+NoteRepository noteRepository(Ref ref) {
+  return useMock
+      ? NoteMockRepository()
+      : NoteApiRepository(NoteApi(dio));
+}

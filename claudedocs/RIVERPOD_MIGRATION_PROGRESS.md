@@ -1,8 +1,8 @@
 # Riverpod Migration Progress
 
 **시작일**: 2025-11-08
-**현재 Phase**: Phase 1 진행 중 (ThemeNotifier, HomeNavigationNotifier 완료!)
-**전체 진행률**: 20% (Phase 0 완료 + Phase 1 67%)
+**현재 Phase**: Phase 1 완료! 🎉 (단순 Provider 변환 100%)
+**전체 진행률**: 25% (Phase 0 완료 + Phase 1 완료)
 
 ---
 
@@ -132,9 +132,40 @@
 
 ---
 
-### 🔄 진행 중인 작업
+#### Task 1.3: Repository Providers 변환 (완료!)
+- [x] **파일 생성**: `lib/app/core/providers/riverpod/repository_providers.dart`
+  - @riverpod annotation 기반 Repository Provider 함수들
+  - useMock 플래그로 Mock/Real 전환
+  - 4개 Repository Provider 생성
 
-### Phase 1 계획 (예상 2~3일, 현재 67% 완료)
+- [x] **생성된 Providers**:
+  ```dart
+  authRepositoryProvider          // AuthRepository
+  attendanceRepositoryProvider    // AttendanceRepository
+  aptitudeRepositoryProvider      // AptitudeRepository
+  noteRepositoryProvider          // NoteRepository
+  ```
+
+- [x] **코드 생성**: `repository_providers.g.dart` 자동 생성
+  - AutoDisposeProvider<Repository> 타입
+  - useMock에 따라 Mock/Real 자동 전환
+
+- [x] **main.dart 업데이트**
+  - 기존 legacy_provider.Provider<Repository> 주석 처리
+  - 사용하지 않는 Repository import 주석 처리
+  - Phase 2에서 사용할 Riverpod Provider import 준비
+
+**검증 결과**:
+- ✅ `flutter analyze` 통과 (0 issues)
+- ✅ 컴파일 에러 0개
+- ✅ build_runner 코드 생성 성공
+- ⏳ Phase 2에서 실제 사용 (AuthProvider 등 변환 필요)
+
+---
+
+### ✅ Phase 1 완료! (100%)
+
+### Phase 1 최종 결과 (예상 2~3일, 실제 1일 완료)
 1. ✅ **ThemeProvider → ThemeNotifier** (완료)
    - 가장 단순, 의존성 없음
    - @riverpod annotation 사용
@@ -145,17 +176,19 @@
    - 단순 상태 관리
    - 빠른 변환 완료
 
-3. ⏳ **Repository Provider 변환** (다음 단계)
-   - AuthRepository
-   - AttendanceRepository
-   - AptitudeRepository
-   - NoteRepository
+3. ✅ **Repository Provider 변환** (완료)
+   - AuthRepository ✅
+   - AttendanceRepository ✅
+   - AptitudeRepository ✅
+   - NoteRepository ✅
 
-### 예상 산출물
-- `lib/app/core/providers/riverpod/theme_notifier.dart`
-- `lib/app/core/providers/riverpod/theme_notifier.g.dart` (자동 생성)
-- `lib/features/home/presentation/riverpod/home_navigation_notifier.dart`
-- 각 feature의 repository_provider.dart
+### Phase 1 산출물
+- ✅ `lib/app/core/providers/riverpod/theme_notifier.dart`
+- ✅ `lib/app/core/providers/riverpod/theme_notifier.g.dart` (자동 생성)
+- ✅ `lib/features/home/presentation/riverpod/home_navigation_notifier.dart`
+- ✅ `lib/features/home/presentation/riverpod/home_navigation_notifier.g.dart` (자동 생성)
+- ✅ `lib/app/core/providers/riverpod/repository_providers.dart`
+- ✅ `lib/app/core/providers/riverpod/repository_providers.g.dart` (자동 생성)
 
 ---
 
@@ -164,14 +197,18 @@
 | Phase | 이름 | 상태 | 진행률 |
 |-------|------|------|--------|
 | 0 | 환경 준비 | ✅ 완료 | 100% |
-| 1 | 단순 Provider 변환 | 🔄 진행중 | 67% (2/3) |
-| 2 | 복잡 Provider 변환 | ⏳ 대기 | 0% |
+| 1 | 단순 Provider 변환 | ✅ 완료 | 100% (3/3) |
+| 2 | 복잡 Provider 변환 | ⏳ 다음 | 0% |
 | 3 | UI 레이어 전환 | ⏳ 대기 | 0% |
 | 4 | Mock/Real 개선 | ⏳ 대기 | 0% |
 | 5 | 최종 정리 | ⏳ 대기 | 0% |
 
-**변환 완료**: ThemeProvider ✅, HomeNavigationProvider ✅
-**다음 대상**: Repository Providers (AuthRepository, AttendanceRepository, AptitudeRepository, NoteRepository)
+**Phase 1 변환 완료**:
+- ThemeProvider → ThemeNotifier ✅
+- HomeNavigationProvider → HomeNavigationNotifier ✅
+- Repository Providers (AuthRepository, AttendanceRepository, AptitudeRepository, NoteRepository) ✅
+
+**다음 Phase**: Phase 2 - 복잡 Provider 변환 (ChangeNotifierProvider들: AuthProvider, EducationProvider, QuizProvider 등)
 
 ---
 
@@ -263,7 +300,7 @@ dart run build_runner watch
 
 ---
 
-**마지막 업데이트**: 2025-11-08 21:30
+**마지막 업데이트**: 2025-11-08 22:00
 **작성자**: Claude Code 🤖
 **현재 브랜치**: feature/riverpod-phase0-setup
-**최근 커밋**: feat: Phase 1 Task 1.2 - HomeNavigationProvider → HomeNavigationNotifier 변환 완료
+**최근 커밋**: feat: Phase 1 완료 - Repository Providers 변환 (AuthRepository, AttendanceRepository, AptitudeRepository, NoteRepository)

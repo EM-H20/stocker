@@ -31,22 +31,22 @@ import 'features/wrong_note/domain/wrong_note_repository.dart';
 import 'features/auth/presentation/auth_provider.dart';
 import 'features/note/presentation/provider/note_provider.dart';
 import 'features/auth/domain/auth_repository.dart';
-import 'features/auth/data/source/auth_api.dart';
-import 'features/auth/data/repository/auth_api_repository.dart';
-import 'features/auth/data/repository/auth_mock_repository.dart';
+// import 'features/auth/data/source/auth_api.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/auth/data/repository/auth_api_repository.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/auth/data/repository/auth_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 
 // 출석 기능 (subin에서 강화)
 import 'features/attendance/presentation/provider/attendance_provider.dart';
 import 'features/attendance/domain/repository/attendance_repository.dart';
-import 'features/attendance/data/source/attendance_api.dart';
-import 'features/attendance/data/repository/attendance_api_repository.dart';
-import 'features/attendance/data/repository/attendance_mock_repository.dart';
+// import 'features/attendance/data/source/attendance_api.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/attendance/data/repository/attendance_api_repository.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/attendance/data/repository/attendance_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 
 // 성향분석 기능 (subin에서 완전 구현)
 import 'features/aptitude/domain/repository/aptitude_repository.dart';
-import 'features/aptitude/data/source/aptitude_api.dart';
-import 'features/aptitude/data/repository/aptitude_api_repository.dart';
-import 'features/aptitude/data/repository/aptitude_mock_repository.dart';
+// import 'features/aptitude/data/source/aptitude_api.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/aptitude/data/repository/aptitude_api_repository.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/aptitude/data/repository/aptitude_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 import 'features/aptitude/presentation/provider/aptitude_provider.dart';
 import 'features/learning/presentation/provider/learning_progress_provider.dart';
 import 'features/learning/data/repository/learning_progress_mock_repository.dart';
@@ -55,9 +55,12 @@ import 'features/learning/data/source/learning_progress_api.dart';
 
 // 노트 기능 (subin 새 기능)
 import 'features/note/domain/repository/note_repository.dart';
-import 'features/note/data/source/note_api.dart';
-import 'features/note/data/repository/note_api_repository.dart';
-import 'features/note/data/repository/note_mock_repository.dart';
+// import 'features/note/data/source/note_api.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/note/data/repository/note_api_repository.dart'; // 🔥 Riverpod으로 이동됨
+// import 'features/note/data/repository/note_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
+
+// 🔥 Riverpod Repository Providers (Phase 2에서 사용 예정)
+// import 'app/core/providers/riverpod/repository_providers.dart';
 
 // Network (subin에서 개선)
 import 'app/core/network/dio.dart';
@@ -104,25 +107,26 @@ class StockerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return legacy_provider.MultiProvider(
       providers: [
+        // 🔥 Repository 계층은 Riverpod으로 이동됨
         // === Repository 계층 (subin 스타일) ===
-        legacy_provider.Provider<AuthRepository>(
-          create: (_) =>
-              useMock ? AuthMockRepository() : AuthApiRepository(AuthApi(dio)),
-        ),
-        legacy_provider.Provider<AttendanceRepository>(
-          create: (_) => useMock
-              ? AttendanceMockRepository()
-              : AttendanceApiRepository(AttendanceApi(dio)),
-        ),
-        legacy_provider.Provider<AptitudeRepository>(
-          create: (_) => useMock
-              ? AptitudeMockRepository()
-              : AptitudeApiRepository(AptitudeApi(dio)),
-        ),
-        legacy_provider.Provider<NoteRepository>(
-          create: (_) =>
-              useMock ? NoteMockRepository() : NoteApiRepository(NoteApi(dio)),
-        ),
+        // legacy_provider.Provider<AuthRepository>(
+        //   create: (_) =>
+        //       useMock ? AuthMockRepository() : AuthApiRepository(AuthApi(dio)),
+        // ),
+        // legacy_provider.Provider<AttendanceRepository>(
+        //   create: (_) => useMock
+        //       ? AttendanceMockRepository()
+        //       : AttendanceApiRepository(AttendanceApi(dio)),
+        // ),
+        // legacy_provider.Provider<AptitudeRepository>(
+        //   create: (_) => useMock
+        //       ? AptitudeMockRepository()
+        //       : AptitudeApiRepository(AptitudeApi(dio)),
+        // ),
+        // legacy_provider.Provider<NoteRepository>(
+        //   create: (_) =>
+        //       useMock ? NoteMockRepository() : NoteApiRepository(NoteApi(dio)),
+        // ),
 
         // === Provider 계층 ===
         // 🔥 테마 상태 관리는 Riverpod으로 이동됨 (ThemeNotifier)
