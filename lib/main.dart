@@ -16,7 +16,8 @@ import 'package:stocker/features/quiz/domain/quiz_mock_repository.dart';
 import 'package:stocker/features/quiz/data/quiz_api.dart';
 import 'package:stocker/features/quiz/domain/quiz_repository.dart';
 import 'package:stocker/features/wrong_note/data/wrong_note_mock_repository.dart';
-import 'package:stocker/app/core/providers/theme_provider.dart';
+// import 'package:stocker/app/core/providers/theme_provider.dart'; // 🔥 Riverpod으로 교체됨
+import 'package:stocker/app/core/providers/riverpod/theme_notifier.dart'; // 🔥 Riverpod ThemeNotifier
 import 'app/config/app_theme.dart';
 import 'app/config/app_router.dart';
 import 'features/home/presentation/home_navigation_provider.dart';
@@ -124,10 +125,10 @@ class StockerApp extends StatelessWidget {
         ),
 
         // === Provider 계층 ===
-        // 테마 상태 관리 (euimin 핵심 기능 유지)
-        legacy_provider.ChangeNotifierProvider(
-          create: (_) => ThemeProvider()..initialize(),
-        ),
+        // 🔥 테마 상태 관리는 Riverpod으로 이동됨 (ThemeNotifier)
+        // legacy_provider.ChangeNotifierProvider(
+        //   create: (_) => ThemeProvider()..initialize(),
+        // ),
 
         // 홈 네비게이션 상태 관리
         legacy_provider.ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
@@ -365,9 +366,12 @@ class StockerApp extends StatelessWidget {
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, child) {
-          // euimin의 테마 Provider를 유지하면서 subin의 기능들 통합
-          return legacy_provider.Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
+          // 🔥 Riverpod Consumer로 변환!
+          return Consumer(
+            builder: (context, ref, child) {
+              // 🔥 Riverpod: ref.watch()로 테마 모드 구독
+              final currentThemeMode = ref.watch(themeModeProvider);
+
               return MaterialApp.router(
                 title: 'Stocker',
                 debugShowCheckedModeBanner: false,
@@ -375,7 +379,7 @@ class StockerApp extends StatelessWidget {
                 // euimin 다크/라이트 테마 유지
                 theme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,
-                themeMode: themeProvider.themeMode,
+                themeMode: currentThemeMode, // 🔥 Riverpod에서 가져온 테마
 
                 // subin의 Quill 로캘 설정 추가
                 locale: const Locale('ko'),
