@@ -220,7 +220,8 @@ class QuizProvider extends ChangeNotifier {
   /// [isReadOnly]: 읽기 전용 모드 (오답노트 복습용, DB 수정 없음)
   ///
   /// ReadOnly 모드에서는 DB를 수정하지 않고 복습만 가능합니다.
-  Future<bool> startSingleQuiz(int chapterId, int quizId, {bool isReadOnly = false}) async {
+  Future<bool> startSingleQuiz(int chapterId, int quizId,
+      {bool isReadOnly = false}) async {
     if (_isLoadingQuiz) return false;
 
     debugPrint(

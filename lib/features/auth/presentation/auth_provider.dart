@@ -121,8 +121,8 @@ class AuthProvider with ChangeNotifier {
 
   /// 회원가입 (업데이트된 버전 - 추가 필드 포함)
   Future<bool> signup(
-    String email, 
-    String password, 
+    String email,
+    String password,
     String nickname, {
     required int age,
     required String occupation,
@@ -140,12 +140,12 @@ class AuthProvider with ChangeNotifier {
         provider: provider,
         profileImageUrl: profileImageUrl,
       );
-      
+
       debugPrint('🔄 [AUTH_PROVIDER] 회원가입 요청: $request');
-      
+
       await _repository.signup(request);
       _errorMessage = null;
-      
+
       debugPrint('✅ [AUTH_PROVIDER] 회원가입 성공');
       return true;
     } catch (e) {
@@ -174,7 +174,8 @@ class AuthProvider with ChangeNotifier {
 
     try {
       debugPrint('🔄 [AUTH_PROVIDER] 프로필 수정 시작...');
-      debugPrint('📝 [AUTH_PROVIDER] 변경 내용 - nickname: $nickname, age: $age, occupation: $occupation');
+      debugPrint(
+          '📝 [AUTH_PROVIDER] 변경 내용 - nickname: $nickname, age: $age, occupation: $occupation');
 
       // Repository를 통해 프로필 수정 API 호출
       final updatedUser = await _repository.updateProfile(
@@ -197,7 +198,6 @@ class AuthProvider with ChangeNotifier {
       debugPrint('✅ [AUTH_PROVIDER] 프로필 수정 성공');
       notifyListeners();
       return true;
-      
     } catch (e) {
       debugPrint('❌ [AUTH_PROVIDER] 프로필 수정 실패: $e');
       _errorMessage = '프로필 수정 실패: ${e.toString()}';

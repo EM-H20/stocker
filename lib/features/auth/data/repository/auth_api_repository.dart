@@ -17,12 +17,12 @@ class AuthApiRepository implements AuthRepository {
   Future<User> login(LoginRequest request) async {
     debugPrint('🌐 [AUTH_API_REPO] 로그인 API 시작');
     debugPrint('📝 [AUTH_API_REPO] Email: ${request.email}');
-    
+
     try {
       final AuthResponse res = await _api.login(request);
       // 응답 DTO -> 도메인 모델 변환
       final user = res.toUser();
-      
+
       debugPrint('✅ [AUTH_API_REPO] 로그인 성공: ${user.nickname}');
       return user;
     } catch (e) {
@@ -34,8 +34,9 @@ class AuthApiRepository implements AuthRepository {
   @override
   Future<void> signup(SignupRequest request) async {
     debugPrint('🌐 [AUTH_API_REPO] 회원가입 API 시작');
-    debugPrint('📝 [AUTH_API_REPO] Email: ${request.email}, Nickname: ${request.nickname}');
-    
+    debugPrint(
+        '📝 [AUTH_API_REPO] Email: ${request.email}, Nickname: ${request.nickname}');
+
     try {
       await _api.signup(request);
       debugPrint('✅ [AUTH_API_REPO] 회원가입 성공');
@@ -48,7 +49,7 @@ class AuthApiRepository implements AuthRepository {
   @override
   Future<void> logout(String email) async {
     debugPrint('🌐 [AUTH_API_REPO] 로그아웃 API 시작: $email');
-    
+
     try {
       await _api.logout(email);
       debugPrint('✅ [AUTH_API_REPO] 로그아웃 성공');
@@ -61,7 +62,7 @@ class AuthApiRepository implements AuthRepository {
   @override
   Future<void> refreshToken() async {
     debugPrint('🌐 [AUTH_API_REPO] 토큰 갱신 API 시작');
-    
+
     try {
       await _api.refreshToken();
       debugPrint('✅ [AUTH_API_REPO] 토큰 갱신 성공');
@@ -79,8 +80,9 @@ class AuthApiRepository implements AuthRepository {
     String? occupation,
   }) async {
     debugPrint('🌐 [AUTH_API_REPO] 프로필 수정 API 시작');
-    debugPrint('📝 [AUTH_API_REPO] 변경사항: nickname=$nickname, age=$age, occupation=$occupation');
-    
+    debugPrint(
+        '📝 [AUTH_API_REPO] 변경사항: nickname=$nickname, age=$age, occupation=$occupation');
+
     try {
       // 수정할 내용이 있는지 확인
       final request = ProfileUpdateRequest(
@@ -93,20 +95,22 @@ class AuthApiRepository implements AuthRepository {
       if (!request.hasUpdates) {
         throw Exception('수정할 내용이 없습니다');
       }
-      
+
       // API 호출 - 응답은 사용하지 않으므로 변수에 저장하지 않음
       await _api.updateProfile(request);
-      
+
       // 현재 저장된 토큰 정보 가져오기
       final currentToken = await TokenStorage.accessToken;
       final currentRefreshToken = await TokenStorage.refreshToken;
       final currentUserId = await TokenStorage.userId;
       final currentEmail = await TokenStorage.userEmail;
-      
-      if (currentToken == null || currentUserId == null || currentEmail == null) {
+
+      if (currentToken == null ||
+          currentUserId == null ||
+          currentEmail == null) {
         throw Exception('로그인 정보가 없습니다');
       }
-      
+
       // API 응답에서 User 객체 생성 (ProfileUpdateResponse 구조에 맞게)
       final updatedUser = User(
         id: int.tryParse(currentUserId) ?? 0,
@@ -115,20 +119,19 @@ class AuthApiRepository implements AuthRepository {
         accessToken: currentToken,
         refreshToken: currentRefreshToken ?? '',
       );
-      
+
       // TokenStorage에 업데이트된 정보 저장
       if (nickname != null) {
         await TokenStorage.setUserNickname(nickname);
         debugPrint('💾 [AUTH_API_REPO] 닉네임 저장소 업데이트: $nickname');
       }
-      
+
       debugPrint('✅ [AUTH_API_REPO] 프로필 수정 완료: ${updatedUser.nickname}');
-      
+
       return updatedUser;
-      
     } catch (e) {
       debugPrint('❌ [AUTH_API_REPO] 프로필 수정 실패: $e');
-      
+
       // 에러 타입에 따른 구체적인 메시지 제공
       if (e.toString().contains('401')) {
         throw Exception('로그인이 필요합니다');

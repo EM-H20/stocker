@@ -48,7 +48,8 @@ class _MypageScreenState extends State<MypageScreen> {
                 builder: (context, authProvider, child) {
                   return ProfileHeader(
                     nickname: authProvider.user?.nickname ?? '사용자', // 실제 닉네임 표시
-                    onEditPressed: () => _showNicknameEditDialog(context, authProvider),
+                    onEditPressed: () =>
+                        _showNicknameEditDialog(context, authProvider),
                   );
                 },
               ),
@@ -87,7 +88,8 @@ class _MypageScreenState extends State<MypageScreen> {
   }
 
   /// 닉네임 수정 다이얼로그 (실제 API 연동)
-  void _showNicknameEditDialog(BuildContext context, AuthProvider authProvider) {
+  void _showNicknameEditDialog(
+      BuildContext context, AuthProvider authProvider) {
     final TextEditingController controller = TextEditingController();
     controller.text = authProvider.user?.nickname ?? '';
 
@@ -119,9 +121,10 @@ class _MypageScreenState extends State<MypageScreen> {
                       enabled: !authProvider.isUpdatingProfile,
                     ),
                     maxLength: 20,
-                    onSubmitted: (value) => _updateNickname(context, authProvider, value.trim()),
+                    onSubmitted: (value) =>
+                        _updateNickname(context, authProvider, value.trim()),
                   ),
-                  
+
                   // 로딩 상태 표시
                   if (authProvider.isUpdatingProfile) ...[
                     SizedBox(height: 8.h),
@@ -129,16 +132,18 @@ class _MypageScreenState extends State<MypageScreen> {
                       message: '닉네임 변경 중...',
                     ),
                   ],
-                  
+
                   // 에러 메시지 표시
-                  if (authProvider.errorMessage != null && authProvider.errorMessage!.contains('프로필')) ...[
+                  if (authProvider.errorMessage != null &&
+                      authProvider.errorMessage!.contains('프로필')) ...[
                     SizedBox(height: 8.h),
                     Container(
                       padding: EdgeInsets.all(8.w),
                       decoration: BoxDecoration(
                         color: Colors.red.withValues(alpha: 25),
                         borderRadius: BorderRadius.circular(6.r),
-                        border: Border.all(color: Colors.red.withValues(alpha: 25)),
+                        border:
+                            Border.all(color: Colors.red.withValues(alpha: 25)),
                       ),
                       child: Text(
                         authProvider.errorMessage!,
@@ -153,19 +158,24 @@ class _MypageScreenState extends State<MypageScreen> {
               ),
               actions: [
                 TextButton(
-                  onPressed: authProvider.isUpdatingProfile ? null : () => Navigator.of(context).pop(),
+                  onPressed: authProvider.isUpdatingProfile
+                      ? null
+                      : () => Navigator.of(context).pop(),
                   child: Text(
                     '취소',
                     style: TextStyle(
-                      color: authProvider.isUpdatingProfile ? Colors.grey : Colors.grey[600],
+                      color: authProvider.isUpdatingProfile
+                          ? Colors.grey
+                          : Colors.grey[600],
                       fontSize: 14.sp,
                     ),
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: authProvider.isUpdatingProfile 
-                    ? null 
-                    : () => _updateNickname(context, authProvider, controller.text.trim()),
+                  onPressed: authProvider.isUpdatingProfile
+                      ? null
+                      : () => _updateNickname(
+                          context, authProvider, controller.text.trim()),
                   child: Text(
                     authProvider.isUpdatingProfile ? '변경 중...' : '변경',
                     style: TextStyle(
@@ -183,7 +193,8 @@ class _MypageScreenState extends State<MypageScreen> {
   }
 
   /// 실제 API를 통한 닉네임 업데이트 처리
-  void _updateNickname(BuildContext context, AuthProvider authProvider, String newNickname) async {
+  void _updateNickname(BuildContext context, AuthProvider authProvider,
+      String newNickname) async {
     // 입력 검증
     if (newNickname.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -211,7 +222,8 @@ class _MypageScreenState extends State<MypageScreen> {
       return;
     }
 
-    debugPrint('🔄 [NICKNAME_UPDATE] 닉네임 변경 요청: ${authProvider.user?.nickname} → $newNickname');
+    debugPrint(
+        '🔄 [NICKNAME_UPDATE] 닉네임 변경 요청: ${authProvider.user?.nickname} → $newNickname');
 
     // 실제 API 호출
     final success = await authProvider.updateNickname(newNickname);
@@ -230,12 +242,14 @@ class _MypageScreenState extends State<MypageScreen> {
         debugPrint('✅ [NICKNAME_UPDATE] 닉네임 변경 성공: $newNickname');
       } else {
         // 실패 시 에러 메시지는 다이얼로그 내에서 표시 (StatefulBuilder로 처리됨)
-        debugPrint('❌ [NICKNAME_UPDATE] 닉네임 변경 실패: ${authProvider.errorMessage}');
-        
+        debugPrint(
+            '❌ [NICKNAME_UPDATE] 닉네임 변경 실패: ${authProvider.errorMessage}');
+
         // 다이얼로그가 닫혀있다면 스낵바로도 표시
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('닉네임 변경에 실패했습니다: ${authProvider.errorMessage ?? "알 수 없는 오류"}'),
+            content: Text(
+                '닉네임 변경에 실패했습니다: ${authProvider.errorMessage ?? "알 수 없는 오류"}'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),

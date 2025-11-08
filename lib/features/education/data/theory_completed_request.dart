@@ -7,7 +7,8 @@ class TheoryCompletedRequest {
 
   /// JSON에서 객체로 변환 (API.md 스펙 준수)
   factory TheoryCompletedRequest.fromJson(Map<String, dynamic> json) {
-    return TheoryCompletedRequest(chapterId: json['chapter_id'] as int); // API.md 스펙
+    return TheoryCompletedRequest(
+        chapterId: json['chapter_id'] as int); // API.md 스펙
   }
 
   /// 객체에서 JSON으로 변환 (API.md 스펙 준수)

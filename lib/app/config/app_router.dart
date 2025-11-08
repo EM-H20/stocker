@@ -151,14 +151,15 @@ class AppRouter {
         pageBuilder: (context, state) {
           final chapterIdStr = state.uri.queryParameters['chapterId'];
           final chapterId = int.tryParse(chapterIdStr ?? '');
-          
+
           if (chapterId == null) {
-            debugPrint('❌ [ROUTER] 이론 학습 - chapterId 파라미터 오류 (받은 값: $chapterIdStr), 기본값 1 사용');
+            debugPrint(
+                '❌ [ROUTER] 이론 학습 - chapterId 파라미터 오류 (받은 값: $chapterIdStr), 기본값 1 사용');
             return NoTransitionPage(
               child: TheoryScreen(chapterId: 1),
             );
           }
-          
+
           debugPrint('✅ [ROUTER] 이론 학습 - chapterId: $chapterId로 이동');
           return NoTransitionPage(
             child: TheoryScreen(chapterId: chapterId),
@@ -179,7 +180,8 @@ class AppRouter {
           final quizId = int.tryParse(quizIdStr ?? '');
           final isReadOnly = readOnlyStr == 'true';
 
-          debugPrint('🧠 [ROUTER] 퀴즈 라우팅 - chapterId: $chapterId, quizId: $quizId, readOnly: $isReadOnly');
+          debugPrint(
+              '🧠 [ROUTER] 퀴즈 라우팅 - chapterId: $chapterId, quizId: $quizId, readOnly: $isReadOnly');
 
           if (chapterId == null) {
             debugPrint('❌ [ROUTER] 퀴즈 - chapterId 파라미터 오류, 기본값 1 사용');
@@ -208,14 +210,14 @@ class AppRouter {
         pageBuilder: (context, state) {
           final chapterIdStr = state.uri.queryParameters['chapterId'];
           final chapterId = int.tryParse(chapterIdStr ?? '');
-          
+
           if (chapterId == null) {
             debugPrint('❌ [ROUTER] 퀴즈 결과 - chapterId 파라미터 오류, 기본값 1 사용');
             return NoTransitionPage(
               child: QuizResultScreen(chapterId: 1),
             );
           }
-          
+
           return NoTransitionPage(
             child: QuizResultScreen(chapterId: chapterId),
           );

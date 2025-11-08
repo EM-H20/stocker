@@ -97,21 +97,22 @@ class AuthMockRepository implements AuthRepository {
   }) async {
     // Mock 환경에서 시뮬레이션 딜레이
     await Future.delayed(const Duration(milliseconds: 800));
-    
+
     debugPrint('🎭 [AUTH_MOCK] 프로필 수정 Mock 호출');
-    debugPrint('📝 [AUTH_MOCK] 변경사항: nickname=$nickname, age=$age, occupation=$occupation');
-    
+    debugPrint(
+        '📝 [AUTH_MOCK] 변경사항: nickname=$nickname, age=$age, occupation=$occupation');
+
     // 기존 사용자 정보 조회
     final currentToken = await TokenStorage.accessToken;
     final currentUserId = await TokenStorage.userId;
     final currentEmail = await TokenStorage.userEmail;
     final currentNickname = await TokenStorage.userNickname;
     final currentRefreshToken = await TokenStorage.refreshToken;
-    
+
     if (currentToken == null || currentUserId == null || currentEmail == null) {
       throw Exception('로그인이 필요합니다');
     }
-    
+
     // 새로운 사용자 정보 생성 (변경된 필드만 업데이트)
     final updatedUser = User(
       id: int.tryParse(currentUserId) ?? 1,
@@ -120,14 +121,14 @@ class AuthMockRepository implements AuthRepository {
       accessToken: currentToken,
       refreshToken: currentRefreshToken ?? '',
     );
-    
+
     // TokenStorage에 업데이트된 닉네임 저장
     if (nickname != null) {
       await TokenStorage.setUserNickname(nickname);
     }
-    
+
     debugPrint('✅ [AUTH_MOCK] 프로필 수정 완료: ${updatedUser.nickname}');
-    
+
     return updatedUser;
   }
 }

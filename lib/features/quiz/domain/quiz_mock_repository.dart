@@ -56,8 +56,10 @@ class QuizMockRepository {
     for (final answer in answers) {
       final quizId = answer['quiz_id']!;
       final selectedAnswer = answer['selected_option']!; // 올바른 키 사용
-      final quiz = quizList.firstWhere((q) => q.id == quizId, orElse: () => quizList.first);
-      if (selectedAnswer == quiz.correctAnswerIndex + 1) { // API에서는 1-based
+      final quiz = quizList.firstWhere((q) => q.id == quizId,
+          orElse: () => quizList.first);
+      if (selectedAnswer == quiz.correctAnswerIndex + 1) {
+        // API에서는 1-based
         correctCount++;
       }
     }

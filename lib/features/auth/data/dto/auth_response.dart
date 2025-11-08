@@ -26,7 +26,8 @@ class AuthResponse {
       email: user['email'] ?? '',
       nickname: user['nickname'] ?? '',
       accessToken: json['token'] ?? '', // ✅ 최상위 level에서 'token' 읽기
-      refreshToken: json['refreshToken'] ?? '', // ✅ 최상위 level에서 'refreshToken' 읽기
+      refreshToken:
+          json['refreshToken'] ?? '', // ✅ 최상위 level에서 'refreshToken' 읽기
     );
   }
 

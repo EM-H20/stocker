@@ -45,8 +45,8 @@ class _AptitudeInitialScreenState extends State<AptitudeInitialScreen> {
         child: provider.isLoading
             ? const Center(
                 child: LoadingWidget(
-                  message: '투자 성향 정보를 불러오는 중...',
-                ))
+                message: '투자 성향 정보를 불러오는 중...',
+              ))
             : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,

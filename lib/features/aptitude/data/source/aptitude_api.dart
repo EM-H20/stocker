@@ -12,19 +12,23 @@ class AptitudeApi {
 
   // 0. 검사지 제공
   Future<List<AptitudeQuestionDto>> getQuestionnaire() async {
-    final response = await _dio.get('/api/investment_profile/test');  // ✅ 백엔드 라우트와 일치
-    
+    final response =
+        await _dio.get('/api/investment_profile/test'); // ✅ 백엔드 라우트와 일치
+
     // 백엔드 실제 응답: { version, questions: [...] }
     final responseData = response.data as Map<String, dynamic>;
-    final List<dynamic> questionsData = responseData['questions'] as List<dynamic>? ?? [];
-    
-    return questionsData.map((json) => AptitudeQuestionDto.fromJson(json)).toList();
+    final List<dynamic> questionsData =
+        responseData['questions'] as List<dynamic>? ?? [];
+
+    return questionsData
+        .map((json) => AptitudeQuestionDto.fromJson(json))
+        .toList();
   }
 
   // 1. 결과 저장 (최초)
   Future<AptitudeResultDto> saveResult(AptitudeAnswerRequest request) async {
     final response = await _dio.post(
-      '/api/investment_profile/result',  // ✅ 백엔드 라우트와 일치
+      '/api/investment_profile/result', // ✅ 백엔드 라우트와 일치
       data: request.toJson(),
     );
     return AptitudeResultDto.fromJson(response.data);
@@ -32,7 +36,8 @@ class AptitudeApi {
 
   // 2. 결과 조회
   Future<AptitudeResultDto> getResult() async {
-    final response = await _dio.get('/api/investment_profile/result');  // ✅ 백엔드 라우트와 일치
+    final response =
+        await _dio.get('/api/investment_profile/result'); // ✅ 백엔드 라우트와 일치
     return AptitudeResultDto.fromJson(response.data);
   }
 
@@ -40,7 +45,7 @@ class AptitudeApi {
   Future<AptitudeResultDto> retestAndUpdate(
       AptitudeAnswerRequest request) async {
     final response = await _dio.put(
-      '/api/investment_profile/result',  // ✅ 백엔드 라우트와 일치
+      '/api/investment_profile/result', // ✅ 백엔드 라우트와 일치
       data: request.toJson(),
     );
     return AptitudeResultDto.fromJson(response.data);
@@ -48,7 +53,8 @@ class AptitudeApi {
 
   // ✅ [추가] 4. 모든 거장(성향) 목록 조회
   Future<List<AptitudeTypeSummaryDto>> listAllMasters() async {
-    final response = await _dio.get('/api/investment_profile/masters');  // ✅ 백엔드 라우트와 일치
+    final response =
+        await _dio.get('/api/investment_profile/masters'); // ✅ 백엔드 라우트와 일치
     final List<dynamic> data = response.data as List<dynamic>? ?? [];
     return data.map((json) => AptitudeTypeSummaryDto.fromJson(json)).toList();
   }

@@ -11,7 +11,7 @@ class EducationProvider extends ChangeNotifier {
   final EducationRepository? _repository;
   final EducationMockRepository? _mockRepository;
   final bool _useMock;
-  
+
   // 챕터 완료 시 호출될 콜백 함수들
   final List<Function(int chapterId)> _onChapterCompletedCallbacks = [];
 
@@ -282,7 +282,8 @@ class EducationProvider extends ChangeNotifier {
   Future<bool> enterTheory(int chapterId) async {
     if (_isLoadingTheory) return false;
 
-    debugPrint('🎓 [EDU_PROVIDER] 이론 진입 요청 - 챕터 ID: $chapterId (useMock: $_useMock)');
+    debugPrint(
+        '🎓 [EDU_PROVIDER] 이론 진입 요청 - 챕터 ID: $chapterId (useMock: $_useMock)');
     _isLoadingTheory = true;
     _theoryError = null;
     notifyListeners();
@@ -306,7 +307,8 @@ class EducationProvider extends ChangeNotifier {
         }
       }
 
-      debugPrint('✅ [EDU_PROVIDER] 이론 진입 성공 - 총 ${_currentTheorySession?.totalCount ?? 0}개 이론');
+      debugPrint(
+          '✅ [EDU_PROVIDER] 이론 진입 성공 - 총 ${_currentTheorySession?.totalCount ?? 0}개 이론');
       _theoryError = null;
       return true;
     } catch (e) {
@@ -373,7 +375,7 @@ class EducationProvider extends ChangeNotifier {
 
     try {
       final chapterId = _currentTheorySession!.chapterId;
-      
+
       if (_useMock) {
         await _mockRepository!.completeTheory(chapterId);
       } else {
@@ -382,7 +384,7 @@ class EducationProvider extends ChangeNotifier {
 
       // 로컬 상태 업데이트: 이론 완료
       _updateLocalChapterCompletion(chapterId, isTheoryCompleted: true);
-      
+
       // 챕터 완료 상태 확인 및 업데이트
       _checkAndUpdateChapterCompletion(chapterId);
 
@@ -500,14 +502,15 @@ class EducationProvider extends ChangeNotifier {
 
   /// 퀴즈 완료 상태 업데이트 (QuizProvider에서 호출됨)
   void updateQuizCompletion(int chapterId, {required bool isPassed}) {
-    debugPrint('🎯 [EDU_PROVIDER] 퀴즈 완료 상태 업데이트 - 챕터 $chapterId (합격: $isPassed)');
-    
+    debugPrint(
+        '🎯 [EDU_PROVIDER] 퀴즈 완료 상태 업데이트 - 챕터 $chapterId (합격: $isPassed)');
+
     // 로컬 상태 업데이트
     _updateLocalChapterCompletion(chapterId, isQuizCompleted: isPassed);
-    
+
     // 챕터 완료 상태 확인 및 업데이트
     _checkAndUpdateChapterCompletion(chapterId);
-    
+
     notifyListeners();
   }
 
@@ -517,12 +520,13 @@ class EducationProvider extends ChangeNotifier {
     final chapterIndex = _chapters.indexWhere((c) => c.id == chapterId);
     if (chapterIndex >= 0) {
       final chapter = _chapters[chapterIndex];
-      
+
       // 이론과 퀴즈가 모두 완료된 경우에만 챕터 완료
       if (chapter.isTheoryCompleted && chapter.isQuizCompleted) {
-        debugPrint('🎉 [EDU_PROVIDER] 챕터 완료! ID: $chapterId, Title: ${chapter.title}');
+        debugPrint(
+            '🎉 [EDU_PROVIDER] 챕터 완료! ID: $chapterId, Title: ${chapter.title}');
         _updateLocalChapterCompletion(chapterId, isChapterCompleted: true);
-        
+
         // 챕터 완료 콜백 호출 (LearningProgressProvider 등에 알림)
         for (final callback in _onChapterCompletedCallbacks) {
           try {
@@ -531,10 +535,11 @@ class EducationProvider extends ChangeNotifier {
             debugPrint('❌ [EDU_PROVIDER] 챕터 완료 콜백 실행 실패: $e');
           }
         }
-        
+
         debugPrint('✅ [EDU_PROVIDER] 챕터 완료 상태 백엔드 업데이트 요청 완료');
       } else {
-        debugPrint('⏳ [EDU_PROVIDER] 챕터 미완료 - 이론: ${chapter.isTheoryCompleted}, 퀴즈: ${chapter.isQuizCompleted}');
+        debugPrint(
+            '⏳ [EDU_PROVIDER] 챕터 미완료 - 이론: ${chapter.isTheoryCompleted}, 퀴즈: ${chapter.isQuizCompleted}');
       }
     }
   }

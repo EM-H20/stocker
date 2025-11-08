@@ -24,9 +24,14 @@ class AttendanceMockRepository implements AttendanceRepository {
   Future<List<AttendanceQuiz>> getTodaysQuiz() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return [
-      AttendanceQuiz(id: 1, question: '주식 투자에서 분산투자는 위험을 줄이는 효과적인 방법이다.', answer: true),
-      AttendanceQuiz(id: 2, question: 'ETF는 개별 주식보다 항상 더 안전한 투자 방법이다.', answer: false),
-      AttendanceQuiz(id: 3, question: '투자할 때는 모든 자금을 한 번에 투입하기보다는 시간을 나누어 투자하는 것이 좋다.', answer: true),
+      AttendanceQuiz(
+          id: 1, question: '주식 투자에서 분산투자는 위험을 줄이는 효과적인 방법이다.', answer: true),
+      AttendanceQuiz(
+          id: 2, question: 'ETF는 개별 주식보다 항상 더 안전한 투자 방법이다.', answer: false),
+      AttendanceQuiz(
+          id: 3,
+          question: '투자할 때는 모든 자금을 한 번에 투입하기보다는 시간을 나누어 투자하는 것이 좋다.',
+          answer: true),
     ];
   }
 

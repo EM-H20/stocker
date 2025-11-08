@@ -48,7 +48,7 @@ class AptitudeQuestionDto {
     final choices = List.generate(5, (index) {
       final value = index + 1;
       String text;
-      
+
       if (value == 1) {
         text = '$leftLabel (매우 그렇다)';
       } else if (value == 2) {
@@ -60,7 +60,7 @@ class AptitudeQuestionDto {
       } else {
         text = '$rightLabel (매우 그렇다)';
       }
-      
+
       return AptitudeChoice(
         text: text,
         value: isReverse ? (6 - value) : value, // 역방향 질문 처리

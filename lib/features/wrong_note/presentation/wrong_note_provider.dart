@@ -82,8 +82,11 @@ class WrongNoteProvider extends ChangeNotifier {
       }
 
       // 🔍 ReadOnly 복습 상태 요약 로깅
-      final retriedCount = _wrongNotes.where((note) => _retriedQuizIds.contains(note.quizId)).length;
-      debugPrint('📊 [WrongNote] 복습 상태 요약: $retriedCount/${_wrongNotes.length}개 복습 완료');
+      final retriedCount = _wrongNotes
+          .where((note) => _retriedQuizIds.contains(note.quizId))
+          .length;
+      debugPrint(
+          '📊 [WrongNote] 복습 상태 요약: $retriedCount/${_wrongNotes.length}개 복습 완료');
 
       notifyListeners();
     } catch (e) {
@@ -184,7 +187,8 @@ class WrongNoteProvider extends ChangeNotifier {
     debugPrint('💡 [WrongNote] 복습용으로 계속 유지되며, 서버 동기화 없음');
 
     // 🔍 해당 퀴즈가 실제로 존재하는지 확인
-    final targetQuiz = _wrongNotes.where((item) => item.quizId == quizId).toList();
+    final targetQuiz =
+        _wrongNotes.where((item) => item.quizId == quizId).toList();
     if (targetQuiz.isEmpty) {
       debugPrint('⚠️ [WrongNote] Quiz $quizId가 오답노트에 없음 - 마크 건너뜀');
       return;

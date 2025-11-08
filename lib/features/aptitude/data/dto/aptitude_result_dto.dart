@@ -19,13 +19,14 @@ class AptitudeResultDto {
     // 백엔드 실제 응답: { profile_id, user_id, type_code, matched_master }
     // saveResult API의 경우 추가로 created, computed 필드도 포함
     final matchedMasterList = json['matched_master'] as List<dynamic>? ?? [];
-    
+
     return AptitudeResultDto(
       profileId: json['profile_id'] as int?,
       userId: json['user_id'] as int?,
       typeCode: json['type_code'] as String? ?? 'UNKNOWN',
       matchedMaster: matchedMasterList
-          .map((item) => InvestmentMasterDto.fromJson(item as Map<String, dynamic>))
+          .map((item) =>
+              InvestmentMasterDto.fromJson(item as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -35,7 +36,9 @@ class AptitudeResultDto {
     return AptitudeResult(
       typeName: _getTypeNameFromCode(typeCode),
       typeDescription: _getTypeDescriptionFromCode(typeCode),
-      master: matchedMaster.isNotEmpty ? matchedMaster.first.toModel() : _getDefaultMaster(),
+      master: matchedMaster.isNotEmpty
+          ? matchedMaster.first.toModel()
+          : _getDefaultMaster(),
     );
   }
 
@@ -43,7 +46,7 @@ class AptitudeResultDto {
   String _getTypeNameFromCode(String code) {
     const typeNameMap = {
       'CONSERVATIVE': '보수형 투자자',
-      'MODERATE': '중립형 투자자',  
+      'MODERATE': '중립형 투자자',
       'AGGRESSIVE': '공격형 투자자',
       'GROWTH': '성장형 투자자',
       'VALUE': '가치형 투자자',

@@ -120,11 +120,13 @@ class _EducationScreenState extends State<EducationScreen> {
                     isSelectedChapter: provider.hasSelectedChapter,
                     onTheoryPressed: () {
                       provider.enterTheory(displayChapter.id);
-                      context.go('${AppRoutes.theory}?chapterId=${displayChapter.id}');
+                      context.go(
+                          '${AppRoutes.theory}?chapterId=${displayChapter.id}');
                     },
                     onQuizPressed: () {
                       // 퀴즈 화면으로 이동 (표시된 챕터 ID 전달)
-                      context.go('${AppRoutes.quiz}?chapterId=${displayChapter.id}');
+                      context.go(
+                          '${AppRoutes.quiz}?chapterId=${displayChapter.id}');
                     },
                     onClearSelection: provider.hasSelectedChapter
                         ? () {
@@ -200,11 +202,12 @@ class _EducationScreenState extends State<EducationScreen> {
                       // 챕터 상태에 따른 설명과 아이콘 결정
                       String description;
                       IconData icon;
-                      
+
                       if (chapter.isChapterCompleted) {
                         description = '챕터 완료! 🎉 (이론 ✓, 퀴즈 ✓)';
                         icon = Icons.stars;
-                      } else if (chapter.isTheoryCompleted && chapter.isQuizCompleted) {
+                      } else if (chapter.isTheoryCompleted &&
+                          chapter.isQuizCompleted) {
                         description = '챕터 완료 처리 중... ⏳';
                         icon = Icons.hourglass_empty;
                       } else if (chapter.isTheoryCompleted) {
@@ -217,7 +220,7 @@ class _EducationScreenState extends State<EducationScreen> {
                         description = '이론 학습을 시작하세요';
                         icon = Icons.play_circle_outline;
                       }
-                      
+
                       return RecommendedChapterCard(
                         title: chapter.title,
                         description: description,
@@ -225,7 +228,8 @@ class _EducationScreenState extends State<EducationScreen> {
                         onTap: () {
                           // 챕터 선택하고 CurrentLearningCard로 스크롤
                           provider.selectChapter(chapter.id);
-                          debugPrint('📌 [EDUCATION_SCREEN] 챕터 선택됨: ${chapter.title}');
+                          debugPrint(
+                              '📌 [EDUCATION_SCREEN] 챕터 선택됨: ${chapter.title}');
 
                           // 선택 후 부드럽게 맨 위로 스크롤 (CurrentLearningCard 위치)
                           Future.delayed(const Duration(milliseconds: 100), () {

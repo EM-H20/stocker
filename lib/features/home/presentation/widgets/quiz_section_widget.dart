@@ -68,8 +68,8 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                       icon: Icon(
                         Icons.check_circle,
                         size: 18.sp,
-                        color: _hasAllAnswers() 
-                            ? AppTheme.successColor 
+                        color: _hasAllAnswers()
+                            ? AppTheme.successColor
                             : AppTheme.grey500,
                       ),
                       label: Text(
@@ -77,8 +77,8 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
-                          color: _hasAllAnswers() 
-                              ? AppTheme.successColor 
+                          color: _hasAllAnswers()
+                              ? AppTheme.successColor
                               : AppTheme.grey500,
                         ),
                       ),
@@ -106,7 +106,8 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Theme.of(context).shadowColor.withValues(alpha: 0.08),
+                      color:
+                          Theme.of(context).shadowColor.withValues(alpha: 0.08),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -144,7 +145,6 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
           ),
           if (i < quizzes.length - 1 && i < 2) SizedBox(height: 16.h),
         ],
-        
         if (_hasAllAnswers()) ...[
           SizedBox(height: 20.h),
           Container(
@@ -196,7 +196,11 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
           '오늘의 퀴즈를 불러오는 중...',
           style: TextStyle(
             fontSize: 14.sp,
-            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+            color: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.color
+                ?.withValues(alpha: 0.7),
           ),
         ),
         SizedBox(height: 40.h),
@@ -212,7 +216,11 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
         Icon(
           Icons.quiz_outlined,
           size: 48.sp,
-          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+          color: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.color
+              ?.withValues(alpha: 0.5),
         ),
         SizedBox(height: 12.h),
         Text(
@@ -220,7 +228,11 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.w500,
-            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+            color: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.color
+                ?.withValues(alpha: 0.8),
           ),
         ),
         SizedBox(height: 4.h),
@@ -228,7 +240,11 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
           '내일 다시 확인해보세요!',
           style: TextStyle(
             fontSize: 12.sp,
-            color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+            color: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.color
+                ?.withValues(alpha: 0.6),
           ),
         ),
         SizedBox(height: 20.h),
@@ -239,7 +255,7 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
   /// 퀴즈 답변 처리
   void _handleAnswer(int index, bool answer) {
     if (_isSubmitting) return;
-    
+
     setState(() {
       _userAnswers[index] = answer;
     });
@@ -265,9 +281,9 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
   bool _hasAllAnswers() {
     final attendanceProvider = context.read<AttendanceProvider>();
     final quizCount = attendanceProvider.quizzes.length;
-    
+
     if (quizCount == 0) return false;
-    
+
     for (int i = 0; i < quizCount && i < 3; i++) {
       if (_userAnswers[i] == null) return false;
     }
@@ -309,7 +325,8 @@ class _QuizSectionWidgetState extends State<QuizSectionWidget> {
                   SizedBox(width: 8.w),
                   Text(
                     '출석이 완료되었습니다! 🎉',
-                    style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                    style:
+                        TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),

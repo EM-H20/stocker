@@ -1,4 +1,3 @@
-
 import '../../domain/model/note.dart';
 
 class NoteDto {
@@ -22,7 +21,8 @@ class NoteDto {
       userId: json['user_id'] as int? ?? 0,
       templateType: json['template_type'] as String? ?? '일지',
       content: json['content'] as Map<String, dynamic>? ?? {},
-      createdAt: json['created_at'] as String? ?? DateTime.now().toIso8601String(),
+      createdAt:
+          json['created_at'] as String? ?? DateTime.now().toIso8601String(),
     );
   }
 
@@ -34,7 +34,7 @@ class NoteDto {
     if (content.isNotEmpty) {
       title = content['title'] as String? ?? '제목 없음';
       final textData = content['text'];
-      
+
       if (textData is String && textData.isNotEmpty) {
         contentText = textData;
       }
@@ -45,7 +45,8 @@ class NoteDto {
       title: title,
       content: contentText,
       createdAt: DateTime.parse(createdAt),
-      updatedAt: DateTime.parse(createdAt), // 서버에 updated_at이 없으므로 created_at 사용
+      updatedAt:
+          DateTime.parse(createdAt), // 서버에 updated_at이 없으므로 created_at 사용
     );
   }
 }

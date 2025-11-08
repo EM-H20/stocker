@@ -4,11 +4,10 @@ import '../../domain/repository/learning_progress_repository.dart';
 
 /// Mock 학습 진도 Repository - SharedPreferences + 하드코딩된 챕터 데이터 사용
 class LearningProgressMockRepository implements LearningProgressRepository {
-  
   /// 📚 Mock 챕터 데이터 (기존 fallback 데이터 유지)
   static const Map<int, String> _mockChapterTitles = {
     1: '주식의 기본 개념',
-    2: '투자의 기본 원리', 
+    2: '투자의 기본 원리',
     3: '리스크와 수익률',
     4: '포트폴리오 구성',
     5: '기술적 분석 입문',
@@ -25,7 +24,7 @@ class LearningProgressMockRepository implements LearningProgressRepository {
       final prefs = await SharedPreferences.getInstance();
       final chapterId = prefs.getInt('last_chapter_id');
       final step = prefs.getString('last_step');
-      
+
       if (chapterId != null && step != null) {
         return {
           'chapterId': chapterId,
@@ -48,7 +47,8 @@ class LearningProgressMockRepository implements LearningProgressRepository {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('last_chapter_id', chapterId);
       await prefs.setString('last_step', step);
-      debugPrint('💾 [LearningProgressMockRepo] 마지막 위치 저장: Chapter $chapterId ($step)');
+      debugPrint(
+          '💾 [LearningProgressMockRepo] 마지막 위치 저장: Chapter $chapterId ($step)');
     } catch (e) {
       debugPrint('❌ [LearningProgressMockRepo] 마지막 위치 저장 실패: $e');
     }
@@ -59,9 +59,10 @@ class LearningProgressMockRepository implements LearningProgressRepository {
     try {
       final prefs = await SharedPreferences.getInstance();
       final completedList = prefs.getStringList('completed_chapters') ?? [];
-      return completedList.map((str) => int.tryParse(str) ?? 0)
-                         .where((id) => id > 0)
-                         .toList();
+      return completedList
+          .map((str) => int.tryParse(str) ?? 0)
+          .where((id) => id > 0)
+          .toList();
     } catch (e) {
       debugPrint('❌ [LearningProgressMockRepo] 완료 챕터 조회 실패: $e');
       return [];
@@ -88,9 +89,10 @@ class LearningProgressMockRepository implements LearningProgressRepository {
     try {
       final prefs = await SharedPreferences.getInstance();
       final completedList = prefs.getStringList('completed_quizzes') ?? [];
-      return completedList.map((str) => int.tryParse(str) ?? 0)
-                         .where((id) => id > 0)
-                         .toList();
+      return completedList
+          .map((str) => int.tryParse(str) ?? 0)
+          .where((id) => id > 0)
+          .toList();
     } catch (e) {
       debugPrint('❌ [LearningProgressMockRepo] 완료 퀴즈 조회 실패: $e');
       return [];
@@ -129,10 +131,11 @@ class LearningProgressMockRepository implements LearningProgressRepository {
     try {
       final prefs = await SharedPreferences.getInstance();
       final datesList = prefs.getStringList('studied_dates') ?? [];
-      
+
       final today = DateTime.now();
-      final todayStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
-      
+      final todayStr =
+          '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+
       if (!datesList.contains(todayStr)) {
         datesList.add(todayStr);
         await prefs.setStringList('studied_dates', datesList);
@@ -162,11 +165,13 @@ class LearningProgressMockRepository implements LearningProgressRepository {
   Future<List<Map<String, dynamic>>> getAvailableChapters() async {
     // Mock 환경에서는 하드코딩된 챕터 데이터 반환
     debugPrint('📚 [LearningProgressMockRepo] Mock 챕터 데이터 반환');
-    
-    return _mockChapterTitles.entries.map((entry) => {
-      'id': entry.key,
-      'title': entry.value,
-      'description': '${entry.value} 학습 내용',
-    }).toList();
+
+    return _mockChapterTitles.entries
+        .map((entry) => {
+              'id': entry.key,
+              'title': entry.value,
+              'description': '${entry.value} 학습 내용',
+            })
+        .toList();
   }
 }

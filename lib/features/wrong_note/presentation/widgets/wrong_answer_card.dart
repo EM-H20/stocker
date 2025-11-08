@@ -77,15 +77,21 @@ class WrongAnswerCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      isRetried ? Icons.check_circle_outline : Icons.schedule_outlined,
-                      color: isRetried ? AppTheme.successColor : AppTheme.warningColor,
+                      isRetried
+                          ? Icons.check_circle_outline
+                          : Icons.schedule_outlined,
+                      color: isRetried
+                          ? AppTheme.successColor
+                          : AppTheme.warningColor,
                       size: 14.sp,
                     ),
                     SizedBox(width: 4.w),
                     Text(
                       isRetried ? '복습 완료 ✨' : '복습 대기',
                       style: TextStyle(
-                        color: isRetried ? AppTheme.successColor : AppTheme.warningColor,
+                        color: isRetried
+                            ? AppTheme.successColor
+                            : AppTheme.warningColor,
                         fontSize: 11.sp,
                         fontWeight: FontWeight.w600,
                       ),
@@ -224,7 +230,8 @@ class WrongAnswerCard extends StatelessWidget {
                   // 복습 모드 안내 텍스트
                   Container(
                     margin: EdgeInsets.only(bottom: 8.h),
-                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                     decoration: BoxDecoration(
                       color: AppTheme.infoColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6.r),
@@ -257,10 +264,12 @@ class WrongAnswerCard extends StatelessWidget {
                   ActionButton(
                     text: isRetried ? '다시 복습하기' : '다시 풀기',
                     icon: isRetried ? Icons.replay_outlined : Icons.refresh,
-                    color: isRetried ? AppTheme.infoColor : AppTheme.successColor,
+                    color:
+                        isRetried ? AppTheme.infoColor : AppTheme.successColor,
                     onPressed: () {
                       // 단일 퀴즈 모드로 해당 문제 재시도 (읽기 전용 모드)
-                      context.go('${AppRoutes.quiz}?chapterId=${wrongNote.chapterId}&quizId=${wrongNote.quizId}&readOnly=true');
+                      context.go(
+                          '${AppRoutes.quiz}?chapterId=${wrongNote.chapterId}&quizId=${wrongNote.quizId}&readOnly=true');
                     },
                   ),
                 ],
@@ -275,19 +284,20 @@ class WrongAnswerCard extends StatelessWidget {
   /// 정답 텍스트 가져오기
   String _getCorrectAnswerText() {
     // correctAnswerText가 있으면 그것을 사용
-    if (wrongNote.correctAnswerText != null && wrongNote.correctAnswerText!.isNotEmpty) {
+    if (wrongNote.correctAnswerText != null &&
+        wrongNote.correctAnswerText!.isNotEmpty) {
       return wrongNote.correctAnswerText!;
     }
-    
+
     // correctAnswerIndex와 options로 정답 텍스트 구성
-    if (wrongNote.correctAnswerIndex != null && 
-        wrongNote.options != null && 
+    if (wrongNote.correctAnswerIndex != null &&
+        wrongNote.options != null &&
         wrongNote.options!.isNotEmpty &&
         wrongNote.correctAnswerIndex! < wrongNote.options!.length) {
       final correctIndex = wrongNote.correctAnswerIndex!;
       return '${correctIndex + 1}번. ${wrongNote.options![correctIndex]}';
     }
-    
+
     return '정답 정보 없음';
   }
 }

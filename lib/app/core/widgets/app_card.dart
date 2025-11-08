@@ -124,7 +124,8 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveBackgroundColor = backgroundColor ?? Theme.of(context).cardColor;
+    final effectiveBackgroundColor =
+        backgroundColor ?? Theme.of(context).cardColor;
 
     final effectiveBorderColor = borderColor ??
         ThemeUtils.getColorWithOpacity(

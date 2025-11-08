@@ -7,7 +7,7 @@ abstract class AuthRepository {
   Future<void> signup(SignupRequest request);
   Future<void> logout(String email);
   Future<void> refreshToken();
-  
+
   /// 🆕 프로필 수정 메서드 추가
   Future<User> updateProfile({
     String? nickname,

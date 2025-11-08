@@ -90,12 +90,13 @@ class _SignupScreenState extends State<SignupScreen> {
       age: age,
       occupation: occupationController.text.trim(),
       provider: selectedProvider,
-      profileImageUrl: profileImageUrl.isEmpty ? 
-        'https://example.com/profile.png' : profileImageUrl, // 기본 프로필 이미지
+      profileImageUrl: profileImageUrl.isEmpty
+          ? 'https://example.com/profile.png'
+          : profileImageUrl, // 기본 프로필 이미지
     );
 
     if (!mounted) return;
-    
+
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -121,8 +122,8 @@ class _SignupScreenState extends State<SignupScreen> {
     final isPasswordMatch = passwordController.text.isNotEmpty &&
         passwordController.text == confirmPasswordController.text;
 
-    final canSubmit = agreedToTerms && 
-        isPasswordMatch && 
+    final canSubmit = agreedToTerms &&
+        isPasswordMatch &&
         emailController.text.trim().isNotEmpty &&
         nicknameController.text.trim().isNotEmpty &&
         ageController.text.trim().isNotEmpty &&
@@ -151,7 +152,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 32),
-              
+
               // 이메일
               TextField(
                 controller: emailController,
@@ -163,7 +164,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // 비밀번호
               TextField(
                 controller: passwordController,
@@ -175,7 +176,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // 비밀번호 확인
               TextField(
                 controller: confirmPasswordController,
@@ -191,7 +192,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // 닉네임
               TextField(
                 controller: nicknameController,
@@ -202,7 +203,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // 나이 (새로 추가)
               TextField(
                 controller: ageController,
@@ -214,10 +215,12 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // 직업 (새로 추가) - 드롭다운으로 개선
               DropdownButtonFormField<String>(
-                initialValue: occupationController.text.isEmpty ? null : occupationController.text,
+                initialValue: occupationController.text.isEmpty
+                    ? null
+                    : occupationController.text,
                 decoration: const InputDecoration(
                   labelText: '💼 직업',
                   border: OutlineInputBorder(),
@@ -237,7 +240,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // 프로필 이미지 URL (선택사항)
               TextField(
                 onChanged: (value) => profileImageUrl = value,
@@ -248,7 +251,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              
+
               // 약관 동의
               Row(
                 children: [
@@ -278,16 +281,18 @@ class _SignupScreenState extends State<SignupScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              
+
               // 회원가입 버튼
               ActionButton(
-                  text: authProvider.isLoading ? '처리중...' : '회원가입',
-                  icon: authProvider.isLoading ? Icons.hourglass_empty : Icons.person_add,
-                  color: canSubmit ? Colors.blue : Colors.grey,
-                  onPressed: canSubmit ? _handleSignup : null,
+                text: authProvider.isLoading ? '처리중...' : '회원가입',
+                icon: authProvider.isLoading
+                    ? Icons.hourglass_empty
+                    : Icons.person_add,
+                color: canSubmit ? Colors.blue : Colors.grey,
+                onPressed: canSubmit ? _handleSignup : null,
               ),
               const SizedBox(height: 16),
-              
+
               // 로그인으로 이동
               TextButton(
                 onPressed: () {

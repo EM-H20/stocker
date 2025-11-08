@@ -68,8 +68,8 @@ class _AptitudeQuizScreenState extends State<AptitudeQuizScreen> {
       body: provider.isLoading && questions.isEmpty
           ? const Center(
               child: LoadingWidget(
-                message: '퀴즈를 불러오는 중...',
-              ))
+              message: '퀴즈를 불러오는 중...',
+            ))
           : Column(
               children: [
                 // 1. 진행률 표시 바

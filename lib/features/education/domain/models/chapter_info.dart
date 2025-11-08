@@ -82,7 +82,7 @@ class ChapterInfo {
   // chapterInfo의 해시코드
   @override
   int get hashCode {
-    return Object.hash(
-        id, title, description, isTheoryCompleted, isQuizCompleted, isChapterCompleted);
+    return Object.hash(id, title, description, isTheoryCompleted,
+        isQuizCompleted, isChapterCompleted);
   }
 }

@@ -27,9 +27,9 @@ class QuizSession {
           .map((quiz) => QuizInfo.fromBackendJson(quiz as Map<String, dynamic>))
           .toList(),
       currentQuizId: json['current_quiz_id'] as int,
-      userAnswers: (json['userAnswers'] as List<dynamic>?)?.cast<int?>() ?? 
+      userAnswers: (json['userAnswers'] as List<dynamic>?)?.cast<int?>() ??
           List<int?>.filled(quizListData.length, null),
-      startedAt: json['startedAt'] != null 
+      startedAt: json['startedAt'] != null
           ? DateTime.parse(json['startedAt'] as String)
           : DateTime.now(),
       isSingleQuizMode: json['isSingleQuizMode'] as bool? ?? false,

@@ -61,7 +61,8 @@ class ChapterCardResponse {
 
   @override
   int get hashCode {
-    return Object.hash(chapterId, title, isTheoryCompleted, isQuizCompleted, isChapterCompleted);
+    return Object.hash(chapterId, title, isTheoryCompleted, isQuizCompleted,
+        isChapterCompleted);
   }
 
   /// 복사본 생성 (일부 필드만 변경)

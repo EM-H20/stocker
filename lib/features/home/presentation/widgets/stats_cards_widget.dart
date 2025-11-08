@@ -51,7 +51,8 @@ class StatsCardsWidget extends StatelessWidget {
           final wrongNotes = wrongNoteProvider.wrongNotes.length;
 
           // 교육 진행률 데이터
-          final completedChapters = educationProvider.getCompletedChapterCount();
+          final completedChapters =
+              educationProvider.getCompletedChapterCount();
           final totalChapters = educationProvider.chapters.length;
           final educationProgress = educationProvider.globalProgressPercentage;
 
@@ -73,7 +74,8 @@ class StatsCardsWidget extends StatelessWidget {
                   // 성향분석 결과가 있으면 표시
                   if (aptitudeProvider.myResult != null)
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                       decoration: BoxDecoration(
                         color: AppTheme.warningColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8.r),
@@ -150,7 +152,8 @@ class StatsCardsWidget extends StatelessWidget {
               ),
 
               // 교육 진행률 (로딩 중이 아니고 챕터가 있을 때만)
-              if (!educationProvider.isLoadingChapters && totalChapters > 0) ...[
+              if (!educationProvider.isLoadingChapters &&
+                  totalChapters > 0) ...[
                 SizedBox(height: 8.h),
                 Row(
                   children: [
@@ -176,7 +179,10 @@ class StatsCardsWidget extends StatelessWidget {
                             children: [
                               Text(
                                 '교육 진행률',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
                                       fontWeight: FontWeight.w600,
                                       color: ThemeUtils.isDarkMode(context)
                                           ? Colors.white
@@ -185,7 +191,10 @@ class StatsCardsWidget extends StatelessWidget {
                               ),
                               Text(
                                 '${educationProgress.toStringAsFixed(1)}%',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: AppTheme.infoColor,
                                     ),
@@ -198,17 +207,23 @@ class StatsCardsWidget extends StatelessWidget {
                               Expanded(
                                 child: LinearProgressIndicator(
                                   value: educationProgress / 100,
-                                  backgroundColor: ThemeUtils.isDarkMode(context)
-                                      ? Colors.grey[700]
-                                      : AppTheme.grey300.withValues(alpha: 0.5),
-                                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.infoColor),
+                                  backgroundColor:
+                                      ThemeUtils.isDarkMode(context)
+                                          ? Colors.grey[700]
+                                          : AppTheme.grey300
+                                              .withValues(alpha: 0.5),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      AppTheme.infoColor),
                                   minHeight: 3.h,
                                 ),
                               ),
                               SizedBox(width: 8.w),
                               Text(
                                 '$completedChapters/$totalChapters',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
                                       color: ThemeUtils.isDarkMode(context)
                                           ? AppTheme.grey400
                                           : AppTheme.grey600,

@@ -268,12 +268,15 @@ class EducationRepository {
       if (cachedChapters != null) {
         final updatedChapters = cachedChapters.map((chapter) {
           if (chapter.chapterId == chapterId) {
-            final updatedChapter = chapter.copyWith(isTheoryCompleted: isCompleted);
-            
+            final updatedChapter =
+                chapter.copyWith(isTheoryCompleted: isCompleted);
+
             // 이론과 퀴즈가 모두 완료된 경우 챕터도 완료로 설정
-            final shouldCompleteChapter = updatedChapter.isTheoryCompleted && updatedChapter.isQuizCompleted;
-            
-            return updatedChapter.copyWith(isChapterCompleted: shouldCompleteChapter);
+            final shouldCompleteChapter = updatedChapter.isTheoryCompleted &&
+                updatedChapter.isQuizCompleted;
+
+            return updatedChapter.copyWith(
+                isChapterCompleted: shouldCompleteChapter);
           }
           return chapter;
         }).toList();
@@ -285,7 +288,6 @@ class EducationRepository {
       debugPrint('❌ [EDU_REPOSITORY] 캐시 업데이트 실패: $e');
     }
   }
-
 
   // === Data to Domain Model Mappers ===
 
@@ -301,7 +303,8 @@ class EducationRepository {
   }
 
   /// TheoryEnterResponse를 TheorySession으로 변환
-  TheorySession _mapToTheorySession(TheoryEnterResponse response, int chapterId) {
+  TheorySession _mapToTheorySession(
+      TheoryEnterResponse response, int chapterId) {
     // API.md 명세: theory_pages를 theories로 변환
     final theories = response.theoryPages
         .map((page) => TheoryInfo(

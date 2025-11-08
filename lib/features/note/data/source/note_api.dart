@@ -26,11 +26,11 @@ class NoteApi {
   Future<List<NoteDto>> getAllNotes() async {
     final options = await _getAuthOptions();
     final response = await _dio.get('/api/memo/', options: options);
-    
+
     // API 응답이 { "memos": [...] } 형식인지 확인
     final data = response.data;
     List<dynamic> memosList;
-    
+
     if (data is Map<String, dynamic> && data.containsKey('memos')) {
       memosList = data['memos'] as List<dynamic>? ?? [];
     } else if (data is List<dynamic>) {
@@ -38,11 +38,11 @@ class NoteApi {
     } else {
       memosList = [];
     }
-    
+
     return memosList.map((json) => NoteDto.fromJson(json)).toList();
   }
 
-  /// 새 노트 생성 API  
+  /// 새 노트 생성 API
   Future<NoteDto> createNote(NoteUpdateRequest request) async {
     final options = await _getAuthOptions();
     final response = await _dio.put(
@@ -50,7 +50,7 @@ class NoteApi {
       data: request.toJson(),
       options: options,
     );
-    
+
     // API 응답이 { "memo": {...} } 형식인지 확인
     final data = response.data;
     if (data is Map<String, dynamic> && data.containsKey('memo')) {
@@ -63,17 +63,17 @@ class NoteApi {
   /// 노트 수정 API
   Future<NoteDto> updateNote(int noteId, NoteUpdateRequest request) async {
     final options = await _getAuthOptions();
-    
+
     // 수정 시에는 id 필드를 요청에 포함
     final requestData = request.toJson();
     requestData['id'] = noteId;
-    
+
     final response = await _dio.put(
       '/api/memo/',
       data: requestData,
       options: options,
     );
-    
+
     // API 응답이 { "memo": {...} } 형식인지 확인
     final data = response.data;
     if (data is Map<String, dynamic> && data.containsKey('memo')) {

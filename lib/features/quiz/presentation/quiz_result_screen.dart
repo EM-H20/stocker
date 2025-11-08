@@ -35,11 +35,11 @@ class _QuizResultScreenState extends State<QuizResultScreen>
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-    
+
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
     );
@@ -129,7 +129,7 @@ class _QuizResultScreenState extends State<QuizResultScreen>
     final isAllCorrect = result.correctAnswers == result.totalQuestions;
     final cardColor = isDarkMode ? AppTheme.grey800 : Colors.white;
     final textColor = isDarkMode ? Colors.white : AppTheme.grey900;
-    
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(32.w),
@@ -151,7 +151,8 @@ class _QuizResultScreenState extends State<QuizResultScreen>
             width: 80.w,
             height: 80.w,
             decoration: BoxDecoration(
-              color: isAllCorrect ? AppTheme.successColor : AppTheme.warningColor,
+              color:
+                  isAllCorrect ? AppTheme.successColor : AppTheme.warningColor,
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -160,9 +161,9 @@ class _QuizResultScreenState extends State<QuizResultScreen>
               color: Colors.white,
             ),
           ),
-          
+
           SizedBox(height: 24.h),
-          
+
           // 제목
           Text(
             isAllCorrect ? '완벽해요!' : '수고했어요!',
@@ -172,9 +173,9 @@ class _QuizResultScreenState extends State<QuizResultScreen>
               color: textColor,
             ),
           ),
-          
+
           SizedBox(height: 16.h),
-          
+
           // 점수 표시
           RichText(
             text: TextSpan(
@@ -195,9 +196,9 @@ class _QuizResultScreenState extends State<QuizResultScreen>
               ],
             ),
           ),
-          
+
           SizedBox(height: 8.h),
-          
+
           Text(
             '${result.scorePercentage}% 정답',
             style: TextStyle(
@@ -205,9 +206,9 @@ class _QuizResultScreenState extends State<QuizResultScreen>
               color: isDarkMode ? AppTheme.grey400 : AppTheme.grey600,
             ),
           ),
-          
+
           SizedBox(height: 24.h),
-          
+
           // 등급 표시
           Container(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
@@ -271,7 +272,9 @@ class _QuizResultScreenState extends State<QuizResultScreen>
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: textColor,
-          side: borderColor != null ? BorderSide(color: borderColor, width: 2) : null,
+          side: borderColor != null
+              ? BorderSide(color: borderColor, width: 2)
+              : null,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
           ),
@@ -292,7 +295,7 @@ class _QuizResultScreenState extends State<QuizResultScreen>
   Widget _buildErrorState() {
     final isDarkMode = ThemeUtils.isDarkMode(context);
     final textColor = isDarkMode ? Colors.white : AppTheme.grey900;
-    
+
     return Center(
       child: Padding(
         padding: EdgeInsets.all(24.w),

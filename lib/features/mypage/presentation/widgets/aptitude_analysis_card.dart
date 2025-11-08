@@ -57,16 +57,14 @@ class AptitudeAnalysisCard extends StatelessWidget {
                             hasResult && result != null
                                 ? result.typeDescription
                                 : '나의 투자 성향을 알아보고 맞춤형 투자 전략을 확인해보세요',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.color
-                                      ?.withValues(alpha: 0.7),
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color
+                                          ?.withValues(alpha: 0.7),
+                                    ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),

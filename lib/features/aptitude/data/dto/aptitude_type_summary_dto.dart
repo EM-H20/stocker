@@ -47,7 +47,7 @@ class AptitudeTypeSummaryDto {
   String _getTypeNameFromCode(String code) {
     const typeNameMap = {
       'ELAI': '적극적 성장형',
-      'ELAD': '신중한 성장형', 
+      'ELAD': '신중한 성장형',
       'ELPI': '균형잡힌 가치형',
       'ELPD': '보수적 가치형',
       'ESAI': '적극적 안정형',
@@ -56,7 +56,7 @@ class AptitudeTypeSummaryDto {
       'ESPD': '보수적 안정형',
       'CLAI': '적극적 창조형',
       'CLAD': '신중한 창조형',
-      'CLPI': '균형잡힌 창조형', 
+      'CLPI': '균형잡힌 창조형',
       'CLPD': '보수적 창조형',
       'CSAI': '적극적 탐색형',
       'CSAD': '신중한 탐색형',

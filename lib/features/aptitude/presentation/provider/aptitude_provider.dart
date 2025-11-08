@@ -87,7 +87,7 @@ class AptitudeProvider with ChangeNotifier {
     try {
       _allTypes = await _repository.getAllTypes();
       debugPrint('✅ [APTITUDE_PROVIDER] 성향 ${_allTypes.length}개 로드');
-      
+
       // 로드된 성향들 로그 출력
       for (final type in _allTypes) {
         debugPrint('   - ${type.typeCode}: ${type.typeName}');
@@ -105,29 +105,29 @@ class AptitudeProvider with ChangeNotifier {
   /// 이미 로드된 allTypes 데이터를 재사용하여 불필요한 API 호출 방지!
   Future<bool> fetchResultByType(String typeCode) async {
     debugPrint('🔎 [APTITUDE_PROVIDER] fetchResultByType 시작: $typeCode');
-    
+
     try {
       _setLoading(true);
       _errorMessage = null;
-      
+
       // ✅ [최적화] 이미 로드된 allTypes 데이터가 있으면 그걸 사용!
       if (_allTypes.isNotEmpty) {
         debugPrint('💾 [APTITUDE_PROVIDER] 캐시된 데이터에서 검색 중...');
-        
+
         try {
           final matchedType = _allTypes.firstWhere(
             (type) => type.typeCode.toUpperCase() == typeCode.toUpperCase(),
           );
-          
+
           debugPrint('✅ [APTITUDE_PROVIDER] 캐시에서 발견: ${matchedType.typeName}');
-          
+
           // 캐시된 데이터로 즉시 결과 생성 (API 호출 없음!)
           _currentResult = AptitudeResult(
             typeName: matchedType.typeName,
             typeDescription: matchedType.description,
             master: _getDefaultMasterForType(typeCode), // 기본 거장 정보
           );
-          
+
           debugPrint('✅ [APTITUDE_PROVIDER] 캐시 데이터로 결과 생성 완료 - API 호출 없음!');
           _setLoading(false);
           return true;
@@ -136,10 +136,10 @@ class AptitudeProvider with ChangeNotifier {
           // 캐시에서 못 찾으면 아래 API 호출로 넘어감
         }
       }
-      
+
       // 캐시가 없거나 찾기 실패하면 API 호출 (기존 로직)
       debugPrint('📡 [APTITUDE_PROVIDER] 캐시 없음 - Repository 호출 중...');
-      
+
       _currentResult = await _repository.getResultByType(typeCode).timeout(
         const Duration(seconds: 30),
         onTimeout: () {
@@ -147,9 +147,10 @@ class AptitudeProvider with ChangeNotifier {
           throw Exception('요청 시간이 초과되었습니다');
         },
       );
-      
+
       if (_currentResult != null) {
-        debugPrint('✅ [APTITUDE_PROVIDER] API로 결과 로드 성공: ${_currentResult!.typeName}');
+        debugPrint(
+            '✅ [APTITUDE_PROVIDER] API로 결과 로드 성공: ${_currentResult!.typeName}');
         debugPrint('   거장: ${_currentResult!.master.name}');
         return true;
       } else {
@@ -167,7 +168,7 @@ class AptitudeProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
-  
+
   /// ✅ [추가] 타입 코드에 맞는 기본 거장 정보 반환
   /// Mock Repository의 로직을 재사용하여 일관성 유지
   InvestmentMaster _getDefaultMasterForType(String typeCode) {

@@ -80,8 +80,8 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
       body: provider.isLoading
           ? const Center(
               child: LoadingWidget(
-                message: '투자 성향 유형을 불러오는 중...',
-              ))
+              message: '투자 성향 유형을 불러오는 중...',
+            ))
           : allTypes.isEmpty
               ? Center(
                   child: Column(
@@ -116,7 +116,7 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                   itemBuilder: (context, index) {
                     final type = allTypes[index];
                     final typeColor = _getColorForType(type.typeCode, context);
-                    
+
                     return Card(
                       margin: EdgeInsets.only(bottom: 16.h),
                       elevation: 2.0,
@@ -160,9 +160,11 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                           color: Theme.of(context).iconTheme.color,
                         ),
                         onTap: () async {
-                          debugPrint('🎯 [APTITUDE_TYPES] ${type.typeName} 클릭됨');
-                          debugPrint('📝 [APTITUDE_TYPES] TypeCode: ${type.typeCode}');
-                          
+                          debugPrint(
+                              '🎯 [APTITUDE_TYPES] ${type.typeName} 클릭됨');
+                          debugPrint(
+                              '📝 [APTITUDE_TYPES] TypeCode: ${type.typeCode}');
+
                           // 로딩 표시
                           showDialog(
                             context: context,
@@ -192,27 +194,28 @@ class _AptitudeTypesListScreenState extends State<AptitudeTypesListScreen> {
                           try {
                             // currentResult 초기화 (이전 결과 제거)
                             provider.clearCurrentResult();
-                            
+
                             // 해당 성향의 상세 정보 가져오기
-                            final success = await provider.fetchResultByType(type.typeCode);
-                            
+                            final success =
+                                await provider.fetchResultByType(type.typeCode);
+
                             // 로딩 다이얼로그 닫기
                             if (context.mounted) {
                               Navigator.of(context).pop();
                             }
-                            
+
                             if (success && context.mounted) {
                               debugPrint('✅ [APTITUDE_TYPES] 데이터 로드 성공, 화면 이동');
                               // 상세 결과 화면으로 이동 (다른 성향 보기 모드)
-                              context.push(AppRoutes.aptitudeResult, extra: false);
+                              context.push(AppRoutes.aptitudeResult,
+                                  extra: false);
                             } else if (context.mounted) {
                               debugPrint('❌ [APTITUDE_TYPES] 데이터 로드 실패');
                               // 에러 처리
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
-                                    provider.errorMessage ?? '정보를 불러오는데 실패했습니다'
-                                  ),
+                                  content: Text(provider.errorMessage ??
+                                      '정보를 불러오는데 실패했습니다'),
                                   backgroundColor: Colors.red,
                                 ),
                               );

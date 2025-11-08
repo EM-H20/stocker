@@ -17,7 +17,11 @@ import 'widgets/quiz_error_widget.dart';
 import '../../../app/core/widgets/loading_widget.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key, required this.chapterId, this.singleQuizId, this.isReadOnly = false});
+  const QuizScreen(
+      {super.key,
+      required this.chapterId,
+      this.singleQuizId,
+      this.isReadOnly = false});
 
   final int chapterId;
   final int? singleQuizId; // 단일 퀴즈 모드용 quiz ID
@@ -35,7 +39,7 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // 단일 퀴즈 모드일 때 오답 삭제 완료 콜백 등록
     if (widget.singleQuizId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -43,7 +47,7 @@ class _QuizScreenState extends State<QuizScreen> {
         quizProvider.addOnWrongNoteRemovedCallback(_onWrongNoteRemoved);
       });
     }
-    
+
     // 빌드 완료 후 다음 프레임에서 퀴즈 시작
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.microtask(() => _startQuiz());
@@ -57,8 +61,11 @@ class _QuizScreenState extends State<QuizScreen> {
     try {
       if (widget.singleQuizId != null) {
         // 단일 퀴즈 모드
-        debugPrint('🧠 [QUIZ_SCREEN] 단일 퀴즈 진입 - 챕터: ${widget.chapterId}, 퀴즈: ${widget.singleQuizId}, 읽기전용: ${widget.isReadOnly}');
-        await quizProvider.startSingleQuiz(widget.chapterId, widget.singleQuizId!, isReadOnly: widget.isReadOnly);
+        debugPrint(
+            '🧠 [QUIZ_SCREEN] 단일 퀴즈 진입 - 챕터: ${widget.chapterId}, 퀴즈: ${widget.singleQuizId}, 읽기전용: ${widget.isReadOnly}');
+        await quizProvider.startSingleQuiz(
+            widget.chapterId, widget.singleQuizId!,
+            isReadOnly: widget.isReadOnly);
       } else {
         // 일반 퀴즈 모드
         debugPrint('🧠 [QUIZ_SCREEN] 일반 퀴즈 진입 - 챕터 ID: ${widget.chapterId}');
@@ -290,15 +297,21 @@ class _QuizScreenState extends State<QuizScreen> {
       // 퀴즈 완료 버튼
       return ActionButton(
         text: _waitingForWrongNoteRemoval ? '처리 중...' : '퀴즈 완료',
-        icon: _waitingForWrongNoteRemoval ? Icons.hourglass_empty : Icons.check_circle,
-        color: _waitingForWrongNoteRemoval ? Colors.grey : AppTheme.successColor,
-        onPressed: _waitingForWrongNoteRemoval ? () {} : () => _completeQuiz(provider),
+        icon: _waitingForWrongNoteRemoval
+            ? Icons.hourglass_empty
+            : Icons.check_circle,
+        color:
+            _waitingForWrongNoteRemoval ? Colors.grey : AppTheme.successColor,
+        onPressed:
+            _waitingForWrongNoteRemoval ? () {} : () => _completeQuiz(provider),
       );
     }
   }
 
   Future<void> _submitAnswer(QuizProvider provider) async {
-    if (_selectedAnswer == null || _isSubmitting || provider.isSubmittingAnswer) {
+    if (_selectedAnswer == null ||
+        _isSubmitting ||
+        provider.isSubmittingAnswer) {
       return;
     }
 

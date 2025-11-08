@@ -114,7 +114,8 @@ class QuizApi {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        return QuizResult.fromBackendJson(data as Map<String, dynamic>, chapterId);
+        return QuizResult.fromBackendJson(
+            data as Map<String, dynamic>, chapterId);
       } else {
         throw DioException(
           requestOptions: response.requestOptions,
@@ -130,5 +131,4 @@ class QuizApi {
       );
     }
   }
-
 }

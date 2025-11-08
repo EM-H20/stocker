@@ -8,23 +8,24 @@ import '../../domain/model/aptitude_type_summary.dart';
 
 /// 테스트용 더미 데이터를 반환하는 Repository 구현체
 class AptitudeMockRepository implements AptitudeRepository {
-  
   @override
   Future<List<AptitudeQuestion>> getQuestions() async {
     debugPrint('🎭 [MOCK_REPO] 질문 목록 요청');
     await Future.delayed(const Duration(milliseconds: 300));
-    
-    return List.generate(24, (index) => AptitudeQuestion(
-      id: index + 1,
-      text: '질문 ${index + 1}: 이 질문은 테스트용입니다. 당신의 생각은?',
-      choices: [
-        AptitudeChoice(text: '매우 그렇다', value: 5),
-        AptitudeChoice(text: '그렇다', value: 4),
-        AptitudeChoice(text: '보통이다', value: 3),
-        AptitudeChoice(text: '아니다', value: 2),
-        AptitudeChoice(text: '매우 아니다', value: 1),
-      ],
-    ));
+
+    return List.generate(
+        24,
+        (index) => AptitudeQuestion(
+              id: index + 1,
+              text: '질문 ${index + 1}: 이 질문은 테스트용입니다. 당신의 생각은?',
+              choices: [
+                AptitudeChoice(text: '매우 그렇다', value: 5),
+                AptitudeChoice(text: '그렇다', value: 4),
+                AptitudeChoice(text: '보통이다', value: 3),
+                AptitudeChoice(text: '아니다', value: 2),
+                AptitudeChoice(text: '매우 아니다', value: 1),
+              ],
+            ));
   }
 
   @override
@@ -52,7 +53,7 @@ class AptitudeMockRepository implements AptitudeRepository {
   Future<List<AptitudeTypeSummary>> getAllTypes() async {
     debugPrint('🎭 [MOCK_REPO] 모든 성향 목록 요청');
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     return [
       AptitudeTypeSummary(
         typeCode: 'STABLE',
@@ -60,7 +61,7 @@ class AptitudeMockRepository implements AptitudeRepository {
         description: '위험을 회피하며 안정적인 수익을 추구하는 투자자',
       ),
       AptitudeTypeSummary(
-        typeCode: 'AGGRESSIVE', 
+        typeCode: 'AGGRESSIVE',
         typeName: '공격적 단기형',
         description: '높은 위험을 감수하며 단기 고수익을 추구하는 투자자',
       ),
@@ -90,10 +91,10 @@ class AptitudeMockRepository implements AptitudeRepository {
   @override
   Future<AptitudeResult> getResultByType(String typeCode) async {
     debugPrint('🎭 [MOCK_REPO] 타입별 결과 요청: $typeCode');
-    
+
     // 빠른 응답을 위해 지연시간 최소화
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     try {
       final result = _getResultByTypeCode(typeCode);
       debugPrint('✅ [MOCK_REPO] 타입별 결과 반환: ${result.typeName}');
@@ -107,12 +108,12 @@ class AptitudeMockRepository implements AptitudeRepository {
   /// 타입 코드에 따른 상세 결과 반환 (간소화된 버전)
   AptitudeResult _getResultByTypeCode(String typeCode) {
     debugPrint('🏭 [MOCK_REPO] 결과 생성 중: $typeCode');
-    
+
     // 기본 포트폴리오 맵
     Map<String, double> createPortfolio(List<MapEntry<String, double>> items) {
       return Map.fromEntries(items);
     }
-    
+
     switch (typeCode.toUpperCase()) {
       case 'STABLE':
         return AptitudeResult(
@@ -150,7 +151,8 @@ class AptitudeMockRepository implements AptitudeRepository {
       case 'NEUTRAL':
         return AptitudeResult(
           typeName: '균형적 성장형',
-          typeDescription: '위험과 수익의 적절한 균형을 추구하며, 다양한 자산에 분산 투자를 통해 안정적인 성장을 도모합니다.',
+          typeDescription:
+              '위험과 수익의 적절한 균형을 추구하며, 다양한 자산에 분산 투자를 통해 안정적인 성장을 도모합니다.',
           master: InvestmentMaster(
             name: '레이 달리오',
             imageUrl: 'https://placehold.co/100x100/34A853/FFFFFF?text=RD',

@@ -29,12 +29,11 @@ class QuizItemWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: isDark 
-            ? AppTheme.grey800.withValues(alpha: 0.3)
-            : AppTheme.grey50,
+        color:
+            isDark ? AppTheme.grey800.withValues(alpha: 0.3) : AppTheme.grey50,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: isDark 
+          color: isDark
               ? AppTheme.grey700.withValues(alpha: 0.5)
               : AppTheme.grey200,
           width: 1,
@@ -67,7 +66,7 @@ class QuizItemWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 12.w),
-              
+
               // 질문 텍스트
               Expanded(
                 child: Text(
@@ -89,7 +88,7 @@ class QuizItemWidget extends StatelessWidget {
           Row(
             children: [
               const Spacer(),
-              
+
               // O 버튼
               _buildAnswerButton(
                 context: context,
@@ -98,18 +97,18 @@ class QuizItemWidget extends StatelessWidget {
                 onTap: isEnabled ? onAnswerO : null,
                 color: AppTheme.successColor,
               ),
-              
+
               SizedBox(width: 16.w),
-              
+
               // X 버튼
               _buildAnswerButton(
                 context: context,
-                label: 'X', 
+                label: 'X',
                 isSelected: selectedAnswer == false,
                 onTap: isEnabled ? onAnswerX : null,
                 color: AppTheme.errorColor,
               ),
-              
+
               const Spacer(),
             ],
           ),
@@ -161,7 +160,9 @@ class QuizItemWidget extends StatelessWidget {
               : !isDisabled
                   ? [
                       BoxShadow(
-                        color: Theme.of(context).shadowColor.withValues(alpha: 0.1),
+                        color: Theme.of(context)
+                            .shadowColor
+                            .withValues(alpha: 0.1),
                         blurRadius: 4,
                         offset: const Offset(0, 1),
                       ),

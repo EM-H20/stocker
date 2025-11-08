@@ -128,9 +128,9 @@ class LearningProgressProvider extends ChangeNotifier {
       debugPrint('⚠️ [LearningProgress] 챕터 $chapterId 이미 완료됨 - 중복 처리 방지');
       return;
     }
-    
+
     _completedChapters[chapterId] = true;
-    
+
     try {
       // Repository를 통해 완료 상태 저장
       await _repository.markChapterCompleted(chapterId);
@@ -139,17 +139,17 @@ class LearningProgressProvider extends ChangeNotifier {
       debugPrint('❌ [LearningProgress] 챕터 $chapterId 완료 저장 실패: $e');
       // 에러가 발생해도 로컬 상태는 유지 (사용자 경험을 위해)
     }
-    
+
     notifyListeners();
   }
 
   /// 🎯 퀴즈 완료 표시
   Future<void> completeQuiz(int chapterId) async {
     _completedQuizzes[chapterId] = true;
-    
+
     // Repository를 통해 완료 상태 저장
     await _repository.markQuizCompleted(chapterId);
-    
+
     notifyListeners();
 
     debugPrint('🎯 [LearningProgress] 퀴즈 $chapterId 완료!');
@@ -165,7 +165,7 @@ class LearningProgressProvider extends ChangeNotifier {
 
     // Repository를 통해 초기화
     await _repository.resetProgress();
-    
+
     notifyListeners();
 
     debugPrint('🔄 [LearningProgress] 진도 초기화 완료');
@@ -250,10 +250,11 @@ class LearningProgressProvider extends ChangeNotifier {
       );
 
       if (chapter.isNotEmpty) {
-        debugPrint('✅ [LEARNING_PROGRESS] Repository에서 실제 챕터 제목 반환: ${chapter['title']}');
+        debugPrint(
+            '✅ [LEARNING_PROGRESS] Repository에서 실제 챕터 제목 반환: ${chapter['title']}');
         return chapter['title'] as String;
       }
-      
+
       debugPrint('⚠️ [LEARNING_PROGRESS] 챕터 $chapterId를 찾을 수 없어 기본 제목 사용');
       return 'Chapter $chapterId';
     } catch (e) {
@@ -271,9 +272,10 @@ class LearningProgressProvider extends ChangeNotifier {
       );
 
       if (chapter.isNotEmpty) {
-        return chapter['description'] as String? ?? '${getChapterTitle(chapterId)} 학습 내용';
+        return chapter['description'] as String? ??
+            '${getChapterTitle(chapterId)} 학습 내용';
       }
-      
+
       return 'Chapter $chapterId 학습 내용';
     } catch (e) {
       debugPrint('❌ [LEARNING_PROGRESS] 챕터 설명 조회 중 오류: $e');

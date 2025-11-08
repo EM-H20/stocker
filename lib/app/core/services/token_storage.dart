@@ -85,7 +85,7 @@ class TokenStorage {
   /// 🔍 디버그용: 저장된 모든 데이터 확인 (개발 환경에서만)
   static Future<void> debugPrintAllData() async {
     if (!kDebugMode) return;
-    
+
     try {
       final allData = await _storage.readAll();
       debugPrint('🔍 [TOKEN_STORAGE] Stored data count: ${allData.length}');
@@ -100,15 +100,18 @@ class TokenStorage {
   /// 🧪 테스트용: Mock 사용자 데이터 생성
   static Future<void> createTestUser() async {
     try {
-      final testAccessToken = 'test_access_token_${DateTime.now().millisecondsSinceEpoch}';
-      final testRefreshToken = 'test_refresh_token_${DateTime.now().millisecondsSinceEpoch}';
+      final testAccessToken =
+          'test_access_token_${DateTime.now().millisecondsSinceEpoch}';
+      final testRefreshToken =
+          'test_refresh_token_${DateTime.now().millisecondsSinceEpoch}';
       final testUserId = '999'; // 테스트 유저 ID
 
       await saveTokens(testAccessToken, testRefreshToken, testUserId);
-      
+
       debugPrint('🧪 [TOKEN_STORAGE] 테스트 유저 생성 완료');
       debugPrint('👤 [TOKEN_STORAGE] UserId: $testUserId');
-      debugPrint('🔑 [TOKEN_STORAGE] AccessToken: ${testAccessToken.substring(0, 20)}...');
+      debugPrint(
+          '🔑 [TOKEN_STORAGE] AccessToken: ${testAccessToken.substring(0, 20)}...');
     } catch (e) {
       debugPrint('❌ [TOKEN_STORAGE] 테스트 유저 생성 실패: $e');
     }
@@ -117,12 +120,13 @@ class TokenStorage {
   /// 📋 현재 인증 상태 요약 (개발 환경에서만)
   static Future<void> debugAuthStatus() async {
     if (!kDebugMode) return;
-    
+
     try {
       final token = await accessToken;
       final userIdValue = await userId;
 
-      debugPrint('📋 [TOKEN_STORAGE] Auth status: ${token != null && userIdValue != null ? "Authenticated" : "Not authenticated"}');
+      debugPrint(
+          '📋 [TOKEN_STORAGE] Auth status: ${token != null && userIdValue != null ? "Authenticated" : "Not authenticated"}');
       if (token != null && userIdValue != null) {
         debugPrint('👤 [TOKEN_STORAGE] User ID: $userIdValue');
       }

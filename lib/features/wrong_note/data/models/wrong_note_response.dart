@@ -62,18 +62,20 @@ class WrongNoteItem {
   /// 백엔드 JSON에서 객체 생성 (JOIN 데이터 포함)
   factory WrongNoteItem.fromBackendJson(Map<String, dynamic> json) {
     debugPrint('🔍 [WrongNote] API 응답 파싱 중: ${json.keys.join(', ')}');
-    
+
     // selected_option null 처리 (API에서 null이 올 수 있음)
     final selectedOpt = json['selected_option'];
-    final selectedOption = selectedOpt is int ? selectedOpt : (selectedOpt is String ? int.tryParse(selectedOpt) : null) ?? 1;
-    
+    final selectedOption = selectedOpt is int
+        ? selectedOpt
+        : (selectedOpt is String ? int.tryParse(selectedOpt) : null) ?? 1;
+
     // correct_option을 correct_answer_index로 변환 (1~4 → 0~3)
     final correctOpt = json['correct_option'];
     int? correctAnswerIndex;
     if (correctOpt is int && correctOpt >= 1 && correctOpt <= 4) {
       correctAnswerIndex = correctOpt - 1; // 1-based to 0-based
     }
-    
+
     // options 파싱 (JSON 문자열일 수도 있고, 배열일 수도 있음)
     List<String>? optionsList;
     final optionsData = json['options'];
@@ -92,7 +94,7 @@ class WrongNoteItem {
         }
       }
     }
-    
+
     final result = WrongNoteItem(
       id: json['id'] as int,
       quizId: json['quiz_id'] as int,
@@ -108,12 +110,16 @@ class WrongNoteItem {
       options: optionsList,
       explanation: json['explanation'] as String?,
       correctAnswerIndex: correctAnswerIndex,
-      correctAnswerText: correctAnswerIndex != null && optionsList != null && 
-          correctAnswerIndex >= 0 && correctAnswerIndex < optionsList.length 
-          ? optionsList[correctAnswerIndex] : null,
+      correctAnswerText: correctAnswerIndex != null &&
+              optionsList != null &&
+              correctAnswerIndex >= 0 &&
+              correctAnswerIndex < optionsList.length
+          ? optionsList[correctAnswerIndex]
+          : null,
     );
-    
-    debugPrint('✅ [WrongNote] 파싱 완료 - ID: ${result.id}, Quiz: ${result.quizId}, Selected: ${result.selectedOption}, Correct: ${result.correctAnswerIndex}');
+
+    debugPrint(
+        '✅ [WrongNote] 파싱 완료 - ID: ${result.id}, Quiz: ${result.quizId}, Selected: ${result.selectedOption}, Correct: ${result.correctAnswerIndex}');
     return result;
   }
 

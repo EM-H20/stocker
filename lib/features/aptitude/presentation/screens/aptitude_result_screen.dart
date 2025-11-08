@@ -78,7 +78,7 @@ class AptitudeResultScreen extends StatelessWidget {
                           : null,
                     ),
                     SizedBox(height: 16.h),
-                    
+
                     // 거장 이름
                     Text(
                       result.master.name,
@@ -86,7 +86,7 @@ class AptitudeResultScreen extends StatelessWidget {
                           fontSize: 22.sp, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 8.h),
-                    
+
                     // 거장 설명
                     Text(
                       result.master.description,
@@ -102,7 +102,7 @@ class AptitudeResultScreen extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 32.h),
-                    
+
                     // 포트폴리오 제목
                     Text(
                       '포트폴리오 예시',
@@ -110,7 +110,7 @@ class AptitudeResultScreen extends StatelessWidget {
                           fontSize: 18.sp, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 16.h),
-                    
+
                     // 포트폴리오 차트
                     MasterPortfolioChart(portfolio: result.master.portfolio),
                   ],
@@ -123,7 +123,7 @@ class AptitudeResultScreen extends StatelessWidget {
             _buildSectionTitle('이런 교육은 어때요?'),
             SizedBox(height: 24.h),
             _buildEducationRecommendations(context, result.typeName),
-            
+
             SizedBox(height: 32.h),
 
             // 나의 결과를 볼 때만 하단 버튼들이 보이도록 처리
@@ -183,7 +183,7 @@ class AptitudeResultScreen extends StatelessWidget {
   /// 성향에 따른 교육 추천 위젯 (챕터명만 표시)
   Widget _buildEducationRecommendations(BuildContext context, String typeName) {
     final recommendations = _getRecommendationsByType(typeName);
-    
+
     return Container(
       padding: EdgeInsets.all(20.w),
       decoration: BoxDecoration(
@@ -216,43 +216,46 @@ class AptitudeResultScreen extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16.h),
-          
+
           // 추천 챕터 목록
           ...recommendations.map((chapter) => Padding(
-            padding: EdgeInsets.only(bottom: 8.h),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 6.w,
-                  height: 6.h,
-                  margin: EdgeInsets.only(top: 8.h, right: 12.w),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    chapter,
-                    style: TextStyle(
-                      fontSize: 15.sp,
-                      height: 1.4,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                padding: EdgeInsets.only(bottom: 8.h),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 6.w,
+                      height: 6.h,
+                      margin: EdgeInsets.only(top: 8.h, right: 12.w),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ),
+                    Expanded(
+                      child: Text(
+                        chapter,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          height: 1.4,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )),
-          
+              )),
+
           SizedBox(height: 16.h),
-          
+
           // 안내 메시지
           Container(
             padding: EdgeInsets.all(12.w),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondary
+                  .withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Row(
