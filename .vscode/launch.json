@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Mock API 🎭",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=USE_MOCK=true",
+        "--dart-define=CREATE_TEST_USER=false"
+      ]
+    },
+    {
+      "name": "Mock API + 테스트 유저 생성 🎭👤",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=USE_MOCK=true",
+        "--dart-define=CREATE_TEST_USER=true"
+      ]
+    },
+    {
+      "name": "Real API 🚀",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=USE_MOCK=false",
+        "--dart-define=CREATE_TEST_USER=false"
+      ]
+    }
+  ]
+}
