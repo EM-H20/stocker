@@ -149,20 +149,11 @@ class AptitudeNotifier extends _$AptitudeNotifier {
             },
           );
 
-      if (result != null) {
-        state = state.copyWith(currentResult: result, isLoading: false);
-        debugPrint(
-            '✅ [APTITUDE_NOTIFIER] API로 결과 로드 성공: ${result.typeName}');
-        debugPrint('   거장: ${result.master.name}');
-        return true;
-      } else {
-        debugPrint('⚠️ [APTITUDE_NOTIFIER] 결과가 null');
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: '결과를 불러올 수 없습니다',
-        );
-        return false;
-      }
+      state = state.copyWith(currentResult: result, isLoading: false);
+      debugPrint(
+          '✅ [APTITUDE_NOTIFIER] API로 결과 로드 성공: ${result.typeName}');
+      debugPrint('   거장: ${result.master.name}');
+      return true;
     } catch (e) {
       debugPrint('💥 [APTITUDE_NOTIFIER] fetchResultByType 예외: $e');
       state = state.copyWith(
