@@ -9,9 +9,9 @@ import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // euimin 브랜치 기능들
-import 'package:stocker/features/education/domain/education_mock_repository.dart';
-import 'package:stocker/features/education/data/education_api.dart';
-import 'package:stocker/features/education/domain/education_repository.dart';
+// import 'package:stocker/features/education/domain/education_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
+// import 'package:stocker/features/education/data/education_api.dart'; // 🔥 Riverpod으로 이동됨
+// import 'package:stocker/features/education/domain/education_repository.dart'; // 🔥 Riverpod으로 이동됨
 import 'package:stocker/features/quiz/domain/quiz_mock_repository.dart';
 import 'package:stocker/features/quiz/data/quiz_api.dart';
 import 'package:stocker/features/quiz/domain/quiz_repository.dart';
@@ -21,7 +21,7 @@ import 'package:stocker/app/core/providers/riverpod/theme_notifier.dart'; // �
 import 'app/config/app_theme.dart';
 import 'app/config/app_router.dart';
 // import 'features/home/presentation/home_navigation_provider.dart'; // 🔥 Riverpod으로 교체됨
-import 'features/education/presentation/education_provider.dart';
+// import 'features/education/presentation/education_provider.dart'; // 🔥 Riverpod으로 교체됨
 import 'features/quiz/presentation/quiz_provider.dart';
 import 'features/wrong_note/presentation/wrong_note_provider.dart';
 import 'features/wrong_note/data/wrong_note_api.dart';
@@ -162,23 +162,23 @@ class StockerApp extends StatelessWidget {
         //   },
         // ),
 
-        // Education 상태 관리 (euimin Mock/Real API 분기 패턴 유지)
-        legacy_provider.ChangeNotifierProvider(
-          create: (_) {
-            debugPrint(
-                '🎯 [PROVIDER] Creating EducationProvider (useMock: $useMock)');
-            if (useMock) {
-              final mockRepository = EducationMockRepository();
-              return EducationProvider.withMock(mockRepository);
-            } else {
-              const storage = FlutterSecureStorage();
-              final educationApi = EducationApi(dio); // 글로벌 dio 사용
-              final educationRepository =
-                  EducationRepository(educationApi, storage);
-              return EducationProvider(educationRepository);
-            }
-          },
-        ),
+        // 🔥 Education Provider는 Riverpod으로 이동됨 (EducationNotifier)
+        // legacy_provider.ChangeNotifierProvider(
+        //   create: (_) {
+        //     debugPrint(
+        //         '🎯 [PROVIDER] Creating EducationProvider (useMock: $useMock)');
+        //     if (useMock) {
+        //       final mockRepository = EducationMockRepository();
+        //       return EducationProvider.withMock(mockRepository);
+        //     } else {
+        //       const storage = FlutterSecureStorage();
+        //       final educationApi = EducationApi(dio); // 글로벌 dio 사용
+        //       final educationRepository =
+        //           EducationRepository(educationApi, storage);
+        //       return EducationProvider(educationRepository);
+        //     }
+        //   },
+        // ),
 
         // Quiz 상태 관리 (euimin 기능)
         legacy_provider.ChangeNotifierProvider(
@@ -246,9 +246,10 @@ class StockerApp extends StatelessWidget {
             } else {
               // Real 환경: API Repository 사용
               final learningProgressApi = LearningProgressApi(dio);
-              final educationProvider = context.read<EducationProvider>();
+              // 🔥 TODO: EducationProvider → EducationNotifier로 변경 필요
+              // final educationProvider = context.read<EducationProvider>();
               final apiRepository = LearningProgressApiRepository(
-                  learningProgressApi, educationProvider);
+                  learningProgressApi, null); // 임시로 null 전달
               learningProgressProvider =
                   LearningProgressProvider(apiRepository);
             }
@@ -257,26 +258,28 @@ class StockerApp extends StatelessWidget {
             debugPrint(
                 '🔗 [PROVIDER] Setting up one-time Provider callbacks...');
 
-            final educationProvider = context.read<EducationProvider>();
+            // 🔥 TODO: EducationProvider → EducationNotifier로 변경 필요
+            // final educationProvider = context.read<EducationProvider>();
             final quizProvider = context.read<QuizProvider>();
             final wrongNoteProvider = context.read<WrongNoteProvider>();
 
             // 🎯 콜백 등록 (create에서 단 한 번만 실행됨!)
 
-            // 1. EducationProvider -> LearningProgressProvider 콜백
-            educationProvider.addOnChapterCompletedCallback((int chapterId) {
-              debugPrint(
-                  '🎉 [CALLBACK] 챕터 $chapterId 완료 - LearningProgress에 알림');
-              learningProgressProvider.completeChapter(chapterId);
-            });
+            // 🔥 TODO: EducationNotifier로 변환 후 다시 활성화 필요
+            // // 1. EducationProvider -> LearningProgressProvider 콜백
+            // educationProvider.addOnChapterCompletedCallback((int chapterId) {
+            //   debugPrint(
+            //       '🎉 [CALLBACK] 챕터 $chapterId 완료 - LearningProgress에 알림');
+            //   learningProgressProvider.completeChapter(chapterId);
+            // });
 
-            // 2. QuizProvider -> EducationProvider 콜백
-            quizProvider.addOnQuizCompletedCallback((chapterId, result) {
-              debugPrint(
-                  '🎯 [CALLBACK] 퀴즈 $chapterId 완료 - Education에 알림 (${result.scorePercentage}%)');
-              educationProvider.updateQuizCompletion(chapterId,
-                  isPassed: result.isPassed);
-            });
+            // // 2. QuizProvider -> EducationProvider 콜백
+            // quizProvider.addOnQuizCompletedCallback((chapterId, result) {
+            //   debugPrint(
+            //       '🎯 [CALLBACK] 퀴즈 $chapterId 완료 - Education에 알림 (${result.scorePercentage}%)');
+            //   educationProvider.updateQuizCompletion(chapterId,
+            //       isPassed: result.isPassed);
+            // });
 
             // 3. 🔥 QuizProvider -> WrongNoteProvider 일반 퀴즈 콜백
             quizProvider.addOnQuizCompletedCallback((chapterId, result) async {

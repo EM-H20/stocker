@@ -6,12 +6,14 @@ import '../../../../features/auth/domain/auth_repository.dart';
 import '../../../../features/attendance/domain/repository/attendance_repository.dart';
 import '../../../../features/aptitude/domain/repository/aptitude_repository.dart';
 import '../../../../features/note/domain/repository/note_repository.dart';
+import '../../../../features/education/domain/education_repository.dart';
 
 // Mock implementations
 import '../../../../features/auth/data/repository/auth_mock_repository.dart';
 import '../../../../features/attendance/data/repository/attendance_mock_repository.dart';
 import '../../../../features/aptitude/data/repository/aptitude_mock_repository.dart';
 import '../../../../features/note/data/repository/note_mock_repository.dart';
+import '../../../../features/education/domain/education_mock_repository.dart';
 
 // API implementations
 import '../../../../features/auth/data/repository/auth_api_repository.dart';
@@ -24,6 +26,10 @@ import '../../../../features/auth/data/source/auth_api.dart';
 import '../../../../features/attendance/data/source/attendance_api.dart';
 import '../../../../features/aptitude/data/source/aptitude_api.dart';
 import '../../../../features/note/data/source/note_api.dart';
+import '../../../../features/education/data/education_api.dart';
+
+// Storage
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Network
 import 'package:stocker/app/core/network/dio.dart' show dio;
@@ -64,4 +70,13 @@ NoteRepository noteRepository(Ref ref) {
   return useMock
       ? NoteMockRepository()
       : NoteApiRepository(NoteApi(dio));
+}
+
+/// 교육 Repository Provider
+@riverpod
+Object educationRepository(Ref ref) {
+  const storage = FlutterSecureStorage();
+  return useMock
+      ? EducationMockRepository()
+      : EducationRepository(EducationApi(dio), storage);
 }

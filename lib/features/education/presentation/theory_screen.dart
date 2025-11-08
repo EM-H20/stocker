@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/config/app_routes.dart';
 import '../../../app/config/app_theme.dart';
-import 'education_provider.dart';
+import 'riverpod/education_notifier.dart';
+import 'riverpod/education_state.dart';
 import 'widgets/education_error_widget.dart';
 import 'widgets/theory_page_widget.dart';
 import 'widgets/theory_navigation_widget.dart';
@@ -13,16 +14,16 @@ import 'widgets/theory_empty_state_widget.dart';
 import '../../../app/core/utils/theme_utils.dart';
 import '../../../app/core/widgets/loading_widget.dart';
 
-class TheoryScreen extends StatefulWidget {
+class TheoryScreen extends ConsumerStatefulWidget {
   const TheoryScreen({super.key, required this.chapterId});
 
   final int chapterId;
 
   @override
-  State<TheoryScreen> createState() => _TheoryScreenState();
+  ConsumerState<TheoryScreen> createState() => _TheoryScreenState();
 }
 
-class _TheoryScreenState extends State<TheoryScreen> {
+class _TheoryScreenState extends ConsumerState<TheoryScreen> {
   final PageController _pageController = PageController();
 
   @override
@@ -30,8 +31,8 @@ class _TheoryScreenState extends State<TheoryScreen> {
     super.initState();
     debugPrint('🎓 [THEORY_SCREEN] 이론 진입 시작 - 챕터 ID: ${widget.chapterId}');
     // 이론 진입
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EducationProvider>().enterTheory(widget.chapterId);
+    Future.microtask(() {
+      ref.read(educationNotifierProvider.notifier).enterTheory(widget.chapterId);
     });
   }
 
@@ -46,35 +47,38 @@ class _TheoryScreenState extends State<TheoryScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(context),
-      body: Consumer<EducationProvider>(
-        builder: (context, provider, child) {
+      body: Consumer(
+        builder: (context, ref, child) {
+          final educationState = ref.watch(educationNotifierProvider);
+          final educationNotifier = ref.read(educationNotifierProvider.notifier);
+
           // 로딩 상태
-          if (provider.isLoadingTheory) {
+          if (educationState.isLoadingTheory) {
             return _buildLoadingState();
           }
 
           // 에러 상태
-          if (provider.theoryError != null) {
+          if (educationState.theoryError != null) {
             return EducationErrorWidget(
               title: '이론을 불러오는데 실패했습니다',
-              errorMessage: provider.theoryError!,
-              onRetry: () => provider.enterTheory(widget.chapterId),
+              errorMessage: educationState.theoryError!,
+              onRetry: () => educationNotifier.enterTheory(widget.chapterId),
             );
           }
 
           // 이론 세션이 없는 경우
-          if (provider.currentTheorySession == null) {
+          if (educationState.currentTheorySession == null) {
             return const TheoryEmptyStateWidget(message: '이론 데이터가 없습니다');
           }
 
-          final theorySession = provider.currentTheorySession!;
+          final theorySession = educationState.currentTheorySession!;
           final theories = theorySession.theories;
 
           if (theories.isEmpty) {
             return const TheoryEmptyStateWidget(message: '이론 페이지가 없습니다');
           }
 
-          return _buildTheoryContent(context, provider, theories);
+          return _buildTheoryContent(context, educationState, educationNotifier, theories);
         },
       ),
     );
@@ -115,7 +119,8 @@ class _TheoryScreenState extends State<TheoryScreen> {
   /// 이론 콘텐츠 빌드
   Widget _buildTheoryContent(
     BuildContext context,
-    EducationProvider provider,
+    EducationState educationState,
+    EducationNotifier educationNotifier,
     List<dynamic> theories,
   ) {
     return Column(
@@ -125,7 +130,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: (index) {
-              provider.setCurrentTheoryIndex(index);
+              educationNotifier.setCurrentTheoryIndex(index);
             },
             itemCount: theories.length,
             itemBuilder: (context, index) {
@@ -137,7 +142,7 @@ class _TheoryScreenState extends State<TheoryScreen> {
 
         // 하단 네비게이션
         TheoryNavigationWidget(
-          currentIndex: provider.currentTheoryIndex,
+          currentIndex: educationState.currentTheoryIndex,
           totalPages: theories.length,
           onPrevious: () {
             _pageController.previousPage(
@@ -151,16 +156,16 @@ class _TheoryScreenState extends State<TheoryScreen> {
               curve: Curves.easeInOut,
             );
           },
-          onComplete: () => _completeTheory(provider),
+          onComplete: () => _completeTheory(educationNotifier),
         ),
       ],
     );
   }
 
   /// 이론 완료 처리
-  Future<void> _completeTheory(EducationProvider provider) async {
+  Future<void> _completeTheory(EducationNotifier educationNotifier) async {
     try {
-      await provider.completeTheory();
+      await educationNotifier.completeTheory();
 
       if (mounted) {
         // 이론 완료 후 퀴즈로 이동

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 // 분리된 위젯들 import
 import 'widgets/search_bar_widget.dart';
 import 'widgets/recommended_chapter_card.dart';
@@ -8,18 +8,18 @@ import 'widgets/current_learning_card.dart';
 import 'widgets/global_progress_bar.dart';
 import 'package:stocker/app/config/app_routes.dart';
 import 'package:go_router/go_router.dart';
-import 'education_provider.dart';
+import 'riverpod/education_notifier.dart';
 import '../../../app/core/widgets/loading_widget.dart';
 import '../../../app/core/widgets/error_message_widget.dart';
 
-class EducationScreen extends StatefulWidget {
+class EducationScreen extends ConsumerStatefulWidget {
   const EducationScreen({super.key});
 
   @override
-  State<EducationScreen> createState() => _EducationScreenState();
+  ConsumerState<EducationScreen> createState() => _EducationScreenState();
 }
 
-class _EducationScreenState extends State<EducationScreen> {
+class _EducationScreenState extends ConsumerState<EducationScreen> {
   late final ScrollController _scrollController;
 
   @override
@@ -28,13 +28,13 @@ class _EducationScreenState extends State<EducationScreen> {
     _scrollController = ScrollController();
 
     // 화면 로드 시 챕터 목록을 가져옴
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = context.read<EducationProvider>();
+    Future.microtask(() {
+      final educationNotifier = ref.read(educationNotifierProvider.notifier);
       // 🧹 캐시 삭제 및 강제 새로고침으로 mock 데이터 제거
       debugPrint('🧹 [EDUCATION_SCREEN] 캐시 삭제 및 강제 새로고침 시작');
-      provider.clearCache().then((_) {
+      educationNotifier.clearCache().then((_) {
         debugPrint('🔄 [EDUCATION_SCREEN] 캐시 삭제 완료, 강제 새로고침 실행');
-        provider.loadChapters(forceRefresh: true);
+        educationNotifier.loadChapters(forceRefresh: true);
       });
     });
   }
@@ -81,12 +81,15 @@ class _EducationScreenState extends State<EducationScreen> {
               const GlobalProgressBar(),
               SizedBox(height: 12.h),
 
-              // 현재 진행 학습 카드 - Provider 데이터 사용
-              Consumer<EducationProvider>(
-                builder: (context, provider, child) {
+              // 현재 진행 학습 카드 - Riverpod 데이터 사용
+              Consumer(
+                builder: (context, ref, child) {
+                  final educationState = ref.watch(educationNotifierProvider);
+                  final educationNotifier = ref.read(educationNotifierProvider.notifier);
+
                   // 로딩 중이거나 챕터가 없는 경우 기본 카드 표시
-                  if (provider.isLoadingChapters || provider.chapters.isEmpty) {
-                    return CurrentLearningCard(
+                  if (educationState.isLoadingChapters || educationState.chapters.isEmpty) {
+                    return const CurrentLearningCard(
                       title: '학습 준비 중...',
                       description: '챕터 정보를 불러오고 있습니다.',
                       isTheoryCompleted: false, // 로딩 중일 때는 퀴즈 버튼 잠금
@@ -96,20 +99,20 @@ class _EducationScreenState extends State<EducationScreen> {
                   }
 
                   // 표시할 챕터 결정: 선택된 챕터가 있으면 선택된 챕터, 없으면 미완료 첫 번째 챕터
-                  final displayChapter = provider.selectedChapter ??
-                      (provider.chapters
+                  final displayChapter = educationState.getSelectedChapter() ??
+                      (educationState.chapters
                               .where((chapter) => !chapter.isTheoryCompleted)
                               .isNotEmpty
-                          ? provider.chapters
+                          ? educationState.chapters
                               .where((chapter) => !chapter.isTheoryCompleted)
                               .first
-                          : provider.chapters.first);
+                          : educationState.chapters.first);
 
                   // 제목과 설명 결정
-                  final cardTitle = provider.hasSelectedChapter
+                  final cardTitle = educationState.hasSelectedChapter
                       ? '${displayChapter.title} ✨'
                       : displayChapter.title;
-                  final cardDescription = provider.hasSelectedChapter
+                  final cardDescription = educationState.hasSelectedChapter
                       ? '선택된 챕터입니다. 이론 학습을 완료한 후 퀴즈에 도전하세요.'
                       : '현재 진행 중인 챕터입니다. 이론 학습을 완료한 후 퀴즈에 도전하세요.';
 
@@ -117,9 +120,9 @@ class _EducationScreenState extends State<EducationScreen> {
                     title: cardTitle,
                     description: cardDescription,
                     isTheoryCompleted: displayChapter.isTheoryCompleted,
-                    isSelectedChapter: provider.hasSelectedChapter,
+                    isSelectedChapter: educationState.hasSelectedChapter,
                     onTheoryPressed: () {
-                      provider.enterTheory(displayChapter.id);
+                      educationNotifier.enterTheory(displayChapter.id);
                       context.go(
                           '${AppRoutes.theory}?chapterId=${displayChapter.id}');
                     },
@@ -128,9 +131,9 @@ class _EducationScreenState extends State<EducationScreen> {
                       context.go(
                           '${AppRoutes.quiz}?chapterId=${displayChapter.id}');
                     },
-                    onClearSelection: provider.hasSelectedChapter
+                    onClearSelection: educationState.hasSelectedChapter
                         ? () {
-                            provider.clearSelectedChapter();
+                            educationNotifier.clearSelectedChapter();
                             debugPrint('🔄 [EDUCATION_SCREEN] 챕터 선택 해제됨');
                           }
                         : null,
@@ -152,18 +155,21 @@ class _EducationScreenState extends State<EducationScreen> {
               ),
               SizedBox(height: 16.h),
 
-              // 추천 학습 챕터 리스트 - Provider 데이터 사용
-              Consumer<EducationProvider>(
-                builder: (context, provider, child) {
-                  if (provider.isLoadingChapters) {
+              // 추천 학습 챕터 리스트 - Riverpod 데이터 사용
+              Consumer(
+                builder: (context, ref, child) {
+                  final educationState = ref.watch(educationNotifierProvider);
+                  final educationNotifier = ref.read(educationNotifierProvider.notifier);
+
+                  if (educationState.isLoadingChapters) {
                     return const Center(child: LoadingWidget());
                   }
 
-                  if (provider.chaptersError != null) {
+                  if (educationState.chaptersError != null) {
                     // 인증 에러인 경우
-                    if (provider.isAuthenticationError) {
+                    if (educationState.isAuthenticationError) {
                       return ErrorMessageWidget.auth(
-                        message: provider.chaptersError!,
+                        message: educationState.chaptersError!,
                         onRetry: () {
                           // TODO: 로그인 화면으로 이동
                           debugPrint('🔐 [EDUCATION_SCREEN] 로그인 필요');
@@ -172,14 +178,14 @@ class _EducationScreenState extends State<EducationScreen> {
                     }
 
                     // 네트워크 에러인 경우
-                    if (provider.chaptersError!.contains('네트워크') ||
-                        provider.chaptersError!.contains('연결')) {
+                    if (educationState.chaptersError!.contains('네트워크') ||
+                        educationState.chaptersError!.contains('연결')) {
                       return ErrorMessageWidget.network(
-                        message: provider.chaptersError!,
+                        message: educationState.chaptersError!,
                         onRetry: () {
                           debugPrint('🔄 [EDUCATION_SCREEN] 재시도 버튼 클릭');
-                          provider.clearCache().then((_) {
-                            provider.loadChapters(forceRefresh: true);
+                          educationNotifier.clearCache().then((_) {
+                            educationNotifier.loadChapters(forceRefresh: true);
                           });
                         },
                       );
@@ -187,18 +193,18 @@ class _EducationScreenState extends State<EducationScreen> {
 
                     // 기타 서버 에러
                     return ErrorMessageWidget.server(
-                      message: provider.chaptersError!,
+                      message: educationState.chaptersError!,
                       onRetry: () {
                         debugPrint('🔄 [EDUCATION_SCREEN] 재시도 버튼 클릭');
-                        provider.clearCache().then((_) {
-                          provider.loadChapters(forceRefresh: true);
+                        educationNotifier.clearCache().then((_) {
+                          educationNotifier.loadChapters(forceRefresh: true);
                         });
                       },
                     );
                   }
 
                   return Column(
-                    children: provider.chapters.map((chapter) {
+                    children: educationState.chapters.map((chapter) {
                       // 챕터 상태에 따른 설명과 아이콘 결정
                       String description;
                       IconData icon;
@@ -227,7 +233,7 @@ class _EducationScreenState extends State<EducationScreen> {
                         icon: icon,
                         onTap: () {
                           // 챕터 선택하고 CurrentLearningCard로 스크롤
-                          provider.selectChapter(chapter.id);
+                          educationNotifier.selectChapter(chapter.id);
                           debugPrint(
                               '📌 [EDUCATION_SCREEN] 챕터 선택됨: ${chapter.title}');
 
