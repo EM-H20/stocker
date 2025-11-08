@@ -1,0 +1,10 @@
+# Riverpod 코드 생성 설정
+targets:
+  $default:
+    builders:
+      riverpod_generator:
+        generate_for:
+          - lib/**/*.dart
+        options:
+          # Riverpod 코드 생성 옵션
+          # .g.dart 파일 생성

@@ -1,7 +1,8 @@
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as legacy_provider; // 🔥 Provider에 prefix 추가 (공존 기간)
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔥 Riverpod 추가!
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
@@ -87,7 +88,12 @@ void main() async {
     await TokenStorage.createTestUser();
   }
 
-  runApp(const StockerApp());
+  // 🔥 Riverpod ProviderScope로 앱 전체 감싸기
+  runApp(
+    ProviderScope(
+      child: const StockerApp(),
+    ),
+  );
 }
 
 class StockerApp extends StatelessWidget {
@@ -95,39 +101,39 @@ class StockerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
+    return legacy_provider.MultiProvider(
       providers: [
         // === Repository 계층 (subin 스타일) ===
-        Provider<AuthRepository>(
+        legacy_provider.Provider<AuthRepository>(
           create: (_) =>
               useMock ? AuthMockRepository() : AuthApiRepository(AuthApi(dio)),
         ),
-        Provider<AttendanceRepository>(
+        legacy_provider.Provider<AttendanceRepository>(
           create: (_) => useMock
               ? AttendanceMockRepository()
               : AttendanceApiRepository(AttendanceApi(dio)),
         ),
-        Provider<AptitudeRepository>(
+        legacy_provider.Provider<AptitudeRepository>(
           create: (_) => useMock
               ? AptitudeMockRepository()
               : AptitudeApiRepository(AptitudeApi(dio)),
         ),
-        Provider<NoteRepository>(
+        legacy_provider.Provider<NoteRepository>(
           create: (_) =>
               useMock ? NoteMockRepository() : NoteApiRepository(NoteApi(dio)),
         ),
 
         // === Provider 계층 ===
         // 테마 상태 관리 (euimin 핵심 기능 유지)
-        ChangeNotifierProvider(
+        legacy_provider.ChangeNotifierProvider(
           create: (_) => ThemeProvider()..initialize(),
         ),
 
         // 홈 네비게이션 상태 관리
-        ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
+        legacy_provider.ChangeNotifierProvider(create: (_) => HomeNavigationProvider()),
 
         // Auth Provider (subin에서 개선된 버전)
-        ChangeNotifierProvider(
+        legacy_provider.ChangeNotifierProvider(
           create: (context) {
             debugPrint(
                 '🔐 [PROVIDER] Creating AuthProvider (useMock: $useMock)');
@@ -150,7 +156,7 @@ class StockerApp extends StatelessWidget {
         ),
 
         // Education 상태 관리 (euimin Mock/Real API 분기 패턴 유지)
-        ChangeNotifierProvider(
+        legacy_provider.ChangeNotifierProvider(
           create: (_) {
             debugPrint(
                 '🎯 [PROVIDER] Creating EducationProvider (useMock: $useMock)');
@@ -168,7 +174,7 @@ class StockerApp extends StatelessWidget {
         ),
 
         // Quiz 상태 관리 (euimin 기능)
-        ChangeNotifierProvider(
+        legacy_provider.ChangeNotifierProvider(
           create: (_) {
             debugPrint(
                 '🎯 [PROVIDER] Creating QuizProvider (useMock: $useMock)');
@@ -185,7 +191,7 @@ class StockerApp extends StatelessWidget {
         ),
 
         // WrongNote 상태 관리 (euimin 기능)
-        ChangeNotifierProvider(
+        legacy_provider.ChangeNotifierProvider(
           create: (_) {
             debugPrint(
                 '🎯 [PROVIDER] Creating WrongNoteProvider (useMock: $useMock)');
@@ -201,25 +207,25 @@ class StockerApp extends StatelessWidget {
         ),
 
         // Attendance Provider (subin 새 기능)
-        ChangeNotifierProvider(
+        legacy_provider.ChangeNotifierProvider(
           create: (context) => AttendanceProvider(
             context.read<AttendanceRepository>(),
           ),
         ),
 
         // Aptitude Provider (subin 새 기능)
-        ChangeNotifierProvider(
+        legacy_provider.ChangeNotifierProvider(
           create: (context) =>
               AptitudeProvider(context.read<AptitudeRepository>()),
         ),
 
         // Note Provider (subin 새 기능)
-        ChangeNotifierProvider(
+        legacy_provider.ChangeNotifierProvider(
           create: (context) => NoteProvider(context.read<NoteRepository>()),
         ),
 
         // Learning Progress Provider (Repository 패턴 적용) - 🚀 새로운 안전한 구조
-        ChangeNotifierProvider(
+        legacy_provider.ChangeNotifierProvider(
           create: (context) {
             debugPrint(
                 '🎯 [PROVIDER] Creating LearningProgressProvider (useMock: $useMock)');
@@ -360,7 +366,7 @@ class StockerApp extends StatelessWidget {
         splitScreenMode: true,
         builder: (context, child) {
           // euimin의 테마 Provider를 유지하면서 subin의 기능들 통합
-          return Consumer<ThemeProvider>(
+          return legacy_provider.Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return MaterialApp.router(
                 title: 'Stocker',
