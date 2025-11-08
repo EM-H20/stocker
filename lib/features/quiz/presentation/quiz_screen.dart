@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/config/app_routes.dart';
 import '../../../app/config/app_theme.dart';
 import '../../../app/core/utils/theme_utils.dart';
 import '../../../app/core/widgets/action_button.dart';
-import 'quiz_provider.dart';
+import 'riverpod/quiz_notifier.dart';
+import 'riverpod/quiz_state.dart';
 import 'widgets/quiz_progress_widget.dart';
 import 'widgets/quiz_question_widget.dart';
 import 'widgets/quiz_option_widget.dart';
@@ -16,7 +17,7 @@ import 'widgets/quiz_navigation_widget.dart';
 import 'widgets/quiz_error_widget.dart';
 import '../../../app/core/widgets/loading_widget.dart';
 
-class QuizScreen extends StatefulWidget {
+class QuizScreen extends ConsumerStatefulWidget {
   const QuizScreen(
       {super.key,
       required this.chapterId,
@@ -28,10 +29,10 @@ class QuizScreen extends StatefulWidget {
   final bool isReadOnly; // 읽기 전용 모드 (오답노트 복습용)
 
   @override
-  State<QuizScreen> createState() => _QuizScreenState();
+  ConsumerState<QuizScreen> createState() => _QuizScreenState();
 }
 
-class _QuizScreenState extends State<QuizScreen> {
+class _QuizScreenState extends ConsumerState<QuizScreen> {
   int? _selectedAnswer;
   bool _isSubmitting = false;
   bool _waitingForWrongNoteRemoval = false; // 오답 삭제 대기 상태
@@ -42,34 +43,30 @@ class _QuizScreenState extends State<QuizScreen> {
 
     // 단일 퀴즈 모드일 때 오답 삭제 완료 콜백 등록
     if (widget.singleQuizId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        final quizProvider = context.read<QuizProvider>();
-        quizProvider.addOnWrongNoteRemovedCallback(_onWrongNoteRemoved);
+      Future.microtask(() {
+        final quizNotifier = ref.read(quizNotifierProvider.notifier);
+        quizNotifier.addOnWrongNoteRemovedCallback(_onWrongNoteRemoved);
       });
     }
 
     // 빌드 완료 후 다음 프레임에서 퀴즈 시작
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.microtask(() => _startQuiz());
-    });
+    Future.microtask(() => _startQuiz());
   }
 
   /// 퀴즈를 바로 시작 (단일 퀴즈 모드 및 읽기 전용 모드 지원)
   Future<void> _startQuiz() async {
-    final quizProvider = context.read<QuizProvider>();
+    final quizNotifier = ref.read(quizNotifierProvider.notifier);
 
     try {
       if (widget.singleQuizId != null) {
         // 단일 퀴즈 모드
         debugPrint(
             '🧠 [QUIZ_SCREEN] 단일 퀴즈 진입 - 챕터: ${widget.chapterId}, 퀴즈: ${widget.singleQuizId}, 읽기전용: ${widget.isReadOnly}');
-        await quizProvider.startSingleQuiz(
-            widget.chapterId, widget.singleQuizId!,
-            isReadOnly: widget.isReadOnly);
+        await quizNotifier.startSingleQuiz(widget.singleQuizId!);
       } else {
         // 일반 퀴즈 모드
         debugPrint('🧠 [QUIZ_SCREEN] 일반 퀴즈 진입 - 챕터 ID: ${widget.chapterId}');
-        await quizProvider.startQuiz(widget.chapterId);
+        await quizNotifier.startQuiz(widget.chapterId);
       }
     } catch (e) {
       debugPrint('❌ [QUIZ_SCREEN] 퀴즈 시작 실패 - 챕터: ${widget.chapterId}, 에러: $e');
@@ -87,10 +84,10 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   void dispose() {
     // 단일 퀴즈 모드일 때 콜백 해제
-    if (widget.singleQuizId != null && mounted) {
+    if (widget.singleQuizId != null) {
       try {
-        final quizProvider = context.read<QuizProvider>();
-        quizProvider.removeOnWrongNoteRemovedCallback(_onWrongNoteRemoved);
+        final quizNotifier = ref.read(quizNotifierProvider.notifier);
+        quizNotifier.removeOnWrongNoteRemovedCallback(_onWrongNoteRemoved);
       } catch (e) {
         // dispose 중 에러는 무시
       }
@@ -109,31 +106,31 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final quizState = ref.watch(quizNotifierProvider);
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _buildAppBar(context),
-      body: Consumer<QuizProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoadingQuiz) {
-            return _buildLoadingState();
-          }
+      body: () {
+        if (quizState.isLoadingQuiz) {
+          return _buildLoadingState();
+        }
 
-          if (provider.quizError != null) {
-            return QuizErrorWidget(
-              title: '퀴즈 로드 실패',
-              errorMessage: provider.quizError!,
-              onRetry: _startQuiz,
-            );
-          }
+        if (quizState.quizError != null) {
+          return QuizErrorWidget(
+            title: '퀴즈 로드 실패',
+            errorMessage: quizState.quizError!,
+            onRetry: _startQuiz,
+          );
+        }
 
-          final session = provider.currentQuizSession;
-          if (session == null) {
-            return _buildEmptyState();
-          }
+        final session = quizState.currentQuizSession;
+        if (session == null) {
+          return _buildEmptyState();
+        }
 
-          return _buildQuizContent(context, provider, session);
-        },
-      ),
+        return _buildQuizContent(context, quizState, session);
+      }(),
     );
   }
 
@@ -184,7 +181,7 @@ class _QuizScreenState extends State<QuizScreen> {
   /// 퀴즈 콘텐츠 빌드
   Widget _buildQuizContent(
     BuildContext context,
-    QuizProvider provider,
+    QuizState quizState,
     session,
   ) {
     final currentQuiz = session.currentQuiz;
@@ -195,7 +192,7 @@ class _QuizScreenState extends State<QuizScreen> {
         QuizProgressWidget(
           currentIndex: session.currentQuizIndex,
           totalCount: session.totalCount,
-          progressRatio: provider.progressRatio,
+          progressRatio: quizState.progressRatio,
         ),
 
         // 퀴즈 내용
@@ -249,20 +246,20 @@ class _QuizScreenState extends State<QuizScreen> {
         QuizNavigationWidget(
           showPrevious: session.currentQuizIndex > 0,
           onPrevious: () {
-            provider.moveToPreviousQuiz();
+            ref.read(quizNotifierProvider.notifier).moveToPreviousQuiz();
             setState(() {
               _selectedAnswer =
                   session.userAnswers[session.currentQuizIndex - 1];
             });
           },
-          actionButton: _buildActionButton(provider, session),
+          actionButton: _buildActionButton(quizState, session),
         ),
       ],
     );
   }
 
   /// 액션 버튼 빌드
-  Widget _buildActionButton(QuizProvider provider, session) {
+  Widget _buildActionButton(QuizState quizState, session) {
     final hasAnswered = session.userAnswers[session.currentQuizIndex] != null;
     final isLastQuiz = session.currentQuizIndex == session.totalCount - 1;
 
@@ -270,15 +267,15 @@ class _QuizScreenState extends State<QuizScreen> {
       // 답안 제출 버튼
       final canSubmit = _selectedAnswer != null &&
           !_isSubmitting &&
-          !provider.isSubmittingAnswer;
+          !quizState.isSubmittingAnswer;
       return ActionButton(
         text:
-            _isSubmitting || provider.isSubmittingAnswer ? '제출 중...' : '답안 제출',
-        icon: _isSubmitting || provider.isSubmittingAnswer
+            _isSubmitting || quizState.isSubmittingAnswer ? '제출 중...' : '답안 제출',
+        icon: _isSubmitting || quizState.isSubmittingAnswer
             ? Icons.hourglass_empty
             : Icons.send,
         color: canSubmit ? AppTheme.successColor : Colors.grey,
-        onPressed: canSubmit ? () => _submitAnswer(provider) : () {},
+        onPressed: canSubmit ? () => _submitAnswer() : () {},
       );
     } else if (!isLastQuiz) {
       // 다음 문제 버튼
@@ -287,7 +284,7 @@ class _QuizScreenState extends State<QuizScreen> {
         icon: Icons.arrow_forward,
         color: AppTheme.successColor,
         onPressed: () {
-          provider.moveToNextQuiz();
+          ref.read(quizNotifierProvider.notifier).moveToNextQuiz();
           setState(() {
             _selectedAnswer = session.userAnswers[session.currentQuizIndex + 1];
           });
@@ -302,16 +299,16 @@ class _QuizScreenState extends State<QuizScreen> {
             : Icons.check_circle,
         color:
             _waitingForWrongNoteRemoval ? Colors.grey : AppTheme.successColor,
-        onPressed:
-            _waitingForWrongNoteRemoval ? () {} : () => _completeQuiz(provider),
+        onPressed: _waitingForWrongNoteRemoval ? () {} : () => _completeQuiz(),
       );
     }
   }
 
-  Future<void> _submitAnswer(QuizProvider provider) async {
+  Future<void> _submitAnswer() async {
+    final quizState = ref.read(quizNotifierProvider);
     if (_selectedAnswer == null ||
         _isSubmitting ||
-        provider.isSubmittingAnswer) {
+        quizState.isSubmittingAnswer) {
       return;
     }
 
@@ -320,7 +317,9 @@ class _QuizScreenState extends State<QuizScreen> {
     });
 
     try {
-      final success = await provider.submitAnswer(_selectedAnswer!);
+      final success = await ref
+          .read(quizNotifierProvider.notifier)
+          .submitAnswer(_selectedAnswer!);
       if (success) {
         // 답안 제출 성공
       } else if (mounted) {
@@ -340,27 +339,28 @@ class _QuizScreenState extends State<QuizScreen> {
     }
   }
 
-  Future<void> _completeQuiz(QuizProvider provider) async {
-    final result = await provider.completeQuiz();
+  Future<void> _completeQuiz() async {
+    final result = await ref.read(quizNotifierProvider.notifier).completeQuiz();
 
     if (result != null && mounted) {
       if (widget.singleQuizId != null) {
         // 🎯 단일 퀴즈 모드
-        final session = provider.currentQuizSession;
+        final quizState = ref.read(quizNotifierProvider);
+        final session = quizState.currentQuizSession;
         if (session != null && session.quizList.isNotEmpty) {
           final quiz = session.quizList.first;
           final userAnswer = session.userAnswers.first;
           final isCorrect = userAnswer == quiz.correctAnswerIndex;
 
           // 🚨 ReadOnly 모드 완료 처리 (무한루프 방지!)
-          if (provider.isReadOnlyMode) {
+          if (quizState.isReadOnlyMode) {
             debugPrint('📖 [QUIZ_SCREEN] ReadOnly 퀴즈 완료 - 복습 모드 종료');
 
             // 🕐 잠깐 대기 후 오답노트로 이동 (자동 퀴즈 시작 방지)
             await Future.delayed(const Duration(milliseconds: 500));
 
             // 🛡️ ReadOnly 모드 해제 후 안전하게 오답노트로 이동
-            provider.exitReadOnlyMode();
+            ref.read(quizNotifierProvider.notifier).exitQuiz();
             debugPrint('🛡️ [QUIZ_SCREEN] ReadOnly 모드 해제 완료, 오답노트로 안전 이동');
 
             if (mounted) {

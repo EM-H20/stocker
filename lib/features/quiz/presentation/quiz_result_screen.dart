@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/config/app_routes.dart';
 import '../../../app/config/app_theme.dart';
-import 'quiz_provider.dart';
+import 'riverpod/quiz_notifier.dart';
 import '../../../app/core/utils/theme_utils.dart';
 import '../../../app/core/widgets/loading_widget.dart';
 
-class QuizResultScreen extends StatefulWidget {
+class QuizResultScreen extends ConsumerStatefulWidget {
   const QuizResultScreen({super.key, required this.chapterId});
 
   final int chapterId;
 
   @override
-  State<QuizResultScreen> createState() => _QuizResultScreenState();
+  ConsumerState<QuizResultScreen> createState() => _QuizResultScreenState();
 }
 
-class _QuizResultScreenState extends State<QuizResultScreen>
+class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -48,8 +48,8 @@ class _QuizResultScreenState extends State<QuizResultScreen>
   }
 
   void _loadQuizResults() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<QuizProvider>().loadQuizResults(widget.chapterId);
+    Future.microtask(() {
+      ref.read(quizNotifierProvider.notifier).loadQuizResults();
     });
   }
 
@@ -62,6 +62,7 @@ class _QuizResultScreenState extends State<QuizResultScreen>
   @override
   Widget build(BuildContext context) {
     final isDarkMode = ThemeUtils.isDarkMode(context);
+    final quizState = ref.watch(quizNotifierProvider);
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -84,44 +85,42 @@ class _QuizResultScreenState extends State<QuizResultScreen>
           ),
         ),
       ),
-      body: Consumer<QuizProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoadingResults) {
-            return Center(child: LoadingWidget());
-          }
+      body: () {
+        if (quizState.isLoadingResults) {
+          return Center(child: LoadingWidget());
+        }
 
-          if (provider.resultsError != null || provider.quizResults.isEmpty) {
-            return _buildErrorState();
-          }
+        if (quizState.resultsError != null || quizState.quizResults.isEmpty) {
+          return _buildErrorState();
+        }
 
-          final result = provider.quizResults.first;
+        final result = quizState.quizResults.first;
 
-          return AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return FadeTransition(
-                opacity: _fadeAnimation,
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.w),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildResultCard(result, isDarkMode),
-                          SizedBox(height: 40.h),
-                          _buildActionButtons(),
-                        ],
-                      ),
+        return AnimatedBuilder(
+          animation: _animationController,
+          builder: (context, child) {
+            return FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24.w),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildResultCard(result, isDarkMode),
+                        SizedBox(height: 40.h),
+                        _buildActionButtons(),
+                      ],
                     ),
                   ),
                 ),
-              );
-            },
-          );
-        },
-      ),
+              ),
+            );
+          },
+        );
+      }(),
     );
   }
 
@@ -329,7 +328,7 @@ class _QuizResultScreenState extends State<QuizResultScreen>
             _buildCustomButton(
               text: '다시 시도',
               onPressed: () {
-                context.read<QuizProvider>().loadQuizResults(widget.chapterId);
+                ref.read(quizNotifierProvider.notifier).loadQuizResults();
               },
               backgroundColor: AppTheme.primaryColor,
               textColor: Colors.white,

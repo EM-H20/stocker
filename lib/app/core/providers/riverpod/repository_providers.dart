@@ -7,6 +7,7 @@ import '../../../../features/attendance/domain/repository/attendance_repository.
 import '../../../../features/aptitude/domain/repository/aptitude_repository.dart';
 import '../../../../features/note/domain/repository/note_repository.dart';
 import '../../../../features/education/domain/education_repository.dart';
+import '../../../../features/quiz/domain/quiz_repository.dart';
 
 // Mock implementations
 import '../../../../features/auth/data/repository/auth_mock_repository.dart';
@@ -14,6 +15,7 @@ import '../../../../features/attendance/data/repository/attendance_mock_reposito
 import '../../../../features/aptitude/data/repository/aptitude_mock_repository.dart';
 import '../../../../features/note/data/repository/note_mock_repository.dart';
 import '../../../../features/education/domain/education_mock_repository.dart';
+import '../../../../features/quiz/domain/quiz_mock_repository.dart';
 
 // API implementations
 import '../../../../features/auth/data/repository/auth_api_repository.dart';
@@ -27,6 +29,7 @@ import '../../../../features/attendance/data/source/attendance_api.dart';
 import '../../../../features/aptitude/data/source/aptitude_api.dart';
 import '../../../../features/note/data/source/note_api.dart';
 import '../../../../features/education/data/education_api.dart';
+import '../../../../features/quiz/data/quiz_api.dart';
 
 // Storage
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -79,4 +82,13 @@ Object educationRepository(Ref ref) {
   return useMock
       ? EducationMockRepository()
       : EducationRepository(EducationApi(dio), storage);
+}
+
+/// 퀴즈 Repository Provider
+@riverpod
+Object quizRepository(Ref ref) {
+  const storage = FlutterSecureStorage();
+  return useMock
+      ? QuizMockRepository()
+      : QuizRepository(QuizApi(dio), storage);
 }
