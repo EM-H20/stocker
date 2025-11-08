@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
-import '../../note/presentation/provider/note_provider.dart';
+import 'package:provider/provider.dart' as legacy_provider;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../note/presentation/riverpod/note_notifier.dart';
 import '../../auth/presentation/auth_provider.dart';
 import '../../../app/core/widgets/loading_widget.dart';
 import 'widgets/profile_header.dart';
@@ -12,20 +13,19 @@ import 'widgets/note_section.dart';
 import 'widgets/theme_toggle_widget.dart';
 import '../../home/presentation/widgets/stats_cards_widget.dart';
 
-class MypageScreen extends StatefulWidget {
+class MypageScreen extends ConsumerStatefulWidget {
   const MypageScreen({super.key});
 
   @override
-  State<MypageScreen> createState() => _MypageScreenState();
+  ConsumerState<MypageScreen> createState() => _MypageScreenState();
 }
 
-class _MypageScreenState extends State<MypageScreen> {
+class _MypageScreenState extends ConsumerState<MypageScreen> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // NoteProvider만 초기화 (다른 Provider는 StatsCardsWidget에서 처리)
-      context.read<NoteProvider>().fetchAllNotes();
+      ref.read(noteNotifierProvider.notifier).fetchAllNotes();
     });
   }
 
@@ -38,11 +38,10 @@ class _MypageScreenState extends State<MypageScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 프로필 헤더 (실제 사용자 닉네임 표시 + 수정 기능)
-              Consumer<AuthProvider>(
+              legacy_provider.Consumer<AuthProvider>(
                 builder: (context, authProvider, child) {
                   return ProfileHeader(
-                    nickname: authProvider.user?.nickname ?? '사용자', // 실제 닉네임 표시
+                    nickname: authProvider.user?.nickname ?? '사용자',
                     onEditPressed: () =>
                         _showNicknameEditDialog(context, authProvider),
                   );

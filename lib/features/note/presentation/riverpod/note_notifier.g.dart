@@ -6,11 +6,9 @@ part of 'note_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$noteNotifierHash() => r'd22a527cab46e725759f75960ea102978857e54c';
+String _$noteNotifierHash() => r'2e448a2953e600ac1b29943792a9429b1c2b84e3';
 
-/// 🔥 Riverpod 기반 노트 상태 관리 Notifier
-///
-/// Copied from [NoteNotifier].
+/// See also [NoteNotifier].
 @ProviderFor(NoteNotifier)
 final noteNotifierProvider =
     AutoDisposeNotifierProvider<NoteNotifier, NoteState>.internal(

@@ -8,11 +8,7 @@ part of 'repository_providers.dart';
 
 String _$authRepositoryHash() => r'92f3a1a4c1cb75596a921c994097b836de88166a';
 
-/// 🔥 Riverpod 기반 Repository Providers
-/// Mock/Real API 전환을 위한 Repository 제공자들
-/// 인증 Repository Provider
-///
-/// Copied from [authRepository].
+/// See also [authRepository].
 @ProviderFor(authRepository)
 final authRepositoryProvider = AutoDisposeProvider<AuthRepository>.internal(
   authRepository,
@@ -30,9 +26,7 @@ typedef AuthRepositoryRef = AutoDisposeProviderRef<AuthRepository>;
 String _$attendanceRepositoryHash() =>
     r'097ba3dcd02c6bb5cc75c8584e95343be365f7c8';
 
-/// 출석 Repository Provider
-///
-/// Copied from [attendanceRepository].
+/// See also [attendanceRepository].
 @ProviderFor(attendanceRepository)
 final attendanceRepositoryProvider =
     AutoDisposeProvider<AttendanceRepository>.internal(
@@ -51,9 +45,7 @@ typedef AttendanceRepositoryRef = AutoDisposeProviderRef<AttendanceRepository>;
 String _$aptitudeRepositoryHash() =>
     r'f1b4f5eda857076d1fe95e667acf88aa311d363c';
 
-/// 성향분석 Repository Provider
-///
-/// Copied from [aptitudeRepository].
+/// See also [aptitudeRepository].
 @ProviderFor(aptitudeRepository)
 final aptitudeRepositoryProvider =
     AutoDisposeProvider<AptitudeRepository>.internal(
@@ -71,9 +63,7 @@ final aptitudeRepositoryProvider =
 typedef AptitudeRepositoryRef = AutoDisposeProviderRef<AptitudeRepository>;
 String _$noteRepositoryHash() => r'cb967c32ff66153d2a60bcb5e0d550a6e0b3c12e';
 
-/// 노트 Repository Provider
-///
-/// Copied from [noteRepository].
+/// See also [noteRepository].
 @ProviderFor(noteRepository)
 final noteRepositoryProvider = AutoDisposeProvider<NoteRepository>.internal(
   noteRepository,
@@ -91,9 +81,7 @@ typedef NoteRepositoryRef = AutoDisposeProviderRef<NoteRepository>;
 String _$educationRepositoryHash() =>
     r'3839ff205361e35dc6f62d75beb5a0644b535107';
 
-/// 교육 Repository Provider
-///
-/// Copied from [educationRepository].
+/// See also [educationRepository].
 @ProviderFor(educationRepository)
 final educationRepositoryProvider = AutoDisposeProvider<Object>.internal(
   educationRepository,
@@ -110,9 +98,7 @@ final educationRepositoryProvider = AutoDisposeProvider<Object>.internal(
 typedef EducationRepositoryRef = AutoDisposeProviderRef<Object>;
 String _$quizRepositoryHash() => r'b12610a1fcc58a716118aeb8da98e04ee62bd6a0';
 
-/// 퀴즈 Repository Provider
-///
-/// Copied from [quizRepository].
+/// See also [quizRepository].
 @ProviderFor(quizRepository)
 final quizRepositoryProvider = AutoDisposeProvider<Object>.internal(
   quizRepository,
@@ -130,9 +116,7 @@ typedef QuizRepositoryRef = AutoDisposeProviderRef<Object>;
 String _$wrongNoteRepositoryHash() =>
     r'b471e05c6609f57bb314a1de0ba8b8e4fb5e4e6c';
 
-/// 오답노트 Repository Provider
-///
-/// Copied from [wrongNoteRepository].
+/// See also [wrongNoteRepository].
 @ProviderFor(wrongNoteRepository)
 final wrongNoteRepositoryProvider = AutoDisposeProvider<Object>.internal(
   wrongNoteRepository,
@@ -150,9 +134,7 @@ typedef WrongNoteRepositoryRef = AutoDisposeProviderRef<Object>;
 String _$learningProgressRepositoryHash() =>
     r'b300b30bf4a4f7bc773b7ee67364876638114fa2';
 
-/// 학습 진도 Repository Provider
-///
-/// Copied from [learningProgressRepository].
+/// See also [learningProgressRepository].
 @ProviderFor(learningProgressRepository)
 final learningProgressRepositoryProvider =
     AutoDisposeProvider<LearningProgressRepository>.internal(

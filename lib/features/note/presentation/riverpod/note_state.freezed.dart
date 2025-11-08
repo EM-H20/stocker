@@ -16,14 +16,9 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$NoteState {
-  /// 노트 목록
-  List<Note> get notes => throw _privateConstructorUsedError;
-
-  /// 로딩 중
   bool get isLoading => throw _privateConstructorUsedError;
-
-  /// 에러 메시지
   String? get errorMessage => throw _privateConstructorUsedError;
+  List<Note> get notes => throw _privateConstructorUsedError;
 
   /// Create a copy of NoteState
   /// with the given fields replaced by the non-null parameter values.
@@ -37,7 +32,7 @@ abstract class $NoteStateCopyWith<$Res> {
   factory $NoteStateCopyWith(NoteState value, $Res Function(NoteState) then) =
       _$NoteStateCopyWithImpl<$Res, NoteState>;
   @useResult
-  $Res call({List<Note> notes, bool isLoading, String? errorMessage});
+  $Res call({bool isLoading, String? errorMessage, List<Note> notes});
 }
 
 /// @nodoc
@@ -55,15 +50,11 @@ class _$NoteStateCopyWithImpl<$Res, $Val extends NoteState>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? notes = null,
     Object? isLoading = null,
     Object? errorMessage = freezed,
+    Object? notes = null,
   }) {
     return _then(_value.copyWith(
-      notes: null == notes
-          ? _value.notes
-          : notes // ignore: cast_nullable_to_non_nullable
-              as List<Note>,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -72,6 +63,10 @@ class _$NoteStateCopyWithImpl<$Res, $Val extends NoteState>
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String?,
+      notes: null == notes
+          ? _value.notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as List<Note>,
     ) as $Val);
   }
 }
@@ -84,7 +79,7 @@ abstract class _$$NoteStateImplCopyWith<$Res>
       __$$NoteStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<Note> notes, bool isLoading, String? errorMessage});
+  $Res call({bool isLoading, String? errorMessage, List<Note> notes});
 }
 
 /// @nodoc
@@ -100,15 +95,11 @@ class __$$NoteStateImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? notes = null,
     Object? isLoading = null,
     Object? errorMessage = freezed,
+    Object? notes = null,
   }) {
     return _then(_$NoteStateImpl(
-      notes: null == notes
-          ? _value._notes
-          : notes // ignore: cast_nullable_to_non_nullable
-              as List<Note>,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -117,23 +108,30 @@ class __$$NoteStateImplCopyWithImpl<$Res>
           ? _value.errorMessage
           : errorMessage // ignore: cast_nullable_to_non_nullable
               as String?,
+      notes: null == notes
+          ? _value._notes
+          : notes // ignore: cast_nullable_to_non_nullable
+              as List<Note>,
     ));
   }
 }
 
 /// @nodoc
 
-class _$NoteStateImpl implements _NoteState {
+class _$NoteStateImpl extends _NoteState {
   const _$NoteStateImpl(
-      {final List<Note> notes = const [],
-      this.isLoading = false,
-      this.errorMessage})
-      : _notes = notes;
+      {this.isLoading = false,
+      this.errorMessage,
+      final List<Note> notes = const []})
+      : _notes = notes,
+        super._();
 
-  /// 노트 목록
+  @override
+  @JsonKey()
+  final bool isLoading;
+  @override
+  final String? errorMessage;
   final List<Note> _notes;
-
-  /// 노트 목록
   @override
   @JsonKey()
   List<Note> get notes {
@@ -142,18 +140,9 @@ class _$NoteStateImpl implements _NoteState {
     return EqualUnmodifiableListView(_notes);
   }
 
-  /// 로딩 중
-  @override
-  @JsonKey()
-  final bool isLoading;
-
-  /// 에러 메시지
-  @override
-  final String? errorMessage;
-
   @override
   String toString() {
-    return 'NoteState(notes: $notes, isLoading: $isLoading, errorMessage: $errorMessage)';
+    return 'NoteState(isLoading: $isLoading, errorMessage: $errorMessage, notes: $notes)';
   }
 
   @override
@@ -161,16 +150,16 @@ class _$NoteStateImpl implements _NoteState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$NoteStateImpl &&
-            const DeepCollectionEquality().equals(other._notes, _notes) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             (identical(other.errorMessage, errorMessage) ||
-                other.errorMessage == errorMessage));
+                other.errorMessage == errorMessage) &&
+            const DeepCollectionEquality().equals(other._notes, _notes));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType,
-      const DeepCollectionEquality().hash(_notes), isLoading, errorMessage);
+  int get hashCode => Object.hash(runtimeType, isLoading, errorMessage,
+      const DeepCollectionEquality().hash(_notes));
 
   /// Create a copy of NoteState
   /// with the given fields replaced by the non-null parameter values.
@@ -181,23 +170,19 @@ class _$NoteStateImpl implements _NoteState {
       __$$NoteStateImplCopyWithImpl<_$NoteStateImpl>(this, _$identity);
 }
 
-abstract class _NoteState implements NoteState {
+abstract class _NoteState extends NoteState {
   const factory _NoteState(
-      {final List<Note> notes,
-      final bool isLoading,
-      final String? errorMessage}) = _$NoteStateImpl;
+      {final bool isLoading,
+      final String? errorMessage,
+      final List<Note> notes}) = _$NoteStateImpl;
+  const _NoteState._() : super._();
 
-  /// 노트 목록
-  @override
-  List<Note> get notes;
-
-  /// 로딩 중
   @override
   bool get isLoading;
-
-  /// 에러 메시지
   @override
   String? get errorMessage;
+  @override
+  List<Note> get notes;
 
   /// Create a copy of NoteState
   /// with the given fields replaced by the non-null parameter values.

@@ -1,77 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../note/domain/model/note.dart';
-import '../../../note/presentation/provider/note_provider.dart';
+import '../../../note/presentation/riverpod/note_notifier.dart';
 import '../../../../app/config/app_routes.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/utils/theme_utils.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
 
-/// 노트 섹션 위젯 - 실제 Note 기능과 연결됨
-class NoteSection extends StatelessWidget {
+class NoteSection extends ConsumerWidget {
   const NoteSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final noteState = ref.watch(noteNotifierProvider);
+    final displayNotes = noteState.notes.take(3).toList();
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
-      child: Consumer<NoteProvider>(
-        builder: (context, noteProvider, child) {
-          // 최대 3개까지만 표시
-          final displayNotes = noteProvider.notes.take(3).toList();
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Text(
+                '노트',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '노트',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  Row(
-                    children: [
-                      if (noteProvider.notes.length > 3)
-                        GestureDetector(
-                          onTap: () => context.go(AppRoutes.noteList),
-                          child: Text(
-                            '더보기',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(context).primaryColor,
-                                    ),
-                          ),
-                        ),
-                      if (noteProvider.notes.length > 3) SizedBox(width: 12.w),
-                      GestureDetector(
-                        onTap: () => context.go(AppRoutes.noteEditor),
-                        child: Icon(
-                          Icons.add,
-                          size: 24.sp,
-                          color: ThemeUtils.isDarkMode(context)
-                              ? AppTheme.primaryColor.withValues(alpha: 0.85)
-                              : AppTheme.primaryColor,
-                        ),
+                  if (noteState.notes.length > 3)
+                    GestureDetector(
+                      onTap: () => context.go(AppRoutes.noteList),
+                      child: Text(
+                        '더보기',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).primaryColor,
+                            ),
                       ),
-                    ],
+                    ),
+                  if (noteState.notes.length > 3) SizedBox(width: 12.w),
+                  GestureDetector(
+                    onTap: () => context.go(AppRoutes.noteEditor),
+                    child: Icon(
+                      Icons.add,
+                      size: 24.sp,
+                      color: ThemeUtils.isDarkMode(context)
+                          ? AppTheme.primaryColor.withValues(alpha: 0.85)
+                          : AppTheme.primaryColor,
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 12.h),
-              if (noteProvider.isLoading)
-                const Center(child: LoadingWidget())
-              else if (displayNotes.isEmpty)
-                _buildEmptyState(context)
-              else
-                ...displayNotes.map((note) => _buildNoteItem(context, note)),
             ],
-          );
-        },
+          ),
+          SizedBox(height: 12.h),
+          if (noteState.isLoading)
+            const Center(child: LoadingWidget())
+          else if (displayNotes.isEmpty)
+            _buildEmptyState(context)
+          else
+            ...displayNotes.map((note) => _buildNoteItem(context, note)),
+        ],
       ),
     );
   }
