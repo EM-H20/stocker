@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/config/app_theme.dart';
+import '../../../../app/core/widgets/app_card.dart';
 
 // 추천 학습 챕터 카드 위젯
 class RecommendedChapterCard extends StatelessWidget {
@@ -22,21 +23,19 @@ class RecommendedChapterCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     // 추천 학습 챕터 카드 위젯
-    return Card(
+    return AppCard(
+      padding: EdgeInsets.all(12.w),
       margin: EdgeInsets.only(bottom: 12.h),
-      color: theme.brightness == Brightness.dark
+      backgroundColor: theme.brightness == Brightness.dark
           ? AppTheme.darkSurface
           : theme.cardColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        side: BorderSide(
-          color: theme.brightness == Brightness.dark
-              ? AppTheme.grey600.withValues(alpha: 0.3)
-              : AppTheme.grey300.withValues(alpha: 0.5),
-          width: 1,
-        ),
-      ),
+      borderColor: theme.brightness == Brightness.dark
+          ? AppTheme.grey600.withValues(alpha: 0.3)
+          : AppTheme.grey300.withValues(alpha: 0.5),
+      borderRadius: 12.0,
+      onTap: onTap,
       child: ListTile(
+        contentPadding: EdgeInsets.zero,
         leading: CircleAvatar(
           backgroundColor: Theme.of(
             context,
@@ -72,7 +71,6 @@ class RecommendedChapterCard extends StatelessWidget {
               : AppTheme.grey600,
           size: 16.sp,
         ),
-        onTap: onTap,
       ),
     );
   }

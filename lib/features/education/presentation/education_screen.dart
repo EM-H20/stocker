@@ -10,6 +10,7 @@ import 'package:stocker/app/config/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import 'education_provider.dart';
 import '../../../app/core/widgets/loading_widget.dart';
+import '../../../app/core/widgets/error_message_widget.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -157,44 +158,40 @@ class _EducationScreenState extends State<EducationScreen> {
                   }
 
                   if (provider.chaptersError != null) {
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 48.sp,
-                            color: colorScheme.error,
-                          ),
-                          SizedBox(height: 16.h),
-                          Text(
-                            '챕터 로드 실패',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: colorScheme.error,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          Text(
-                            provider.chaptersError!,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color:
-                                  colorScheme.onSurface.withValues(alpha: 0.7),
-                            ),
-                          ),
-                          SizedBox(height: 16.h),
-                          ElevatedButton(
-                            onPressed: () {
-                              debugPrint('🔄 [EDUCATION_SCREEN] 재시도 버튼 클릭');
-                              provider.clearCache().then((_) {
-                                provider.loadChapters(forceRefresh: true);
-                              });
-                            },
-                            child: Text('다시 시도'),
-                          ),
-                        ],
-                      ),
+                    // 인증 에러인 경우
+                    if (provider.isAuthenticationError) {
+                      return ErrorMessageWidget.auth(
+                        message: provider.chaptersError!,
+                        onRetry: () {
+                          // TODO: 로그인 화면으로 이동
+                          debugPrint('🔐 [EDUCATION_SCREEN] 로그인 필요');
+                        },
+                      );
+                    }
+
+                    // 네트워크 에러인 경우
+                    if (provider.chaptersError!.contains('네트워크') ||
+                        provider.chaptersError!.contains('연결')) {
+                      return ErrorMessageWidget.network(
+                        message: provider.chaptersError!,
+                        onRetry: () {
+                          debugPrint('🔄 [EDUCATION_SCREEN] 재시도 버튼 클릭');
+                          provider.clearCache().then((_) {
+                            provider.loadChapters(forceRefresh: true);
+                          });
+                        },
+                      );
+                    }
+
+                    // 기타 서버 에러
+                    return ErrorMessageWidget.server(
+                      message: provider.chaptersError!,
+                      onRetry: () {
+                        debugPrint('🔄 [EDUCATION_SCREEN] 재시도 버튼 클릭');
+                        provider.clearCache().then((_) {
+                          provider.loadChapters(forceRefresh: true);
+                        });
+                      },
                     );
                   }
 

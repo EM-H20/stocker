@@ -8,6 +8,8 @@ import 'wrong_note_provider.dart';
 import '../../quiz/presentation/quiz_provider.dart';
 import '../../../app/config/app_theme.dart';
 import '../../../app/core/utils/theme_utils.dart';
+import '../../../app/core/widgets/loading_widget.dart';
+import '../../../app/core/widgets/error_message_widget.dart';
 
 /// 오답노트 메인 화면
 ///
@@ -96,64 +98,21 @@ class _WrongNoteScreenState extends State<WrongNoteScreen>
           builder: (context, provider, child) {
             // 로딩 중일 때
             if (provider.isLoading) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const CircularProgressIndicator(
-                        color: AppTheme.primaryColor),
-                    SizedBox(height: 16.h),
-                    Text(
-                      '오답노트를 불러오는 중...',
-                      style: TextStyle(
-                        color: AppTheme.grey600,
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                  ],
+              return const Center(
+                child: LoadingWidget(
+                  message: '오답노트를 불러오는 중...',
                 ),
               );
             }
 
             // 에러가 있을 때
             if (provider.hasError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64.sp,
-                      color: AppTheme.errorColor,
-                    ),
-                    SizedBox(height: 16.h),
-                    Text(
-                      _getUserFriendlyErrorMessage(provider.errorMessage),
-                      style: TextStyle(
-                        color: AppTheme.errorColor,
-                        fontSize: 16.sp,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 16.h),
-                    ElevatedButton(
-                      onPressed: () {
-                        provider.clearError();
-                        _loadWrongNotesWithCheck();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryColor,
-                      ),
-                      child: Text(
-                        '다시 시도',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              return ErrorMessageWidget.server(
+                message: _getUserFriendlyErrorMessage(provider.errorMessage),
+                onRetry: () {
+                  provider.clearError();
+                  _loadWrongNotesWithCheck();
+                },
               );
             }
 

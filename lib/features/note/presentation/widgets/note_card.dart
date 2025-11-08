@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import '../../domain/model/note.dart';
 import 'dart:convert';
+import '../../../../app/core/widgets/app_card.dart';
 
 /// 노트 목록에 표시될 개별 노트 카드 위젯
 class NoteCard extends StatelessWidget {
@@ -41,20 +42,10 @@ class NoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final plainContent = _extractTextFromQuill(note.content);
 
-    return Card(
+    return AppCard.compact(
       margin: EdgeInsets.only(bottom: 16.h),
-      elevation: 2.0,
-      color: Theme.of(context).cardColor,
-      shadowColor: Theme.of(context).shadowColor.withValues(alpha: 0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12.r),
-        splashColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-        highlightColor: Theme.of(context).primaryColor.withValues(alpha: 0.05),
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
+      onTap: onTap,
+      child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -138,8 +129,6 @@ class NoteCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
     );
   }
 }
