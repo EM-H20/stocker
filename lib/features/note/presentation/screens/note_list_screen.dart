@@ -2,37 +2,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
 import '../constants/note_templates.dart';
-import '../provider/note_provider.dart';
+import '../riverpod/note_notifier.dart';
 import '../widgets/note_card.dart';
 import '../widgets/template_picker_dialog.dart';
 
 /// 전체 노트 목록을 보여주는 화면
-class NoteListScreen extends StatefulWidget {
+class NoteListScreen extends ConsumerStatefulWidget {
   const NoteListScreen({super.key});
 
   @override
-  State<NoteListScreen> createState() => _NoteListScreenState();
+  ConsumerState<NoteListScreen> createState() => _NoteListScreenState();
 }
 
-class _NoteListScreenState extends State<NoteListScreen> {
+class _NoteListScreenState extends ConsumerState<NoteListScreen> {
   @override
   void initState() {
     super.initState();
     // 화면이 처음 빌드될 때, 모든 노트를 불러옵니다.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NoteProvider>().fetchAllNotes();
-    });
+    Future.microtask(() =>
+        ref.read(noteNotifierProvider.notifier).fetchAllNotes());
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<NoteProvider>();
-    final notes = provider.notes;
+    final noteState = ref.watch(noteNotifierProvider);
+    final notes = noteState.notes;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -61,7 +60,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
               ),
         ),
       ),
-      body: provider.isLoading
+      body: noteState.isLoading
           ? const Center(
               child: LoadingWidget(
                 message: '노트를 불러오는 중...',
@@ -70,7 +69,8 @@ class _NoteListScreenState extends State<NoteListScreen> {
           : notes.isEmpty
               ? _buildEmptyState(context)
               : RefreshIndicator(
-                  onRefresh: () => provider.fetchAllNotes(),
+                  onRefresh: () =>
+                      ref.read(noteNotifierProvider.notifier).fetchAllNotes(),
                   color: Theme.of(context).primaryColor,
                   child: ListView.builder(
                     padding: EdgeInsets.all(16.w),
@@ -83,8 +83,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
                           // 기존 노트를 편집하기 위해 에디터 화면으로 이동
                           context.push(AppRoutes.noteEditor, extra: note);
                         },
-                        onDelete: () =>
-                            _showDeleteDialog(context, provider, note),
+                        onDelete: () => _showDeleteDialog(context, note),
                       );
                     },
                   ),
@@ -164,8 +163,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
     );
   }
 
-  void _showDeleteDialog(
-      BuildContext context, NoteProvider provider, dynamic note) {
+  void _showDeleteDialog(BuildContext context, dynamic note) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -201,7 +199,7 @@ class _NoteListScreenState extends State<NoteListScreen> {
           ),
           TextButton(
             onPressed: () {
-              provider.deleteNote(note.id);
+              ref.read(noteNotifierProvider.notifier).deleteNote(note.id);
               Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -234,7 +232,9 @@ class _NoteListScreenState extends State<NoteListScreen> {
   Future<void> _showTemplateDialog(BuildContext context) async {
     final selectedTemplate = await showDialog<NoteTemplate>(
       context: context,
-      builder: (_) => const TemplatePickerDialog(),
+      builder: (_) => ProviderScope(
+        child: const TemplatePickerDialog(),
+      ),
     );
 
     if (mounted && selectedTemplate != null && context.mounted) {

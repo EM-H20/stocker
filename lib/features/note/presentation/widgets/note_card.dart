@@ -2,12 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/model/note.dart';
 import 'dart:convert';
 import '../../../../app/core/widgets/app_card.dart';
 
 /// 노트 목록에 표시될 개별 노트 카드 위젯
-class NoteCard extends StatelessWidget {
+class NoteCard extends ConsumerWidget {
   final Note note;
   final VoidCallback onTap;
   final VoidCallback onDelete;
@@ -39,7 +40,7 @@ class NoteCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final plainContent = _extractTextFromQuill(note.content);
 
     return AppCard.compact(

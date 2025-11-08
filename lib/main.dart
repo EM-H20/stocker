@@ -30,7 +30,7 @@ import 'features/wrong_note/domain/wrong_note_repository.dart';
 // subin 브랜치 새로운 기능들 (Repository & API)
 // import 'features/auth/presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
 // import 'features/auth/presentation/riverpod/auth_notifier.dart'; // 🔥 Riverpod AuthNotifier (UI에서 직접 사용)
-import 'features/note/presentation/provider/note_provider.dart';
+// import 'features/note/presentation/provider/note_provider.dart'; // 🔥 Riverpod으로 교체됨
 // import 'features/auth/domain/auth_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/auth/data/source/auth_api.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/auth/data/repository/auth_api_repository.dart'; // 🔥 Riverpod으로 이동됨
@@ -55,13 +55,13 @@ import 'features/learning/data/repository/learning_progress_api_repository.dart'
 import 'features/learning/data/source/learning_progress_api.dart';
 
 // 노트 기능 (subin 새 기능)
-import 'features/note/domain/repository/note_repository.dart';
+// import 'features/note/domain/repository/note_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/note/data/source/note_api.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/note/data/repository/note_api_repository.dart'; // 🔥 Riverpod으로 이동됨
 // import 'features/note/data/repository/note_mock_repository.dart'; // 🔥 Riverpod으로 이동됨
 
-// 🔥 Riverpod Repository Providers (Phase 2에서 사용!)
-import 'app/core/providers/riverpod/repository_providers.dart';
+// 🔥 Riverpod Repository Providers (각 Notifier 파일에서 직접 import)
+// import 'app/core/providers/riverpod/repository_providers.dart'; // main.dart에서는 불필요
 
 // Network (subin에서 개선)
 import 'app/core/network/dio.dart';
@@ -226,10 +226,10 @@ class StockerApp extends StatelessWidget {
               AptitudeProvider(context.read<AptitudeRepository>()),
         ),
 
-        // Note Provider (subin 새 기능)
-        legacy_provider.ChangeNotifierProvider(
-          create: (context) => NoteProvider(context.read<NoteRepository>()),
-        ),
+        // 🔥 Note Provider는 Riverpod으로 이동됨 (NoteNotifier)
+        // legacy_provider.ChangeNotifierProvider(
+        //   create: (context) => NoteProvider(context.read<NoteRepository>()),
+        // ),
 
         // Learning Progress Provider (Repository 패턴 적용) - 🚀 새로운 안전한 구조
         legacy_provider.ChangeNotifierProvider(

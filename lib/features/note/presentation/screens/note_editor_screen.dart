@@ -5,24 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // ✅ Provider에 데이터를 전달하기 위한 DTO import를 추가합니다.
 import '../../data/dto/note_update_request.dart';
 import '../../domain/model/note.dart';
 import '../constants/note_templates.dart';
-import '../provider/note_provider.dart';
+import '../riverpod/note_notifier.dart';
 import '../../../../app/config/app_routes.dart';
 
-class NoteEditorScreen extends StatefulWidget {
+class NoteEditorScreen extends ConsumerStatefulWidget {
   final dynamic initialData;
   const NoteEditorScreen({super.key, this.initialData});
 
   @override
-  State<NoteEditorScreen> createState() => _NoteEditorScreenState();
+  ConsumerState<NoteEditorScreen> createState() => _NoteEditorScreenState();
 }
 
-class _NoteEditorScreenState extends State<NoteEditorScreen> {
+class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
   quill.QuillController _controller = quill.QuillController.basic(); // ✅ 기본값
   TextEditingController _titleController = TextEditingController(); // ✅ 기본값
   bool _isNewNote = true;
@@ -77,9 +77,10 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     }
   }
 
-  // ✅ [수정] 이 부분의 로직만 Provider와 맞도록 수정합니다.
+  // ✅ [수정] 이 부분의 로직만 Riverpod와 맞도록 수정합니다.
   Future<void> _saveNote() async {
-    final provider = context.read<NoteProvider>();
+    final noteNotifier = ref.read(noteNotifierProvider.notifier);
+    final noteState = ref.read(noteNotifierProvider);
     final title = _titleController.text.trim();
     final content = jsonEncode(_controller.document.toDelta().toJson());
 
@@ -95,12 +96,12 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     bool success;
 
     if (_isNewNote) {
-      // Provider의 createNote 메소드에 request 객체 하나만 전달합니다.
-      final newNote = await provider.createNote(request);
+      // Notifier의 createNote 메소드에 request 객체 하나만 전달합니다.
+      final newNote = await noteNotifier.createNote(request);
       success = newNote != null;
     } else {
-      // Provider의 updateNote 메소드에 id와 request 객체를 전달합니다.
-      success = await provider.updateNote(_existingNote!.id, request);
+      // Notifier의 updateNote 메소드에 id와 request 객체를 전달합니다.
+      success = await noteNotifier.updateNote(_existingNote!.id, request);
     }
 
     if (mounted && success) {
@@ -113,7 +114,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       }
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(provider.errorMessage ?? '저장에 실패했습니다.')),
+        SnackBar(content: Text(noteState.errorMessage ?? '저장에 실패했습니다.')),
       );
     }
   }

@@ -1,14 +1,15 @@
 // FILE: lib/features/note/presentation/widgets/template_picker_dialog.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../constants/note_templates.dart';
 
 /// 새 노트 작성 시 템플릿을 선택하는 다이얼로그
-class TemplatePickerDialog extends StatelessWidget {
+class TemplatePickerDialog extends ConsumerWidget {
   const TemplatePickerDialog({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return AlertDialog(
       backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
       shape: RoundedRectangleBorder(
