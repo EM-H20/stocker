@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔥 Riverpod 추가
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../app/core/widgets/action_button.dart';
+import '../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 // import '../presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
 import '../presentation/riverpod/auth_notifier.dart'; // 🔥 Riverpod AuthNotifier
 
@@ -65,22 +66,20 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     // 나이 유효성 검사
     final age = int.tryParse(ageController.text.trim());
     if (age == null || age < 1 || age > 120) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('올바른 나이를 입력해주세요 (1-120세)'),
-          backgroundColor: Colors.red,
-        ),
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.error,
+        message: '올바른 나이를 입력해주세요 (1-120세)',
       );
       return;
     }
 
     // 직업 유효성 검사
     if (occupationController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('직업을 입력해주세요'),
-          backgroundColor: Colors.red,
-        ),
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.error,
+        message: '직업을 입력해주세요',
       );
       return;
     }
@@ -100,22 +99,22 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('회원가입이 완료되었습니다. 로그인 해주세요.'),
-          backgroundColor: Colors.green,
-        ),
+      // 🎨 회원가입 성공 메시지
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.success,
+        message: '회원가입이 완료되었습니다. 로그인 해주세요.',
       );
       context.go(AppRoutes.login);
     } else {
       // 🔥 Riverpod: 최신 상태를 다시 읽어옴
       final currentState = ref.read(authNotifierProvider).value;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(currentState?.errorMessage ?? '회원가입에 실패했습니다.'),
-          backgroundColor: Colors.red,
-        ),
+      // 🎨 회원가입 실패 메시지 (서버 에러 메시지 자동 표시)
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.error,
+        message: currentState?.errorMessage ?? '회원가입에 실패했습니다.',
       );
     }
   }

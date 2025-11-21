@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔥 Riverpod 추가
 import 'package:go_router/go_router.dart';
 import '../../../app/config/app_routes.dart';
 import '../../../app/core/widgets/action_button.dart';
+import '../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 // import '../../auth/presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
 import '../../auth/presentation/riverpod/auth_notifier.dart'; // 🔥 Riverpod AuthNotifier
 
@@ -47,14 +48,12 @@ class LoginScreen extends ConsumerWidget {
           debugPrint('📍 [LOGIN] Redirecting to: $destination');
           context.go(destination);
 
-          // 성공 메시지 표시
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text('${currentState?.user?.nickname ?? "사용자"}님 환영합니다! 🎉'),
-              backgroundColor: Colors.green,
-              duration: const Duration(seconds: 2),
-            ),
+          // 🎨 성공 메시지 표시 (커스텀 SnackBar)
+          CustomSnackBar.show(
+            context: context,
+            type: SnackBarType.success,
+            message: '${currentState?.user?.nickname ?? "사용자"}님 환영합니다! 🎉',
+            duration: const Duration(seconds: 2),
           );
         } else {
           debugPrint('❌ [LOGIN] 로그인 실패');
@@ -62,12 +61,12 @@ class LoginScreen extends ConsumerWidget {
           // 🔥 Riverpod: 최신 상태를 다시 읽어옴
           final currentState = ref.read(authNotifierProvider).value;
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(currentState?.errorMessage ?? '로그인에 실패했습니다.'),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
-            ),
+          // 🎨 실패 메시지 표시 (커스텀 SnackBar) - 서버 에러 메시지 자동 표시
+          CustomSnackBar.show(
+            context: context,
+            type: SnackBarType.error,
+            message: currentState?.errorMessage ?? '로그인에 실패했습니다.',
+            duration: const Duration(seconds: 3),
           );
         }
       }
