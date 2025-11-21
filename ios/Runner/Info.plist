@@ -45,6 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- 사진 라이브러리 접근 권한 (TestFlight 배포 필수) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>프로필 사진 설정 등을 위해 사진 라이브러리 접근이 필요합니다.</string>
+
 	<!-- HTTP 트래픽 허용 설정 (개발용) -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
