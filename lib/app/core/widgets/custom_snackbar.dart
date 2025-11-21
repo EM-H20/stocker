@@ -137,39 +137,21 @@ class _SnackBarContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
       decoration: BoxDecoration(
         color: config.backgroundColor,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: config.borderColor.withValues(alpha: 0.3),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: config.borderColor.withValues(alpha: 0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(8.r),
       ),
       child: Row(
         children: [
           // 아이콘
-          Container(
-            padding: EdgeInsets.all(8.r),
-            decoration: BoxDecoration(
-              color: config.iconColor.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              config.icon,
-              color: config.iconColor,
-              size: 24.sp,
-            ),
+          Icon(
+            config.icon,
+            color: config.iconColor,
+            size: 20.sp,
           ),
 
-          SizedBox(width: 12.w),
+          SizedBox(width: 10.w),
 
           // 메시지
           Expanded(
@@ -178,8 +160,8 @@ class _SnackBarContent extends StatelessWidget {
               style: TextStyle(
                 color: config.textColor,
                 fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                height: 1.4,
+                fontWeight: FontWeight.w500,
+                height: 1.3,
               ),
             ),
           ),
