@@ -49,8 +49,13 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
       });
     }
 
-    // 빌드 완료 후 다음 프레임에서 퀴즈 시작
-    Future.microtask(() => _startQuiz());
+    // 🎯 일반 퀴즈 모드: 시작 전 안내 다이얼로그 표시
+    // 단일 퀴즈/ReadOnly 모드: 바로 시작
+    if (widget.singleQuizId == null && !widget.isReadOnly) {
+      Future.microtask(() => _showQuizStartDialog());
+    } else {
+      Future.microtask(() => _startQuiz());
+    }
   }
 
   /// 퀴즈를 바로 시작 (단일 퀴즈 모드 및 읽기 전용 모드 지원)
@@ -104,33 +109,249 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
     }
   }
 
+  /// 퀴즈 시작 전 안내 다이얼로그 표시
+  Future<void> _showQuizStartDialog() async {
+    final isDarkMode = ThemeUtils.isDarkMode(context);
+
+    final shouldStart = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // 뒤로가기로 닫기 불가
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.quiz, color: AppTheme.successColor, size: 24.sp),
+            SizedBox(width: 8.w),
+            Text(
+              '퀴즈 시작 안내',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: isDarkMode ? Colors.white : AppTheme.grey900,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInfoRow('📚', '이번 챕터는 총 30문제입니다.', isDarkMode),
+            SizedBox(height: 12.h),
+            _buildInfoRow('⏱️', '약 10-15분 정도 소요됩니다.', isDarkMode),
+            SizedBox(height: 12.h),
+            _buildInfoRow(
+              '⚠️',
+              '중간에 나가면 처음부터 다시 풀어야 합니다.',
+              isDarkMode,
+              isWarning: true,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              '지금 시작하시겠습니까?',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14.sp,
+                color: isDarkMode ? Colors.white : AppTheme.grey900,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext, false);
+            },
+            child: Text(
+              '나중에',
+              style: TextStyle(
+                color: isDarkMode ? AppTheme.grey400 : AppTheme.grey600,
+                fontSize: 14.sp,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.successColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+            ),
+            child: Text(
+              '시작하기',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (mounted) {
+      if (shouldStart == true) {
+        await _startQuiz();
+      } else {
+        // 나중에 선택 시 교육 탭으로 이동
+        context.go(AppRoutes.education);
+      }
+    }
+  }
+
+  /// 안내 정보 행 위젯
+  Widget _buildInfoRow(String icon, String text, bool isDarkMode,
+      {bool isWarning = false}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          icon,
+          style: TextStyle(fontSize: 16.sp),
+        ),
+        SizedBox(width: 8.w),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 13.sp,
+              color: isWarning
+                  ? AppTheme.errorColor
+                  : (isDarkMode ? AppTheme.grey300 : AppTheme.grey700),
+              fontWeight: isWarning ? FontWeight.w600 : FontWeight.normal,
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 퀴즈 종료 확인 다이얼로그
+  Future<bool?> _showExitConfirmDialog() {
+    final isDarkMode = ThemeUtils.isDarkMode(context);
+
+    return showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: Text(
+          '퀴즈를 종료하시겠습니까?',
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+            color: isDarkMode ? Colors.white : AppTheme.grey900,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '현재까지 푼 문제는 저장되지 않습니다.',
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: isDarkMode ? AppTheme.grey300 : AppTheme.grey700,
+                height: 1.4,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              '처음부터 다시 풀어야 합니다.',
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: AppTheme.errorColor,
+                fontWeight: FontWeight.w600,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(
+              '계속 풀기',
+              style: TextStyle(
+                color: AppTheme.successColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.errorColor,
+            ),
+            child: Text(
+              '나가기',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final quizState = ref.watch(quizNotifierProvider);
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: _buildAppBar(context),
-      body: () {
-        if (quizState.isLoadingQuiz) {
-          return _buildLoadingState();
+    return PopScope(
+      canPop: false, // 자동 뒤로가기 차단
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return; // 이미 pop된 경우 무시
+
+        // 단일 퀴즈 모드나 ReadOnly 모드는 경고 없이 바로 나가기
+        if (widget.singleQuizId != null || widget.isReadOnly) {
+          if (context.mounted) {
+            context.go(AppRoutes.education);
+          }
+          return;
         }
 
-        if (quizState.quizError != null) {
-          return QuizErrorWidget(
-            title: '퀴즈 로드 실패',
-            errorMessage: quizState.quizError!,
-            onRetry: _startQuiz,
-          );
+        // 일반 퀴즈 모드: 경고 다이얼로그 표시
+        final shouldExit = await _showExitConfirmDialog();
+        if (shouldExit == true && context.mounted) {
+          context.go(AppRoutes.education);
         }
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        appBar: _buildAppBar(context),
+        body: () {
+          if (quizState.isLoadingQuiz) {
+            return _buildLoadingState();
+          }
 
-        final session = quizState.currentQuizSession;
-        if (session == null) {
-          return _buildEmptyState();
-        }
+          if (quizState.quizError != null) {
+            return QuizErrorWidget(
+              title: '퀴즈 로드 실패',
+              errorMessage: quizState.quizError!,
+              onRetry: _startQuiz,
+            );
+          }
 
-        return _buildQuizContent(context, quizState, session);
-      }(),
+          final session = quizState.currentQuizSession;
+          if (session == null) {
+            return _buildEmptyState();
+          }
+
+          return _buildQuizContent(context, quizState, session);
+        }(),
+      ),
     );
   }
 
@@ -146,7 +367,19 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
           Icons.arrow_back,
           color: isDarkMode ? Colors.white : AppTheme.grey900,
         ),
-        onPressed: () => context.go(AppRoutes.education),
+        onPressed: () async {
+          // 단일 퀴즈/ReadOnly 모드는 바로 나가기
+          if (widget.singleQuizId != null || widget.isReadOnly) {
+            context.go(AppRoutes.education);
+            return;
+          }
+
+          // 일반 퀴즈 모드: 경고 다이얼로그 표시
+          final shouldExit = await _showExitConfirmDialog();
+          if (shouldExit == true && context.mounted) {
+            context.go(AppRoutes.education);
+          }
+        },
       ),
       title: Text(
         '퀴즈',
@@ -185,6 +418,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
     session,
   ) {
     final currentQuiz = session.currentQuiz;
+    final isDarkMode = ThemeUtils.isDarkMode(context);
 
     return Column(
       children: [
@@ -241,6 +475,44 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
             ),
           ),
         ),
+
+        // 💡 안내 텍스트 (일반 퀴즈 모드에만 표시)
+        if (widget.singleQuizId == null && !widget.isReadOnly)
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: AppTheme.warningColor.withValues(alpha: 0.1),
+              border: Border(
+                top: BorderSide(
+                  color: AppTheme.warningColor.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 18.sp,
+                  color: AppTheme.warningColor,
+                ),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: Text(
+                    '💡 Tip: ${session.totalCount}문제를 모두 완료해야 저장됩니다',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: isDarkMode
+                          ? AppTheme.warningColor.withValues(alpha: 0.9)
+                          : AppTheme.warningColor,
+                      fontWeight: FontWeight.w500,
+                      height: 1.3,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
 
         // 하단 네비게이션
         QuizNavigationWidget(
