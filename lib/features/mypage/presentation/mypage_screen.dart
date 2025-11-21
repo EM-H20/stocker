@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../note/presentation/riverpod/note_notifier.dart';
 import '../../auth/presentation/riverpod/auth_notifier.dart';
+import '../../../app/config/app_routes.dart';
 import '../../../app/core/widgets/loading_widget.dart';
 import '../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 import 'widgets/profile_header.dart';
@@ -80,12 +82,163 @@ class _MypageScreenState extends ConsumerState<MypageScreen> {
               // 테마 설정
               const ThemeToggleWidget(),
 
+              SizedBox(height: 16.h),
+
+              // 로그아웃 버튼
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: _buildLogoutButton(context),
+              ),
+
               SizedBox(height: 24.h),
             ],
           ),
         ),
       ),
     );
+  }
+
+  /// 로그아웃 버튼 위젯
+  Widget _buildLogoutButton(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.grey.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showLogoutDialog(context),
+          borderRadius: BorderRadius.circular(12.r),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 20.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.logout_rounded,
+                      size: 24.sp,
+                      color: Colors.red[600],
+                    ),
+                    SizedBox(width: 12.w),
+                    Text(
+                      '로그아웃',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.red[600],
+                      ),
+                    ),
+                  ],
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16.sp,
+                  color: Colors.red[600]?.withValues(alpha: 0.5),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 로그아웃 확인 다이얼로그
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: Text(
+          '로그아웃',
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          '정말 로그아웃 하시겠습니까?',
+          style: TextStyle(
+            fontSize: 14.sp,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              '취소',
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyMedium?.color,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await _handleLogout(context);
+            },
+            child: Text(
+              '로그아웃',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 로그아웃 처리
+  Future<void> _handleLogout(BuildContext context) async {
+    try {
+      // 🔥 Riverpod: 로그아웃 실행
+      await ref.read(authNotifierProvider.notifier).logout();
+
+      if (context.mounted) {
+        // 🎨 로그아웃 성공 메시지
+        CustomSnackBar.show(
+          context: context,
+          type: SnackBarType.success,
+          message: '로그아웃되었습니다',
+          duration: const Duration(seconds: 2),
+        );
+
+        // 로그인 화면으로 이동
+        context.go(AppRoutes.login);
+      }
+    } catch (e) {
+      debugPrint('❌ [LOGOUT] 로그아웃 처리 중 오류 발생: $e');
+
+      if (context.mounted) {
+        // 🎨 로그아웃 실패 메시지
+        CustomSnackBar.show(
+          context: context,
+          type: SnackBarType.error,
+          message: '로그아웃 처리 중 오류가 발생했습니다',
+        );
+      }
+    }
   }
 
   /// 닉네임 수정 다이얼로그 (실제 API 연동)
