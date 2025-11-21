@@ -142,7 +142,9 @@ class LoginScreen extends ConsumerWidget {
                   icon: Icons.login,
                   color: Colors.blue,
                   // 🔥 Riverpod: authState.value?.isLoading으로 로딩 상태 확인
-                  onPressed: (authState.value?.isLoading ?? false) ? null : handleLogin,
+                  onPressed: (authState.value?.isLoading ?? false)
+                      ? null
+                      : handleLogin,
                 ),
                 const SizedBox(height: 16),
                 Row(

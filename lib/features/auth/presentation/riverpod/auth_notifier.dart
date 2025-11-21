@@ -48,7 +48,8 @@ class AuthNotifier extends _$AuthNotifier {
             refreshToken: storedRefreshToken,
           );
 
-          debugPrint('✅ [AUTH_NOTIFIER] Auto-login successful for: ${user.email}');
+          debugPrint(
+              '✅ [AUTH_NOTIFIER] Auto-login successful for: ${user.email}');
 
           return AuthState(
             user: user,
@@ -56,7 +57,8 @@ class AuthNotifier extends _$AuthNotifier {
           );
         } else {
           // 사용자 정보가 불완전한 경우 토큰 정리
-          debugPrint('⚠️ [AUTH_NOTIFIER] Incomplete user data - clearing tokens');
+          debugPrint(
+              '⚠️ [AUTH_NOTIFIER] Incomplete user data - clearing tokens');
           await TokenStorage.clear();
         }
       } else {
@@ -160,7 +162,8 @@ class AuthNotifier extends _$AuthNotifier {
     } catch (e) {
       debugPrint('❌ [AUTH_NOTIFIER] 회원가입 실패: $e');
 
-      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '회원가입');
+      final errorMessage =
+          ErrorMessageExtractor.extractSubmissionError(e, '회원가입');
 
       state = AsyncValue.data(
         state.value!.copyWith(
@@ -194,7 +197,8 @@ class AuthNotifier extends _$AuthNotifier {
 
     try {
       debugPrint('🔄 [AUTH_NOTIFIER] 프로필 수정 시작...');
-      debugPrint('📝 [AUTH_NOTIFIER] 변경 내용 - nickname: $nickname, age: $age, occupation: $occupation');
+      debugPrint(
+          '📝 [AUTH_NOTIFIER] 변경 내용 - nickname: $nickname, age: $age, occupation: $occupation');
 
       final repository = ref.read(authRepositoryProvider);
       final updatedUser = await repository.updateProfile(
@@ -222,7 +226,8 @@ class AuthNotifier extends _$AuthNotifier {
     } catch (e) {
       debugPrint('❌ [AUTH_NOTIFIER] 프로필 수정 실패: $e');
 
-      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '프로필 수정');
+      final errorMessage =
+          ErrorMessageExtractor.extractSubmissionError(e, '프로필 수정');
 
       state = AsyncValue.data(
         state.value!.copyWith(
@@ -236,7 +241,8 @@ class AuthNotifier extends _$AuthNotifier {
 
   /// 닉네임만 수정하는 편의 메서드
   Future<bool> updateNickname(String newNickname) async {
-    debugPrint('📝 [AUTH_NOTIFIER] 닉네임 변경: ${state.value?.user?.nickname} → $newNickname');
+    debugPrint(
+        '📝 [AUTH_NOTIFIER] 닉네임 변경: ${state.value?.user?.nickname} → $newNickname');
     return await updateProfile(nickname: newNickname);
   }
 
@@ -268,7 +274,8 @@ class AuthNotifier extends _$AuthNotifier {
       // 토큰 갱신 성공 시 사용자 상태도 동기화
       await _syncUserStateWithStorage();
     } catch (e) {
-      debugPrint('⚠️ [AUTH_NOTIFIER] Token refresh failed - may need re-login: $e');
+      debugPrint(
+          '⚠️ [AUTH_NOTIFIER] Token refresh failed - may need re-login: $e');
     }
   }
 
@@ -283,7 +290,10 @@ class AuthNotifier extends _$AuthNotifier {
 
       final currentUser = state.value?.user;
 
-      if (token != null && userId != null && email != null && currentUser != null) {
+      if (token != null &&
+          userId != null &&
+          email != null &&
+          currentUser != null) {
         final updatedUser = User(
           id: int.tryParse(userId) ?? currentUser.id,
           email: email,

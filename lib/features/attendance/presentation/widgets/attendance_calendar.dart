@@ -78,7 +78,9 @@ class AttendanceCalendar extends ConsumerWidget {
       ),
       // 월이 변경될 때마다 Riverpod를 통해 API 호출
       onPageChanged: (focusedDay) {
-        ref.read(attendanceNotifierProvider.notifier).fetchAttendanceStatus(focusedDay);
+        ref
+            .read(attendanceNotifierProvider.notifier)
+            .fetchAttendanceStatus(focusedDay);
       },
       // 출석한 날에 이벤트 마커(점) 표시
       eventLoader: (day) {

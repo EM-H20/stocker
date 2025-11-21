@@ -49,9 +49,7 @@ part 'repository_providers.g.dart';
 
 @riverpod
 AuthRepository authRepository(Ref ref) {
-  return useMock
-      ? AuthMockRepository()
-      : AuthApiRepository(AuthApi(dio));
+  return useMock ? AuthMockRepository() : AuthApiRepository(AuthApi(dio));
 }
 
 @riverpod
@@ -70,9 +68,7 @@ AptitudeRepository aptitudeRepository(Ref ref) {
 
 @riverpod
 NoteRepository noteRepository(Ref ref) {
-  return useMock
-      ? NoteMockRepository()
-      : NoteApiRepository(NoteApi(dio));
+  return useMock ? NoteMockRepository() : NoteApiRepository(NoteApi(dio));
 }
 
 @riverpod
@@ -86,9 +82,7 @@ Object educationRepository(Ref ref) {
 @riverpod
 Object quizRepository(Ref ref) {
   const storage = FlutterSecureStorage();
-  return useMock
-      ? QuizMockRepository()
-      : QuizRepository(QuizApi(dio), storage);
+  return useMock ? QuizMockRepository() : QuizRepository(QuizApi(dio), storage);
 }
 
 @riverpod

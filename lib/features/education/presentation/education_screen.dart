@@ -20,12 +20,9 @@ class EducationScreen extends ConsumerStatefulWidget {
 }
 
 class _EducationScreenState extends ConsumerState<EducationScreen> {
-  late final ScrollController _scrollController;
-
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
 
     // 화면 로드 시 챕터 목록을 가져옴
     Future.microtask(() {
@@ -40,23 +37,6 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
   }
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  /// CurrentLearningCard로 부드럽게 스크롤
-  void _scrollToCurrentLearningCard() {
-    // CurrentLearningCard는 페이지 상단에서 약 100픽셀 정도 위치
-    // 검색바(약 50h) + 진행률바(약 40h) + 여백들 = 대략 100-150픽셀
-    _scrollController.animateTo(
-      0.0, // 맨 위로 스크롤
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -68,7 +48,6 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          controller: _scrollController,
           padding: EdgeInsets.all(20.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,10 +64,12 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
               Consumer(
                 builder: (context, ref, child) {
                   final educationState = ref.watch(educationNotifierProvider);
-                  final educationNotifier = ref.read(educationNotifierProvider.notifier);
+                  final educationNotifier =
+                      ref.read(educationNotifierProvider.notifier);
 
                   // 로딩 중이거나 챕터가 없는 경우 기본 카드 표시
-                  if (educationState.isLoadingChapters || educationState.chapters.isEmpty) {
+                  if (educationState.isLoadingChapters ||
+                      educationState.chapters.isEmpty) {
                     return const CurrentLearningCard(
                       title: '학습 준비 중...',
                       description: '챕터 정보를 불러오고 있습니다.',
@@ -159,7 +140,8 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
               Consumer(
                 builder: (context, ref, child) {
                   final educationState = ref.watch(educationNotifierProvider);
-                  final educationNotifier = ref.read(educationNotifierProvider.notifier);
+                  final educationNotifier =
+                      ref.read(educationNotifierProvider.notifier);
 
                   if (educationState.isLoadingChapters) {
                     return const Center(child: LoadingWidget());
@@ -232,15 +214,10 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
                         description: description,
                         icon: icon,
                         onTap: () {
-                          // 챕터 선택하고 CurrentLearningCard로 스크롤
+                          // 챕터 선택
                           educationNotifier.selectChapter(chapter.id);
                           debugPrint(
                               '📌 [EDUCATION_SCREEN] 챕터 선택됨: ${chapter.title}');
-
-                          // 선택 후 부드럽게 맨 위로 스크롤 (CurrentLearningCard 위치)
-                          Future.delayed(const Duration(milliseconds: 100), () {
-                            _scrollToCurrentLearningCard();
-                          });
                         },
                       );
                     }).toList(),

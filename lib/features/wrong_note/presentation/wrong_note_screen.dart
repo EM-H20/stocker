@@ -257,14 +257,14 @@ class _WrongNoteScreenState extends ConsumerState<WrongNoteScreen>
                         padding: EdgeInsets.only(bottom: 12.h),
                         child: WrongAnswerCard(
                           wrongNote: wrongNote,
-                          isRetried: state.retriedQuizIds
-                              .contains(wrongNote.quizId),
-                          onRetry: () =>
-                              ref.read(wrongNoteNotifierProvider.notifier)
-                                  .markAsRetried(wrongNote.quizId),
-                          onRemove: () =>
-                              ref.read(wrongNoteNotifierProvider.notifier)
-                                  .removeWrongNote(wrongNote.quizId),
+                          isRetried:
+                              state.retriedQuizIds.contains(wrongNote.quizId),
+                          onRetry: () => ref
+                              .read(wrongNoteNotifierProvider.notifier)
+                              .markAsRetried(wrongNote.quizId),
+                          onRemove: () => ref
+                              .read(wrongNoteNotifierProvider.notifier)
+                              .removeWrongNote(wrongNote.quizId),
                         ),
                       );
                     },

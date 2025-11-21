@@ -34,43 +34,57 @@ class RecommendedChapterCard extends StatelessWidget {
           : AppTheme.grey300.withValues(alpha: 0.5),
       borderRadius: 12.0,
       onTap: onTap,
-      child: ListTile(
-        contentPadding: EdgeInsets.zero,
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(
-            context,
-          ).primaryColor.withValues(alpha: 0.2),
-          child: Icon(
-            icon,
-            color: theme.brightness == Brightness.dark
-                ? Colors.white
-                : Theme.of(context).primaryColor,
+      child: Row(
+        children: [
+          // Leading - CircleAvatar 아이콘
+          CircleAvatar(
+            backgroundColor: Theme.of(
+              context,
+            ).primaryColor.withValues(alpha: 0.2),
+            child: Icon(
+              icon,
+              color: theme.brightness == Brightness.dark
+                  ? Colors.white
+                  : Theme.of(context).primaryColor,
+            ),
           ),
-        ),
-        title: Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.brightness == Brightness.dark
-                ? Colors.white
-                : AppTheme.grey900,
-            fontWeight: FontWeight.w600,
+          SizedBox(width: 16.w),
+          // Title & Subtitle
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.white
+                        : AppTheme.grey900,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  description,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.brightness == Brightness.dark
+                        ? AppTheme.grey400
+                        : AppTheme.grey600,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        subtitle: Text(
-          description,
-          style: theme.textTheme.bodyMedium?.copyWith(
+          SizedBox(width: 8.w),
+          // Trailing - Arrow 아이콘
+          Icon(
+            Icons.arrow_forward_ios,
             color: theme.brightness == Brightness.dark
-                ? AppTheme.grey400
+                ? AppTheme.grey500
                 : AppTheme.grey600,
+            size: 16.sp,
           ),
-        ),
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          color: theme.brightness == Brightness.dark
-              ? AppTheme.grey500
-              : AppTheme.grey600,
-          size: 16.sp,
-        ),
+        ],
       ),
     );
   }

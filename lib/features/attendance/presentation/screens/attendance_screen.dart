@@ -21,8 +21,9 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() =>
-        ref.read(attendanceNotifierProvider.notifier).fetchAttendanceStatus(DateTime.now()));
+    Future.microtask(() => ref
+        .read(attendanceNotifierProvider.notifier)
+        .fetchAttendanceStatus(DateTime.now()));
   }
 
   Future<void> _onStartQuizPressed() async {
@@ -82,8 +83,7 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
               )
             else
               ActionButton(
-                text:
-                    isAlreadyAttended ? '오늘은 이미 출석했습니다' : '오늘의 퀴즈 풀고 출석하기',
+                text: isAlreadyAttended ? '오늘은 이미 출석했습니다' : '오늘의 퀴즈 풀고 출석하기',
                 icon: isAlreadyAttended ? Icons.check_circle : Icons.quiz,
                 color: isAlreadyAttended
                     ? (ThemeUtils.isDarkMode(context)

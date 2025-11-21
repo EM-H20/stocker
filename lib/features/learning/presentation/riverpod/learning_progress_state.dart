@@ -46,7 +46,8 @@ class LearningProgressState with _$LearningProgressState {
       completedChapters.values.where((v) => v).length;
 
   /// 완료된 퀴즈 수
-  int get completedQuizzesCount => completedQuizzes.values.where((v) => v).length;
+  int get completedQuizzesCount =>
+      completedQuizzes.values.where((v) => v).length;
 
   /// 전체 진도율 (0.0 ~ 1.0)
   double getOverallProgress({int totalChapters = 10}) {

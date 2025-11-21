@@ -149,7 +149,9 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
             icon: Icon(
               Icons.save_outlined,
               size: 24.sp,
-              color: Theme.of(context).primaryColor,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Theme.of(context).primaryColor,
             ),
             onPressed: _saveNote,
           ),

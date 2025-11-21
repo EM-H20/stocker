@@ -32,7 +32,9 @@ class _TheoryScreenState extends ConsumerState<TheoryScreen> {
     debugPrint('🎓 [THEORY_SCREEN] 이론 진입 시작 - 챕터 ID: ${widget.chapterId}');
     // 이론 진입
     Future.microtask(() {
-      ref.read(educationNotifierProvider.notifier).enterTheory(widget.chapterId);
+      ref
+          .read(educationNotifierProvider.notifier)
+          .enterTheory(widget.chapterId);
     });
   }
 
@@ -50,7 +52,8 @@ class _TheoryScreenState extends ConsumerState<TheoryScreen> {
       body: Consumer(
         builder: (context, ref, child) {
           final educationState = ref.watch(educationNotifierProvider);
-          final educationNotifier = ref.read(educationNotifierProvider.notifier);
+          final educationNotifier =
+              ref.read(educationNotifierProvider.notifier);
 
           // 로딩 상태
           if (educationState.isLoadingTheory) {
@@ -78,7 +81,8 @@ class _TheoryScreenState extends ConsumerState<TheoryScreen> {
             return const TheoryEmptyStateWidget(message: '이론 페이지가 없습니다');
           }
 
-          return _buildTheoryContent(context, educationState, educationNotifier, theories);
+          return _buildTheoryContent(
+              context, educationState, educationNotifier, theories);
         },
       ),
     );

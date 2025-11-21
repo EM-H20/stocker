@@ -253,8 +253,8 @@ POST /api/quiz/complete
 Request: {
   "chapter_id": 1,
   "answers": [
-    { "quiz_id": 1, "answer": 2 },
-    { "quiz_id": 2, "answer": 3 }
+    { "quiz_id": 1, "selected_option": 2 },
+    { "quiz_id": 2, "selected_option": 3 }
   ]
 }
 ```

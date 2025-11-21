@@ -24,8 +24,8 @@ class _NoteListScreenState extends ConsumerState<NoteListScreen> {
   void initState() {
     super.initState();
     // 화면이 처음 빌드될 때, 모든 노트를 불러옵니다.
-    Future.microtask(() =>
-        ref.read(noteNotifierProvider.notifier).fetchAllNotes());
+    Future.microtask(
+        () => ref.read(noteNotifierProvider.notifier).fetchAllNotes());
   }
 
   @override

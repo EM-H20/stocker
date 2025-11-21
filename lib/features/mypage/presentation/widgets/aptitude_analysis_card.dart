@@ -33,7 +33,7 @@ class AptitudeAnalysisCard extends ConsumerWidget {
             padding: EdgeInsets.all(20.w),
             borderRadius: 12.0,
             onTap: () {
-              context.go(AppRoutes.aptitude);
+              context.push(AppRoutes.aptitude);
             },
             child: Row(
               children: [

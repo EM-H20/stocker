@@ -74,15 +74,36 @@ class CurrentLearningCard extends StatelessWidget {
                 GestureDetector(
                   onTap: onClearSelection,
                   child: Container(
-                    padding: EdgeInsets.all(6.w),
-                    decoration: BoxDecoration(
-                      color: AppTheme.grey300.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(6.r),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.w,
+                      vertical: 6.h,
                     ),
-                    child: Icon(
-                      Icons.close,
-                      size: 18.sp,
-                      color: AppTheme.grey600,
+                    decoration: BoxDecoration(
+                      color: AppTheme.infoColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20.r),
+                      border: Border.all(
+                        color: AppTheme.infoColor.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.refresh,
+                          size: 14.sp,
+                          color: AppTheme.infoColor,
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(
+                          '다른 챕터',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: AppTheme.infoColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

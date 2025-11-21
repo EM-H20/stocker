@@ -101,9 +101,7 @@ class GlobalProgressBar extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: isDarkTheme
                       ? AppTheme.successColor.withValues(alpha: 0.2)
-                      : Theme.of(context)
-                          .primaryColor
-                          .withValues(alpha: 0.1),
+                      : Theme.of(context).primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Text(

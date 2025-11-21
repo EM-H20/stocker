@@ -257,8 +257,7 @@ class _MypageScreenState extends ConsumerState<MypageScreen> {
         // 다이얼로그가 닫혀있다면 스낵바로도 표시
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                '닉네임 변경에 실패했습니다: ${errorMessage ?? "알 수 없는 오류"}'),
+            content: Text('닉네임 변경에 실패했습니다: ${errorMessage ?? "알 수 없는 오류"}'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),

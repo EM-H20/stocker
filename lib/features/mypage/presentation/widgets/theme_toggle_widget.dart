@@ -95,11 +95,7 @@ class ThemeToggleWidget extends ConsumerWidget {
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(
                           context,
-                        )
-                            .textTheme
-                            .bodySmall
-                            ?.color
-                            ?.withValues(alpha: 0.7),
+                        ).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                       ),
                 ),
               ],

@@ -34,265 +34,265 @@ class AppRouter {
       redirect: (context, state) => AuthGuard.redirect(context, state, ref),
 
       routes: [
-      // 로그인 화면 (완전한 애니메이션 제거)
-      GoRoute(
-        path: AppRoutes.login,
-        pageBuilder: (context, state) {
-          debugPrint('🔐 [ROUTER] 로그인 페이지 로드 (완전한 애니메이션 제거)');
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: const LoginScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              // 뒤로가기 포함 모든 애니메이션 완전 제거
-              return child;
-            },
-          );
-        },
-      ),
-
-      // 회원가입 화면 (완전한 애니메이션 제거)
-      GoRoute(
-        path: AppRoutes.register,
-        pageBuilder: (context, state) {
-          debugPrint('📝 [ROUTER] 회원가입 페이지 로드 (완전한 애니메이션 제거)');
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: const SignupScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              // 뒤로가기 포함 모든 애니메이션 완전 제거
-              return child;
-            },
-          );
-        },
-      ),
-
-      // ShellRoute로 BottomNavigationBar를 유지하면서 탭 라우팅 (4개 탭)
-      ShellRoute(
-        builder: (context, state, child) {
-          return HomeShell(child: child);
-        },
-        routes: [
-          // 교육 탭 (완전한 애니메이션 제거)
-          GoRoute(
-            path: AppRoutes.education,
-            pageBuilder: (context, state) {
-              debugPrint('🎓 [ROUTER] 교육 탭 로드 (완전한 애니메이션 제거)');
-              return CustomTransitionPage(
-                key: state.pageKey,
-                child: const EducationScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  // 애니메이션 완전 제거: 항상 child를 그대로 반환
-                  return child;
-                },
-              );
-            },
-          ),
-
-          // 출석 탭 (완전한 애니메이션 제거)
-          GoRoute(
-            path: AppRoutes.attendance,
-            pageBuilder: (context, state) {
-              debugPrint('📅 [ROUTER] 출석 탭 로드 (완전한 애니메이션 제거)');
-              return CustomTransitionPage(
-                key: state.pageKey,
-                child: const AttendanceScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  // 애니메이션 완전 제거: 항상 child를 그대로 반환
-                  return child;
-                },
-              );
-            },
-          ),
-
-          // 오답노트 탭 (완전한 애니메이션 제거)
-          GoRoute(
-            path: AppRoutes.wrongNote,
-            pageBuilder: (context, state) {
-              debugPrint('📝 [ROUTER] 오답노트 탭 로드 (완전한 애니메이션 제거)');
-              return CustomTransitionPage(
-                key: state.pageKey,
-                child: const WrongNoteScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  // 애니메이션 완전 제거: 항상 child를 그대로 반환
-                  return child;
-                },
-              );
-            },
-          ),
-
-          // 마이페이지 탭 (완전한 애니메이션 제거)
-          GoRoute(
-            path: AppRoutes.mypage,
-            pageBuilder: (context, state) {
-              debugPrint('👤 [ROUTER] 마이페이지 탭 로드 (완전한 애니메이션 제거)');
-              return CustomTransitionPage(
-                key: state.pageKey,
-                child: const MypageScreen(),
-                transitionsBuilder:
-                    (context, animation, secondaryAnimation, child) {
-                  // 애니메이션 완전 제거: 항상 child를 그대로 반환
-                  return child;
-                },
-              );
-            },
-          ),
-        ],
-      ),
-
-      // 이론 학습 화면 (애니메이션 없음)
-      GoRoute(
-        path: AppRoutes.theory,
-        pageBuilder: (context, state) {
-          final chapterIdStr = state.uri.queryParameters['chapterId'];
-          final chapterId = int.tryParse(chapterIdStr ?? '');
-
-          if (chapterId == null) {
-            debugPrint(
-                '❌ [ROUTER] 이론 학습 - chapterId 파라미터 오류 (받은 값: $chapterIdStr), 기본값 1 사용');
-            return NoTransitionPage(
-              child: TheoryScreen(chapterId: 1),
+        // 로그인 화면 (완전한 애니메이션 제거)
+        GoRoute(
+          path: AppRoutes.login,
+          pageBuilder: (context, state) {
+            debugPrint('🔐 [ROUTER] 로그인 페이지 로드 (완전한 애니메이션 제거)');
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const LoginScreen(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                // 뒤로가기 포함 모든 애니메이션 완전 제거
+                return child;
+              },
             );
-          }
+          },
+        ),
 
-          debugPrint('✅ [ROUTER] 이론 학습 - chapterId: $chapterId로 이동');
-          return NoTransitionPage(
-            child: TheoryScreen(chapterId: chapterId),
-          );
-        },
-      ),
+        // 회원가입 화면 (완전한 애니메이션 제거)
+        GoRoute(
+          path: AppRoutes.register,
+          pageBuilder: (context, state) {
+            debugPrint('📝 [ROUTER] 회원가입 페이지 로드 (완전한 애니메이션 제거)');
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const SignupScreen(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                // 뒤로가기 포함 모든 애니메이션 완전 제거
+                return child;
+              },
+            );
+          },
+        ),
 
-      // === euimin 브랜치 기능들 ===
-      // 퀴즈 화면 (애니메이션 없음)
-      GoRoute(
-        path: AppRoutes.quiz,
-        pageBuilder: (context, state) {
-          final chapterIdStr = state.uri.queryParameters['chapterId'];
-          final quizIdStr = state.uri.queryParameters['quizId'];
-          final readOnlyStr = state.uri.queryParameters['readOnly'];
+        // ShellRoute로 BottomNavigationBar를 유지하면서 탭 라우팅 (4개 탭)
+        ShellRoute(
+          builder: (context, state, child) {
+            return HomeShell(child: child);
+          },
+          routes: [
+            // 교육 탭 (완전한 애니메이션 제거)
+            GoRoute(
+              path: AppRoutes.education,
+              pageBuilder: (context, state) {
+                debugPrint('🎓 [ROUTER] 교육 탭 로드 (완전한 애니메이션 제거)');
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: const EducationScreen(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    // 애니메이션 완전 제거: 항상 child를 그대로 반환
+                    return child;
+                  },
+                );
+              },
+            ),
 
-          final chapterId = int.tryParse(chapterIdStr ?? '');
-          final quizId = int.tryParse(quizIdStr ?? '');
-          final isReadOnly = readOnlyStr == 'true';
+            // 출석 탭 (완전한 애니메이션 제거)
+            GoRoute(
+              path: AppRoutes.attendance,
+              pageBuilder: (context, state) {
+                debugPrint('📅 [ROUTER] 출석 탭 로드 (완전한 애니메이션 제거)');
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: const AttendanceScreen(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    // 애니메이션 완전 제거: 항상 child를 그대로 반환
+                    return child;
+                  },
+                );
+              },
+            ),
 
-          debugPrint(
-              '🧠 [ROUTER] 퀴즈 라우팅 - chapterId: $chapterId, quizId: $quizId, readOnly: $isReadOnly');
+            // 오답노트 탭 (완전한 애니메이션 제거)
+            GoRoute(
+              path: AppRoutes.wrongNote,
+              pageBuilder: (context, state) {
+                debugPrint('📝 [ROUTER] 오답노트 탭 로드 (완전한 애니메이션 제거)');
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: const WrongNoteScreen(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    // 애니메이션 완전 제거: 항상 child를 그대로 반환
+                    return child;
+                  },
+                );
+              },
+            ),
 
-          if (chapterId == null) {
-            debugPrint('❌ [ROUTER] 퀴즈 - chapterId 파라미터 오류, 기본값 1 사용');
+            // 마이페이지 탭 (완전한 애니메이션 제거)
+            GoRoute(
+              path: AppRoutes.mypage,
+              pageBuilder: (context, state) {
+                debugPrint('👤 [ROUTER] 마이페이지 탭 로드 (완전한 애니메이션 제거)');
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: const MypageScreen(),
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    // 애니메이션 완전 제거: 항상 child를 그대로 반환
+                    return child;
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+
+        // 이론 학습 화면 (애니메이션 없음)
+        GoRoute(
+          path: AppRoutes.theory,
+          pageBuilder: (context, state) {
+            final chapterIdStr = state.uri.queryParameters['chapterId'];
+            final chapterId = int.tryParse(chapterIdStr ?? '');
+
+            if (chapterId == null) {
+              debugPrint(
+                  '❌ [ROUTER] 이론 학습 - chapterId 파라미터 오류 (받은 값: $chapterIdStr), 기본값 1 사용');
+              return NoTransitionPage(
+                child: TheoryScreen(chapterId: 1),
+              );
+            }
+
+            debugPrint('✅ [ROUTER] 이론 학습 - chapterId: $chapterId로 이동');
+            return NoTransitionPage(
+              child: TheoryScreen(chapterId: chapterId),
+            );
+          },
+        ),
+
+        // === euimin 브랜치 기능들 ===
+        // 퀴즈 화면 (애니메이션 없음)
+        GoRoute(
+          path: AppRoutes.quiz,
+          pageBuilder: (context, state) {
+            final chapterIdStr = state.uri.queryParameters['chapterId'];
+            final quizIdStr = state.uri.queryParameters['quizId'];
+            final readOnlyStr = state.uri.queryParameters['readOnly'];
+
+            final chapterId = int.tryParse(chapterIdStr ?? '');
+            final quizId = int.tryParse(quizIdStr ?? '');
+            final isReadOnly = readOnlyStr == 'true';
+
+            debugPrint(
+                '🧠 [ROUTER] 퀴즈 라우팅 - chapterId: $chapterId, quizId: $quizId, readOnly: $isReadOnly');
+
+            if (chapterId == null) {
+              debugPrint('❌ [ROUTER] 퀴즈 - chapterId 파라미터 오류, 기본값 1 사용');
+              return NoTransitionPage(
+                child: QuizScreen(
+                  chapterId: 1,
+                  singleQuizId: quizId,
+                  isReadOnly: isReadOnly,
+                ),
+              );
+            }
+
             return NoTransitionPage(
               child: QuizScreen(
-                chapterId: 1,
+                chapterId: chapterId,
                 singleQuizId: quizId,
                 isReadOnly: isReadOnly,
               ),
             );
-          }
+          },
+        ),
 
-          return NoTransitionPage(
-            child: QuizScreen(
-              chapterId: chapterId,
-              singleQuizId: quizId,
-              isReadOnly: isReadOnly,
-            ),
-          );
-        },
-      ),
+        // 퀴즈 결과 화면 (애니메이션 없음)
+        GoRoute(
+          path: AppRoutes.quizResult,
+          pageBuilder: (context, state) {
+            final chapterIdStr = state.uri.queryParameters['chapterId'];
+            final chapterId = int.tryParse(chapterIdStr ?? '');
 
-      // 퀴즈 결과 화면 (애니메이션 없음)
-      GoRoute(
-        path: AppRoutes.quizResult,
-        pageBuilder: (context, state) {
-          final chapterIdStr = state.uri.queryParameters['chapterId'];
-          final chapterId = int.tryParse(chapterIdStr ?? '');
+            if (chapterId == null) {
+              debugPrint('❌ [ROUTER] 퀴즈 결과 - chapterId 파라미터 오류, 기본값 1 사용');
+              return NoTransitionPage(
+                child: QuizResultScreen(chapterId: 1),
+              );
+            }
 
-          if (chapterId == null) {
-            debugPrint('❌ [ROUTER] 퀴즈 결과 - chapterId 파라미터 오류, 기본값 1 사용');
             return NoTransitionPage(
-              child: QuizResultScreen(chapterId: 1),
+              child: QuizResultScreen(chapterId: chapterId),
             );
-          }
+          },
+        ),
 
-          return NoTransitionPage(
-            child: QuizResultScreen(chapterId: chapterId),
-          );
-        },
-      ),
+        // === subin 브랜치 새로운 기능들 ===
+        // 성향 분석 메인 화면 (완전한 애니메이션 제거)
+        GoRoute(
+          path: AppRoutes.aptitude,
+          pageBuilder: (context, state) {
+            debugPrint('🧠 [ROUTER] 성향분석 메인 페이지 로드 (완전한 애니메이션 제거)');
+            return CustomTransitionPage(
+              key: state.pageKey,
+              child: const AptitudeInitialScreen(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                // 애니메이션 완전 제거: 항상 child를 그대로 반환
+                return child;
+              },
+            );
+          },
+        ),
 
-      // === subin 브랜치 새로운 기능들 ===
-      // 성향 분석 메인 화면 (완전한 애니메이션 제거)
-      GoRoute(
-        path: AppRoutes.aptitude,
-        pageBuilder: (context, state) {
-          debugPrint('🧠 [ROUTER] 성향분석 메인 페이지 로드 (완전한 애니메이션 제거)');
-          return CustomTransitionPage(
-            key: state.pageKey,
-            child: const AptitudeInitialScreen(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              // 애니메이션 완전 제거: 항상 child를 그대로 반환
-              return child;
-            },
-          );
-        },
-      ),
+        // 성향 분석 퀴즈 화면 (애니메이션 없음)
+        GoRoute(
+          path: AppRoutes.aptitudeQuiz,
+          pageBuilder: (context, state) {
+            debugPrint('📝 [ROUTER] 성향분석 퀴즈 페이지 로드 (애니메이션 없음)');
+            return const NoTransitionPage(child: AptitudeQuizScreen());
+          },
+        ),
 
-      // 성향 분석 퀴즈 화면 (애니메이션 없음)
-      GoRoute(
-        path: AppRoutes.aptitudeQuiz,
-        pageBuilder: (context, state) {
-          debugPrint('📝 [ROUTER] 성향분석 퀴즈 페이지 로드 (애니메이션 없음)');
-          return const NoTransitionPage(child: AptitudeQuizScreen());
-        },
-      ),
+        // 성향 분석 결과 화면 (애니메이션 없음)
+        GoRoute(
+          path: AppRoutes.aptitudeResult,
+          pageBuilder: (context, state) {
+            debugPrint('📊 [ROUTER] 성향분석 결과 페이지 로드 (애니메이션 없음)');
+            // extra로 전달된 isMyResult 값을 받음 (없으면 true가 기본값)
+            final isMyResult = (state.extra as bool?) ?? true;
+            return NoTransitionPage(
+              child: AptitudeResultScreen(isMyResult: isMyResult),
+            );
+          },
+        ),
 
-      // 성향 분석 결과 화면 (애니메이션 없음)
-      GoRoute(
-        path: AppRoutes.aptitudeResult,
-        pageBuilder: (context, state) {
-          debugPrint('📊 [ROUTER] 성향분석 결과 페이지 로드 (애니메이션 없음)');
-          // extra로 전달된 isMyResult 값을 받음 (없으면 true가 기본값)
-          final isMyResult = (state.extra as bool?) ?? true;
-          return NoTransitionPage(
-            child: AptitudeResultScreen(isMyResult: isMyResult),
-          );
-        },
-      ),
+        // 모든 성향 목록 화면 (애니메이션 없음)
+        GoRoute(
+          path: AppRoutes.aptitudeTypesList,
+          pageBuilder: (context, state) {
+            debugPrint('📋 [ROUTER] 성향분석 목록 페이지 로드 (애니메이션 없음)');
+            return const NoTransitionPage(child: AptitudeTypesListScreen());
+          },
+        ),
 
-      // 모든 성향 목록 화면 (애니메이션 없음)
-      GoRoute(
-        path: AppRoutes.aptitudeTypesList,
-        pageBuilder: (context, state) {
-          debugPrint('📋 [ROUTER] 성향분석 목록 페이지 로드 (애니메이션 없음)');
-          return const NoTransitionPage(child: AptitudeTypesListScreen());
-        },
-      ),
+        // 노트 목록 화면 (subin 새 기능, 애니메이션 없음)
+        GoRoute(
+          path: AppRoutes.noteList,
+          pageBuilder: (context, state) {
+            debugPrint('📝 [ROUTER] 노트 목록 페이지 로드 (애니메이션 없음)');
+            return const NoTransitionPage(child: NoteListScreen());
+          },
+        ),
 
-      // 노트 목록 화면 (subin 새 기능, 애니메이션 없음)
-      GoRoute(
-        path: AppRoutes.noteList,
-        pageBuilder: (context, state) {
-          debugPrint('📝 [ROUTER] 노트 목록 페이지 로드 (애니메이션 없음)');
-          return const NoTransitionPage(child: NoteListScreen());
-        },
-      ),
-
-      // 노트 에디터 화면 (subin 새 기능, 애니메이션 없음)
-      GoRoute(
-        path: AppRoutes.noteEditor,
-        pageBuilder: (context, state) {
-          debugPrint('✏️ [ROUTER] 노트 에디터 페이지 로드 (애니메이션 없음)');
-          // extra로 Note(편집) 또는 NoteTemplate(생성) 객체를 전달받음
-          final initialData = state.extra;
-          return NoTransitionPage(
-            child: NoteEditorScreen(initialData: initialData),
-          );
-        },
-      ),
+        // 노트 에디터 화면 (subin 새 기능, 애니메이션 없음)
+        GoRoute(
+          path: AppRoutes.noteEditor,
+          pageBuilder: (context, state) {
+            debugPrint('✏️ [ROUTER] 노트 에디터 페이지 로드 (애니메이션 없음)');
+            // extra로 Note(편집) 또는 NoteTemplate(생성) 객체를 전달받음
+            final initialData = state.extra;
+            return NoTransitionPage(
+              child: NoteEditorScreen(initialData: initialData),
+            );
+          },
+        ),
       ],
 
       // 에러 페이지 처리

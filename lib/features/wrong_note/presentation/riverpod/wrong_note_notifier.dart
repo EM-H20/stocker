@@ -181,8 +181,7 @@ class WrongNoteNotifier extends _$WrongNoteNotifier {
     final targetQuiz =
         state.wrongNotes.where((item) => item.quizId == quizId).toList();
     if (targetQuiz.isEmpty) {
-      debugPrint(
-          '⚠️ [WRONG_NOTE_NOTIFIER] Quiz $quizId가 오답노트에 없음 - 마크 건너뜀');
+      debugPrint('⚠️ [WRONG_NOTE_NOTIFIER] Quiz $quizId가 오답노트에 없음 - 마크 건너뜀');
       return;
     }
 
@@ -196,8 +195,7 @@ class WrongNoteNotifier extends _$WrongNoteNotifier {
     debugPrint('   - Quiz $quizId: ${wasAlreadyMarked ? '이미 마크됨' : '새로 마크됨'}');
     debugPrint('   - 전체 재시도 마크: ${state.retriedQuizIds.length}개');
     debugPrint('   - 전체 오답노트: ${state.wrongNotes.length}개');
-    debugPrint(
-        '✅ [WRONG_NOTE_NOTIFIER] ReadOnly 로컬 마크 완료 - 오답노트에서 제거하지 않음');
+    debugPrint('✅ [WRONG_NOTE_NOTIFIER] ReadOnly 로컬 마크 완료 - 오답노트에서 제거하지 않음');
   }
 
   // === 오답노트 삭제 ===
@@ -231,8 +229,7 @@ class WrongNoteNotifier extends _$WrongNoteNotifier {
       final existingNote =
           state.wrongNotes.where((item) => item.quizId == quizId).toList();
       if (existingNote.isEmpty) {
-        debugPrint(
-            '⚠️ [WRONG_NOTE_NOTIFIER] 로컬에서 Quiz $quizId를 찾을 수 없음');
+        debugPrint('⚠️ [WRONG_NOTE_NOTIFIER] 로컬에서 Quiz $quizId를 찾을 수 없음');
         debugPrint('💡 [WRONG_NOTE_NOTIFIER] 가능한 원인:');
         debugPrint('   1. 이미 삭제된 문제');
         debugPrint('   2. 오답노트에 없던 문제 (원래 정답이었던 문제)');
@@ -265,9 +262,8 @@ class WrongNoteNotifier extends _$WrongNoteNotifier {
 
       // API 호출 성공 시 로컬 상태에서 제거
       final removedCount = state.wrongNotes.length;
-      final updatedNotes = state.wrongNotes
-          .where((item) => item.quizId != quizId)
-          .toList();
+      final updatedNotes =
+          state.wrongNotes.where((item) => item.quizId != quizId).toList();
       final actualRemoved = removedCount - updatedNotes.length;
 
       state = state.copyWith(wrongNotes: updatedNotes);
@@ -275,7 +271,8 @@ class WrongNoteNotifier extends _$WrongNoteNotifier {
       debugPrint('✅ [WRONG_NOTE_NOTIFIER] 서버 & 로컬 삭제 성공!');
       debugPrint('   - Quiz ID: $quizId');
       debugPrint('   - 제거된 항목 수: $actualRemoved개');
-      debugPrint('   - 삭제 전 총 개수: $removedCount개 → 삭제 후: ${updatedNotes.length}개');
+      debugPrint(
+          '   - 삭제 전 총 개수: $removedCount개 → 삭제 후: ${updatedNotes.length}개');
     } catch (e) {
       final errorStr = e.toString();
 
@@ -288,9 +285,8 @@ class WrongNoteNotifier extends _$WrongNoteNotifier {
 
         // 로컬에서 제거
         final removedCount = state.wrongNotes.length;
-        final updatedNotes = state.wrongNotes
-            .where((item) => item.quizId != quizId)
-            .toList();
+        final updatedNotes =
+            state.wrongNotes.where((item) => item.quizId != quizId).toList();
         final actualRemoved = removedCount - updatedNotes.length;
 
         state = state.copyWith(wrongNotes: updatedNotes);

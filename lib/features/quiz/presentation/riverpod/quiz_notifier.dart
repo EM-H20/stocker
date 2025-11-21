@@ -193,7 +193,8 @@ class QuizNotifier extends _$QuizNotifier {
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 오답노트 복습 시작 실패: $e');
 
-      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '오답노트');
+      final errorMessage =
+          ErrorMessageExtractor.extractDataLoadError(e, '오답노트');
 
       state = state.copyWith(
         isLoadingQuiz: false,
@@ -228,8 +229,10 @@ class QuizNotifier extends _$QuizNotifier {
       );
 
       // 답변 업데이트 - userAnswers에 저장
-      final updatedAnswers = List<int?>.from(state.currentQuizSession!.userAnswers);
-      updatedAnswers[state.currentQuizSession!.currentQuizIndex] = selectedOption;
+      final updatedAnswers =
+          List<int?>.from(state.currentQuizSession!.userAnswers);
+      updatedAnswers[state.currentQuizSession!.currentQuizIndex] =
+          selectedOption;
 
       final updatedSession = state.currentQuizSession!.copyWith(
         userAnswers: updatedAnswers,
@@ -242,21 +245,22 @@ class QuizNotifier extends _$QuizNotifier {
 
       // 단일 퀴즈 완료 콜백 호출
       final chapterId = state.currentQuizSession!.chapterId;
+      final isCorrect = result['isCorrect'] as bool;
       for (final callback in _onSingleQuizCompletedCallbacks) {
         try {
-          callback(chapterId, currentQuiz.id, result.isCorrect);
+          callback(chapterId, currentQuiz.id, isCorrect);
         } catch (e) {
           debugPrint('❌ [QUIZ_NOTIFIER] 단일 퀴즈 완료 콜백 실행 실패: $e');
         }
       }
 
-      debugPrint(
-          '✅ [QUIZ_NOTIFIER] 답안 제출 완료 - ${result.isCorrect ? "정답" : "오답"}');
+      debugPrint('✅ [QUIZ_NOTIFIER] 답안 제출 완료 - ${isCorrect ? "정답" : "오답"}');
       return true;
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 답안 제출 실패: $e');
 
-      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '답안 제출');
+      final errorMessage =
+          ErrorMessageExtractor.extractSubmissionError(e, '답안 제출');
 
       state = state.copyWith(
         isSubmittingAnswer: false,
@@ -335,10 +339,31 @@ class QuizNotifier extends _$QuizNotifier {
 
     try {
       final chapterId = state.currentQuizSession!.chapterId;
-      final result = await _repository.completeQuiz(chapterId);
+      final session = state.currentQuizSession!;
+
+      // userAnswers를 API 형식으로 변환: List<Map<String, int>>
+      final answers = <Map<String, int>>[];
+      for (int i = 0; i < session.quizList.length; i++) {
+        final quizId = session.quizList[i].id;
+        final answer = session.userAnswers[i];
+        final quiz = session.quizList[i];
+
+        if (answer != null) {
+          // 디버깅: 로컬 정답과 전송 값 비교
+          debugPrint(
+              '🔍 [DEBUG] Quiz $quizId: 로컬 정답=${quiz.correctAnswerIndex}, 사용자 선택=$answer, API 전송=${answer + 1}');
+
+          answers.add({
+            'quiz_id': quizId,
+            'selected_option': answer + 1, // 0-based → 1-based (API는 1~4 기대)
+          });
+        }
+      }
+
+      final result = await _repository.completeQuiz(chapterId, answers);
 
       debugPrint(
-          '✅ [QUIZ_NOTIFIER] 퀴즈 완료 - 점수: ${result.score}/${result.totalScore}, 합격: ${result.isPassed}');
+          '✅ [QUIZ_NOTIFIER] 퀴즈 완료 - 정답: ${result.correctAnswers}/${result.totalQuestions} (${result.scorePercentage}%), 합격: ${result.isPassed}');
 
       // 타이머 정지
       _stopTimer();
@@ -367,7 +392,8 @@ class QuizNotifier extends _$QuizNotifier {
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 퀴즈 완료 실패: $e');
 
-      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '퀴즈 완료');
+      final errorMessage =
+          ErrorMessageExtractor.extractSubmissionError(e, '퀴즈 완료');
 
       state = state.copyWith(
         isSubmittingAnswer: false,
@@ -396,15 +422,23 @@ class QuizNotifier extends _$QuizNotifier {
   Future<void> loadQuizResults({bool forceRefresh = false}) async {
     if (state.isLoadingResults) return;
 
+    // 가장 최근 완료한 퀴즈의 chapterId 가져오기
+    if (state.quizResults.isEmpty) {
+      debugPrint('⚠️ [QUIZ_NOTIFIER] 퀴즈 결과가 없어서 로드할 수 없습니다');
+      return;
+    }
+
+    final chapterId = state.quizResults.last.chapterId;
+
     debugPrint(
-        '📊 [QUIZ_NOTIFIER] 퀴즈 결과 로드 시작 (forceRefresh: $forceRefresh)');
+        '📊 [QUIZ_NOTIFIER] 퀴즈 결과 로드 시작 (chapterId: $chapterId, forceRefresh: $forceRefresh)');
     state = state.copyWith(
       isLoadingResults: true,
       resultsError: null,
     );
 
     try {
-      final results = await _repository.getQuizResults(forceRefresh: forceRefresh);
+      final results = await _repository.getQuizResults(chapterId);
 
       // 최신순 정렬
       final resultsList = List<QuizResult>.from(results);
@@ -420,7 +454,8 @@ class QuizNotifier extends _$QuizNotifier {
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 퀴즈 결과 로드 실패: $e');
 
-      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '퀴즈 결과');
+      final errorMessage =
+          ErrorMessageExtractor.extractDataLoadError(e, '퀴즈 결과');
 
       state = state.copyWith(
         isLoadingResults: false,

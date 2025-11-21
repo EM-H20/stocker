@@ -262,14 +262,15 @@ class WrongAnswerCard extends StatelessWidget {
                   ),
                   // 기존 버튼
                   ActionButton(
-                    text: isRetried ? '다시 복습하기' : '다시 풀기',
-                    icon: isRetried ? Icons.replay_outlined : Icons.refresh,
+                    text: isRetried ? '챕터 다시 풀기' : '챕터 퀴즈 풀기',
+                    icon:
+                        isRetried ? Icons.replay_outlined : Icons.quiz_outlined,
                     color:
                         isRetried ? AppTheme.infoColor : AppTheme.successColor,
                     onPressed: () {
-                      // 단일 퀴즈 모드로 해당 문제 재시도 (읽기 전용 모드)
+                      // 해당 챕터의 전체 퀴즈로 이동
                       context.go(
-                          '${AppRoutes.quiz}?chapterId=${wrongNote.chapterId}&quizId=${wrongNote.quizId}&readOnly=true');
+                          '${AppRoutes.quiz}?chapterId=${wrongNote.chapterId}');
                     },
                   ),
                 ],

@@ -26,7 +26,8 @@ class AttendanceNotifier extends _$AttendanceNotifier {
   }
 
   /// AttendanceRepository 접근
-  AttendanceRepository get _repository => ref.read(attendanceRepositoryProvider);
+  AttendanceRepository get _repository =>
+      ref.read(attendanceRepositoryProvider);
 
   /// 퀴즈 로딩 상태 설정
   void setQuizLoading(bool value) {
@@ -45,7 +46,8 @@ class AttendanceNotifier extends _$AttendanceNotifier {
       final attendanceList = await _repository.getAttendanceStatus(month);
       final attendanceMap = {
         for (var day in attendanceList)
-          DateTime.utc(day.date.year, day.date.month, day.date.day): day.isPresent
+          DateTime.utc(day.date.year, day.date.month, day.date.day):
+              day.isPresent
       };
 
       state = state.copyWith(
@@ -58,7 +60,8 @@ class AttendanceNotifier extends _$AttendanceNotifier {
     } catch (e) {
       debugPrint('❌ [ATTENDANCE] 출석 현황 로딩 실패: $e');
 
-      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '출석 현황');
+      final errorMessage =
+          ErrorMessageExtractor.extractDataLoadError(e, '출석 현황');
 
       state = state.copyWith(
         isLoading: false,
@@ -111,7 +114,8 @@ class AttendanceNotifier extends _$AttendanceNotifier {
     } catch (e) {
       debugPrint('❌ [ATTENDANCE] 출석 처리 실패: $e');
 
-      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '출석 처리');
+      final errorMessage =
+          ErrorMessageExtractor.extractSubmissionError(e, '출석 처리');
 
       state = state.copyWith(
         isSubmitting: false,

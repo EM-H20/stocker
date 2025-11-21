@@ -13,8 +13,7 @@ class AptitudeQuizScreen extends ConsumerStatefulWidget {
   const AptitudeQuizScreen({super.key});
 
   @override
-  ConsumerState<AptitudeQuizScreen> createState() =>
-      _AptitudeQuizScreenState();
+  ConsumerState<AptitudeQuizScreen> createState() => _AptitudeQuizScreenState();
 }
 
 class _AptitudeQuizScreenState extends ConsumerState<AptitudeQuizScreen> {
@@ -125,9 +124,9 @@ class _AptitudeQuizScreenState extends ConsumerState<AptitudeQuizScreen> {
                                 padding: const EdgeInsets.only(bottom: 12.0),
                                 child: QuizOptionButton(
                                   text: choice.text,
-                                  isSelected: aptitudeState
-                                          .answers[question.id] ==
-                                      choice.value,
+                                  isSelected:
+                                      aptitudeState.answers[question.id] ==
+                                          choice.value,
                                   onPressed: () {
                                     // 답변을 Notifier에 저장
                                     ref
@@ -157,11 +156,11 @@ class _AptitudeQuizScreenState extends ConsumerState<AptitudeQuizScreen> {
                 Padding(
                   padding: const EdgeInsets.all(24.0),
                   child: ElevatedButton(
-                    onPressed: (aptitudeState.answers.length ==
-                                totalQuestions &&
-                            totalQuestions > 0)
-                        ? _submit
-                        : null, // 모든 질문에 답하지 않으면 버튼 비활성화
+                    onPressed:
+                        (aptitudeState.answers.length == totalQuestions &&
+                                totalQuestions > 0)
+                            ? _submit
+                            : null, // 모든 질문에 답하지 않으면 버튼 비활성화
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
                       backgroundColor: Theme.of(context).primaryColor,

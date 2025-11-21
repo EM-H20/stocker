@@ -16,7 +16,8 @@ class AptitudeTypesListScreen extends ConsumerStatefulWidget {
       _AptitudeTypesListScreenState();
 }
 
-class _AptitudeTypesListScreenState extends ConsumerState<AptitudeTypesListScreen> {
+class _AptitudeTypesListScreenState
+    extends ConsumerState<AptitudeTypesListScreen> {
   @override
   void initState() {
     super.initState();
@@ -103,7 +104,9 @@ class _AptitudeTypesListScreenState extends ConsumerState<AptitudeTypesListScree
                       SizedBox(height: 16.h),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(aptitudeNotifierProvider.notifier).fetchAllTypes();
+                          ref
+                              .read(aptitudeNotifierProvider.notifier)
+                              .fetchAllTypes();
                         },
                         child: const Text('다시 시도'),
                       ),
@@ -193,11 +196,14 @@ class _AptitudeTypesListScreenState extends ConsumerState<AptitudeTypesListScree
 
                           try {
                             // currentResult 초기화 (이전 결과 제거)
-                            ref.read(aptitudeNotifierProvider.notifier).clearCurrentResult();
+                            ref
+                                .read(aptitudeNotifierProvider.notifier)
+                                .clearCurrentResult();
 
                             // 해당 성향의 상세 정보 가져오기
-                            final success =
-                                await ref.read(aptitudeNotifierProvider.notifier).fetchResultByType(type.typeCode);
+                            final success = await ref
+                                .read(aptitudeNotifierProvider.notifier)
+                                .fetchResultByType(type.typeCode);
 
                             // 로딩 다이얼로그 닫기
                             if (context.mounted) {
@@ -212,7 +218,8 @@ class _AptitudeTypesListScreenState extends ConsumerState<AptitudeTypesListScree
                             } else if (context.mounted) {
                               debugPrint('❌ [APTITUDE_TYPES] 데이터 로드 실패');
                               // 에러 처리
-                              final currentState = ref.read(aptitudeNotifierProvider);
+                              final currentState =
+                                  ref.read(aptitudeNotifierProvider);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(currentState.errorMessage ??

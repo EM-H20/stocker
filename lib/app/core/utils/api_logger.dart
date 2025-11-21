@@ -124,7 +124,8 @@ class ApiLogger {
         try {
           final responseData = error.response!.data;
           if (responseData is Map || responseData is List) {
-            final prettyJson = JsonEncoder.withIndent('  ').convert(responseData);
+            final prettyJson =
+                JsonEncoder.withIndent('  ').convert(responseData);
             prettyJson.split('\n').forEach((line) {
               debugPrint('║   $line');
             });

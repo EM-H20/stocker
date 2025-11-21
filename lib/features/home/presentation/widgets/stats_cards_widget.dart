@@ -106,8 +106,7 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
           final wrongNotes = wrongNoteState.wrongNotes.length;
 
           // 교육 진행률 데이터
-          final completedChapters =
-              educationState.getCompletedChapterCount();
+          final completedChapters = educationState.getCompletedChapterCount();
           final totalChapters = educationState.chapters.length;
           final educationProgress = educationState.globalProgressPercentage;
 
@@ -207,8 +206,7 @@ class _StatsCardsWidgetState extends ConsumerState<StatsCardsWidget> {
               ),
 
               // 교육 진행률 (로딩 중이 아니고 챕터가 있을 때만)
-              if (!educationState.isLoadingChapters &&
-                  totalChapters > 0) ...[
+              if (!educationState.isLoadingChapters && totalChapters > 0) ...[
                 SizedBox(height: 8.h),
                 Row(
                   children: [

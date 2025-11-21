@@ -42,7 +42,10 @@ void main() {
       // Test theme mode conversion
       final themeMode = container.read(themeModeProvider);
       expect(themeMode, equals(ThemeMode.system)); // 기본값 확인
-      expect([ThemeMode.light, ThemeMode.dark, ThemeMode.system].contains(themeMode), isTrue);
+      expect(
+          [ThemeMode.light, ThemeMode.dark, ThemeMode.system]
+              .contains(themeMode),
+          isTrue);
 
       // Test theme change
       final notifier = container.read(themeNotifierProvider.notifier);
@@ -59,12 +62,14 @@ void main() {
       final notifier = container.read(homeNavigationNotifierProvider.notifier);
 
       // Verify initial state
-      expect(container.read(homeNavigationNotifierProvider), equals(TabItem.education));
+      expect(container.read(homeNavigationNotifierProvider),
+          equals(TabItem.education));
       expect(notifier.currentIndex, equals(0));
 
       // Test navigation
       notifier.changeTabByIndex(1);
-      expect(container.read(homeNavigationNotifierProvider), equals(TabItem.attendance));
+      expect(container.read(homeNavigationNotifierProvider),
+          equals(TabItem.attendance));
       expect(notifier.currentIndex, equals(1));
 
       // Test bounds checking
@@ -80,17 +85,18 @@ void main() {
 
       // Test changeTab directly
       notifier.changeTab(TabItem.wrongNote);
-      expect(container.read(homeNavigationNotifierProvider), equals(TabItem.wrongNote));
+      expect(container.read(homeNavigationNotifierProvider),
+          equals(TabItem.wrongNote));
     });
 
     test('App themes are properly configured', () {
       // Test that themes are not null and have expected properties
       expect(AppTheme.lightTheme, isNotNull);
       expect(AppTheme.darkTheme, isNotNull);
-      
+
       expect(AppTheme.lightTheme.brightness, equals(Brightness.light));
       expect(AppTheme.darkTheme.brightness, equals(Brightness.dark));
-      
+
       // Test that themes have basic required properties
       expect(AppTheme.lightTheme.colorScheme, isNotNull);
       expect(AppTheme.darkTheme.colorScheme, isNotNull);
@@ -116,7 +122,7 @@ void main() {
       );
 
       await tester.pump();
-      
+
       // Verify app doesn't crash with ScreenUtil
       expect(find.text('Test'), findsOneWidget);
       expect(find.byType(Scaffold), findsOneWidget);

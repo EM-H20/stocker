@@ -24,7 +24,8 @@ void main() async {
 
   debugPrint('[INIT] Loading environment variables...');
   await dotenv.load(fileName: ".env");
-  debugPrint('[INIT] Environment loaded - API_BASE_URL: ${dotenv.env['API_BASE_URL']}');
+  debugPrint(
+      '[INIT] Environment loaded - API_BASE_URL: ${dotenv.env['API_BASE_URL']}');
 
   await setupDio();
 

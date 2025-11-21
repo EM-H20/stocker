@@ -136,8 +136,10 @@ class _AptitudeQuizScreenState extends ConsumerState<AptitudeQuizScreen> {
                                       choice.value,
                                   onPressed: () {
                                     // 답변을 Notifier에 저장
-                                    ref.read(aptitudeNotifierProvider.notifier).answerQuestion(
-                                        question.id, choice.value);
+                                    ref
+                                        .read(aptitudeNotifierProvider.notifier)
+                                        .answerQuestion(
+                                            question.id, choice.value);
 
                                     // 마지막 문제가 아니면 다음 페이지로 자동 이동
                                     if (index < totalQuestions - 1) {

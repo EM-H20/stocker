@@ -11,7 +11,8 @@ class AptitudeInitialScreen extends ConsumerStatefulWidget {
   const AptitudeInitialScreen({super.key});
 
   @override
-  ConsumerState<AptitudeInitialScreen> createState() => _AptitudeInitialScreenState();
+  ConsumerState<AptitudeInitialScreen> createState() =>
+      _AptitudeInitialScreenState();
 }
 
 class _AptitudeInitialScreenState extends ConsumerState<AptitudeInitialScreen> {
@@ -34,8 +35,8 @@ class _AptitudeInitialScreenState extends ConsumerState<AptitudeInitialScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            debugPrint('🔙 [APTITUDE] 뒤로가기 버튼 클릭 - 홈으로 이동');
-            context.go(AppRoutes.home);
+            debugPrint('🔙 [APTITUDE] 뒤로가기 버튼 클릭 - 이전 화면으로');
+            context.pop();
           },
         ),
         actions: [],
@@ -129,7 +130,9 @@ class _AptitudeInitialScreenState extends ConsumerState<AptitudeInitialScreen> {
                             '📋 [APTITUDE_INITIAL] 이전 결과 다시보기 버튼 클릭 - 기존 결과로 이동');
                         // ✅ [수정] 결과 화면으로 이동
                         // currentResult를 초기화해서 myResult를 보도록 함
-                        ref.read(aptitudeNotifierProvider.notifier).clearCurrentResult();
+                        ref
+                            .read(aptitudeNotifierProvider.notifier)
+                            .clearCurrentResult();
                         context.push(AppRoutes.aptitudeResult);
                       },
                       child: Text(

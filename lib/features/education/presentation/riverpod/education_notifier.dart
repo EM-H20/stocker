@@ -41,17 +41,16 @@ class EducationNotifier extends _$EducationNotifier {
       return;
     }
 
-    debugPrint(
-        '🔄 [EDU_NOTIFIER] 챕터 목록 로드 시작 (forceRefresh: $forceRefresh)');
+    debugPrint('🔄 [EDU_NOTIFIER] 챕터 목록 로드 시작 (forceRefresh: $forceRefresh)');
     state = state.copyWith(
       isLoadingChapters: true,
       chaptersError: null,
     );
 
     try {
-      final chapters = await _repository.getChapters(forceRefresh: forceRefresh);
-      debugPrint(
-          '✅ [EDU_NOTIFIER] 챕터 로드 성공 - 총 ${chapters.length}개 챕터');
+      final chapters =
+          await _repository.getChapters(forceRefresh: forceRefresh);
+      debugPrint('✅ [EDU_NOTIFIER] 챕터 로드 성공 - 총 ${chapters.length}개 챕터');
 
       state = state.copyWith(
         chapters: chapters,
@@ -215,7 +214,8 @@ class EducationNotifier extends _$EducationNotifier {
     } catch (e) {
       debugPrint('❌ [EDU_NOTIFIER] 이론 완료 처리 실패: $e');
 
-      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '이론 완료');
+      final errorMessage =
+          ErrorMessageExtractor.extractSubmissionError(e, '이론 완료');
 
       state = state.copyWith(
         isCompletingTheory: false,

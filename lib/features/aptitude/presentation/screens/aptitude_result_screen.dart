@@ -67,9 +67,12 @@ class AptitudeResultScreen extends ConsumerWidget {
                     // 거장 프로필 이미지
                     CircleAvatar(
                       radius: 50.r,
-                      backgroundImage: NetworkImage(result.master.imageUrl),
+                      backgroundImage: result.master.imageUrl.isNotEmpty
+                          ? NetworkImage(result.master.imageUrl)
+                          : null,
                       backgroundColor: Colors.grey[300],
-                      child: result.master.imageUrl.contains('placehold')
+                      child: result.master.imageUrl.isEmpty ||
+                              result.master.imageUrl.contains('placehold')
                           ? Icon(
                               Icons.person,
                               size: 50.r,

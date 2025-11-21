@@ -7,6 +7,7 @@ import '../../../../app/core/providers/riverpod/repository_providers.dart';
 import 'aptitude_state.dart';
 
 part 'aptitude_notifier.g.dart';
+
 @riverpod
 class AptitudeNotifier extends _$AptitudeNotifier {
   @override
@@ -130,8 +131,7 @@ class AptitudeNotifier extends _$AptitudeNotifier {
             isLoading: false,
           );
 
-          debugPrint(
-              '✅ [APTITUDE_NOTIFIER] 캐시 데이터로 결과 생성 완료 - API 호출 없음!');
+          debugPrint('✅ [APTITUDE_NOTIFIER] 캐시 데이터로 결과 생성 완료 - API 호출 없음!');
           return true;
         } else {
           debugPrint('⚠️ [APTITUDE_NOTIFIER] 캐시에서 찾기 실패');
@@ -142,16 +142,15 @@ class AptitudeNotifier extends _$AptitudeNotifier {
       debugPrint('📡 [APTITUDE_NOTIFIER] 캐시 없음 - Repository 호출 중...');
 
       final result = await _repository.getResultByType(typeCode).timeout(
-            const Duration(seconds: 30),
-            onTimeout: () {
-              debugPrint('⏰ [APTITUDE_NOTIFIER] 타임아웃 발생');
-              throw Exception('요청 시간이 초과되었습니다');
-            },
-          );
+        const Duration(seconds: 30),
+        onTimeout: () {
+          debugPrint('⏰ [APTITUDE_NOTIFIER] 타임아웃 발생');
+          throw Exception('요청 시간이 초과되었습니다');
+        },
+      );
 
       state = state.copyWith(currentResult: result, isLoading: false);
-      debugPrint(
-          '✅ [APTITUDE_NOTIFIER] API로 결과 로드 성공: ${result.typeName}');
+      debugPrint('✅ [APTITUDE_NOTIFIER] API로 결과 로드 성공: ${result.typeName}');
       debugPrint('   거장: ${result.master.name}');
       return true;
     } catch (e) {
@@ -182,16 +181,14 @@ class AptitudeNotifier extends _$AptitudeNotifier {
         return InvestmentMaster(
           name: '조지 소로스',
           imageUrl: 'https://placehold.co/100x100/EA4335/FFFFFF?text=GS',
-          description:
-              '퀀텀 펀드의 창립자로 알려진 조지 소로스는 거시경제 분석을 통한 투기적 투자로 유명합니다.',
+          description: '퀀텀 펀드의 창립자로 알려진 조지 소로스는 거시경제 분석을 통한 투기적 투자로 유명합니다.',
           portfolio: {'선물': 35.0, '주식': 25.0, '원자재': 20.0, '현금': 20.0},
         );
       case 'NEUTRAL':
         return InvestmentMaster(
           name: '레이 달리오',
           imageUrl: 'https://placehold.co/100x100/34A853/FFFFFF?text=RD',
-          description:
-              '브리지워터 어소시에이츠의 창립자인 레이 달리오는 올웨더 포트폴리오로 유명합니다.',
+          description: '브리지워터 어소시에이츠의 창립자인 레이 달리오는 올웨더 포트폴리오로 유명합니다.',
           portfolio: {'주식': 30.0, '채권': 40.0, '원자재': 15.0, '기타': 15.0},
         );
       case 'CONSERVATIVE':
@@ -205,8 +202,7 @@ class AptitudeNotifier extends _$AptitudeNotifier {
         return InvestmentMaster(
           name: '캐시 우드',
           imageUrl: 'https://placehold.co/100x100/FF9800/FFFFFF?text=CW',
-          description:
-              'ARK 인베스트의 CEO인 캐시 우드는 파괴적 혁신 기업에 투자하는 것으로 유명합니다.',
+          description: 'ARK 인베스트의 CEO인 캐시 우드는 파괴적 혁신 기업에 투자하는 것으로 유명합니다.',
           portfolio: {'Tesla': 15.0, 'Nvidia': 12.0, '혁신기업': 60.0, '기타': 13.0},
         );
       case 'DIVIDEND':

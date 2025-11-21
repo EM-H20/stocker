@@ -37,6 +37,49 @@ class QuizRepository {
     }
   }
 
+  /// 답안 제출 (로컬 전용)
+  ///
+  /// 서버에 전송하지 않고 로컬에만 답안을 저장하고 정답/오답 여부를 반환
+  /// 실제 채점은 completeQuiz()에서 서버로 전체 답안 제출 시 수행
+  ///
+  /// Returns: Map with 'isCorrect' (bool) and 'hint' (String)
+  Future<Map<String, dynamic>> submitAnswer(
+    int quizId,
+    int selectedOption,
+  ) async {
+    try {
+      final session = await _getLocalQuizProgress();
+      if (session == null) {
+        throw Exception('퀴즈 세션을 찾을 수 없습니다');
+      }
+
+      // 현재 퀴즈 찾기
+      final quizIndex = session.quizList.indexWhere((q) => q.id == quizId);
+      if (quizIndex < 0) {
+        throw Exception('퀴즈를 찾을 수 없습니다: $quizId');
+      }
+
+      final quiz = session.quizList[quizIndex];
+
+      // 로컬에 답안 저장
+      await updateLocalAnswer(session.chapterId, quizIndex, selectedOption);
+
+      // 정답 확인 (로컬에서만)
+      final isCorrect = selectedOption == quiz.correctAnswerIndex;
+
+      debugPrint(
+          '✅ [QUIZ_REPO] 답안 로컬 저장 완료 - Quiz $quizId: ${isCorrect ? "정답" : "오답"}');
+
+      return {
+        'isCorrect': isCorrect,
+        'hint': quiz.explanation, // explanation을 hint로 사용
+      };
+    } catch (e) {
+      debugPrint('❌ [QUIZ_REPO] 답안 제출 실패: $e');
+      rethrow;
+    }
+  }
+
   /// 퀴즈 진도 업데이트
   ///
   /// 서버에 현재 퀴즈 진행 상황을 업데이트하고 로컬 상태 업데이트

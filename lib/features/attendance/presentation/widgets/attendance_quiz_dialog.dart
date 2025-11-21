@@ -18,7 +18,8 @@ class AttendanceQuizDialog extends ConsumerStatefulWidget {
   const AttendanceQuizDialog({super.key, required this.quizzes});
 
   @override
-  ConsumerState<AttendanceQuizDialog> createState() => _AttendanceQuizDialogState();
+  ConsumerState<AttendanceQuizDialog> createState() =>
+      _AttendanceQuizDialogState();
 }
 
 class _AttendanceQuizDialogState extends ConsumerState<AttendanceQuizDialog> {
