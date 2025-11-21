@@ -2,6 +2,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../services/token_storage.dart';
+import '../utils/api_logger.dart';
 
 class AuthInterceptor extends Interceptor {
   final Dio _dio;
@@ -22,27 +23,38 @@ class AuthInterceptor extends Interceptor {
       options.headers['x-refresh-token'] = refreshToken;
     }
 
+    // API 요청 로깅 (Real API 모드에서만)
+    ApiLogger.logRequest(
+      method: options.method,
+      url: '${options.baseUrl}${options.path}',
+      data: options.data is Map<String, dynamic> ? options.data : null,
+      queryParameters: options.queryParameters,
+    );
+
     handler.next(options);
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
-    // 중요한 에러만 로깅 (개발 환경에서)
-    if (kDebugMode) {
-      debugPrint(
-          '🚨 [AUTH_INTERCEPTOR] HTTP Error - ${err.response?.statusCode ?? err.type}');
-      debugPrint('🚨 [AUTH_INTERCEPTOR] URL: ${err.requestOptions.uri}');
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    // API 응답 로깅 (Real API 모드에서만)
+    ApiLogger.logResponse(
+      method: response.requestOptions.method,
+      url: '${response.requestOptions.baseUrl}${response.requestOptions.path}',
+      statusCode: response.statusCode ?? 0,
+      data: response.data,
+    );
 
-      // 상세 로그는 심각한 에러에만 표시
-      if (err.response?.statusCode != 401) {
-        debugPrint('🚨 [AUTH_INTERCEPTOR] Error Type: ${err.type}');
-        debugPrint('🚨 [AUTH_INTERCEPTOR] Message: ${err.message}');
-        if (err.response != null) {
-          debugPrint(
-              '🚨 [AUTH_INTERCEPTOR] Response Data: ${err.response!.data}');
-        }
-      }
-    }
+    handler.next(response);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    // API 에러 로깅 (Real API 모드에서만)
+    ApiLogger.logError(
+      method: err.requestOptions.method,
+      url: '${err.requestOptions.baseUrl}${err.requestOptions.path}',
+      error: err,
+    );
 
     // 네트워크 문제 및 백엔드 연결 오류 감지 (사용자 친화적 메시지)
     String userFriendlyMessage = '네트워크 오류가 발생했어요';
