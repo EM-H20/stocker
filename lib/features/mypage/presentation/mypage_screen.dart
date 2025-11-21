@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../note/presentation/riverpod/note_notifier.dart';
 import '../../auth/presentation/riverpod/auth_notifier.dart';
 import '../../../app/core/widgets/loading_widget.dart';
+import '../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 import 'widgets/profile_header.dart';
 import 'widgets/aptitude_analysis_card.dart';
 import 'widgets/attendance_status_card.dart';
@@ -203,21 +204,19 @@ class _MypageScreenState extends ConsumerState<MypageScreen> {
 
     // 입력 검증
     if (newNickname.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('닉네임을 입력해주세요'),
-          backgroundColor: Colors.red,
-        ),
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.error,
+        message: '닉네임을 입력해주세요',
       );
       return;
     }
 
     if (newNickname.length < 2) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('닉네임은 2글자 이상 입력해주세요'),
-          backgroundColor: Colors.red,
-        ),
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.error,
+        message: '닉네임은 2글자 이상 입력해주세요',
       );
       return;
     }
@@ -240,12 +239,11 @@ class _MypageScreenState extends ConsumerState<MypageScreen> {
       if (success) {
         // 성공 시 다이얼로그 닫고 성공 메시지
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('닉네임이 "$newNickname"으로 변경되었습니다'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ),
+        CustomSnackBar.show(
+          context: context,
+          type: SnackBarType.success,
+          message: '닉네임이 "$newNickname"으로 변경되었습니다',
+          duration: const Duration(seconds: 2),
         );
         debugPrint('✅ [NICKNAME_UPDATE] 닉네임 변경 성공: $newNickname');
       } else {
@@ -255,12 +253,11 @@ class _MypageScreenState extends ConsumerState<MypageScreen> {
         debugPrint('❌ [NICKNAME_UPDATE] 닉네임 변경 실패: $errorMessage');
 
         // 다이얼로그가 닫혀있다면 스낵바로도 표시
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('닉네임 변경에 실패했습니다: ${errorMessage ?? "알 수 없는 오류"}'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
+        CustomSnackBar.show(
+          context: context,
+          type: SnackBarType.error,
+          message: '닉네임 변경에 실패했습니다: ${errorMessage ?? "알 수 없는 오류"}',
+          duration: const Duration(seconds: 3),
         );
       }
     }

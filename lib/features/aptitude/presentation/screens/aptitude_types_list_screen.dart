@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
+import '../../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 import '../riverpod/aptitude_notifier.dart';
 
 /// 모든 투자 성향 종류를 보여주는 목록 화면
@@ -217,15 +218,14 @@ class _AptitudeTypesListScreenState
                                   extra: false);
                             } else if (context.mounted) {
                               debugPrint('❌ [APTITUDE_TYPES] 데이터 로드 실패');
-                              // 에러 처리
+                              // 🎨 에러 처리 (커스텀 SnackBar)
                               final currentState =
                                   ref.read(aptitudeNotifierProvider);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(currentState.errorMessage ??
-                                      '정보를 불러오는데 실패했습니다'),
-                                  backgroundColor: Colors.red,
-                                ),
+                              CustomSnackBar.show(
+                                context: context,
+                                type: SnackBarType.error,
+                                message: currentState.errorMessage ??
+                                    '정보를 불러오는데 실패했습니다',
                               );
                             }
                           } catch (e) {
@@ -233,11 +233,11 @@ class _AptitudeTypesListScreenState
                             // 로딩 다이얼로그 닫기
                             if (context.mounted) {
                               Navigator.of(context).pop();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('오류가 발생했습니다: $e'),
-                                  backgroundColor: Colors.red,
-                                ),
+                              // 🎨 예외 에러 처리 (커스텀 SnackBar)
+                              CustomSnackBar.show(
+                                context: context,
+                                type: SnackBarType.error,
+                                message: '오류가 발생했습니다: $e',
                               );
                             }
                           }

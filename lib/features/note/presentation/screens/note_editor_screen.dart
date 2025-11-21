@@ -13,6 +13,7 @@ import '../../domain/model/note.dart';
 import '../constants/note_templates.dart';
 import '../riverpod/note_notifier.dart';
 import '../../../../app/config/app_routes.dart';
+import '../../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 
 class NoteEditorScreen extends ConsumerStatefulWidget {
   final dynamic initialData;
@@ -85,8 +86,11 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
     final content = jsonEncode(_controller.document.toDelta().toJson());
 
     if (title.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('제목을 입력해주세요.')),
+      // 🎨 제목 미입력 경고 (Warning 타입)
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.warning,
+        message: '제목을 입력해주세요.',
       );
       return;
     }
@@ -113,8 +117,11 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
         context.go(AppRoutes.noteList);
       }
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(noteState.errorMessage ?? '저장에 실패했습니다.')),
+      // 🎨 저장 실패 에러 메시지 (서버 에러 메시지 자동 표시)
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.error,
+        message: noteState.errorMessage ?? '저장에 실패했습니다.',
       );
     }
   }

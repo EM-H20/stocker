@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/config/app_routes.dart';
 import '../../../app/config/app_theme.dart';
+import '../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 import 'riverpod/education_notifier.dart';
 import 'riverpod/education_state.dart';
 import 'widgets/education_error_widget.dart';
@@ -177,11 +178,11 @@ class _TheoryScreenState extends ConsumerState<TheoryScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('이론 완료 처리 중 오류가 발생했습니다: $e'),
-            backgroundColor: Colors.red,
-          ),
+        // 🎨 이론 완료 에러 메시지 (커스텀 SnackBar)
+        CustomSnackBar.show(
+          context: context,
+          type: SnackBarType.error,
+          message: '이론 완료 처리 중 오류가 발생했습니다: $e',
         );
       }
     }

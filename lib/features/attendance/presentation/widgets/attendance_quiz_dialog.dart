@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
+import '../../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 import '../../../../app/core/widgets/loading_widget.dart';
 import '../../data/dto/quiz_submission_dto.dart';
 import '../../domain/model/attendance_quiz.dart';
@@ -65,14 +66,13 @@ class _AttendanceQuizDialogState extends ConsumerState<AttendanceQuizDialog> {
     if (mounted) {
       final attendanceState = ref.read(attendanceNotifierProvider);
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(success
-              ? '출석이 완료되었습니다!'
-              : attendanceState.errorMessage ?? '출석 처리 중 오류가 발생했습니다.'),
-          backgroundColor:
-              success ? AppTheme.successColor : AppTheme.errorColor,
-        ),
+      // 🎨 출석 완료/실패 메시지 (커스텀 SnackBar - 조건부 타입)
+      CustomSnackBar.show(
+        context: context,
+        type: success ? SnackBarType.success : SnackBarType.error,
+        message: success
+            ? '출석이 완료되었습니다!'
+            : attendanceState.errorMessage ?? '출석 처리 중 오류가 발생했습니다.',
       );
     }
   }

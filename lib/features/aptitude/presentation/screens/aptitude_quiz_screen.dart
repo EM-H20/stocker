@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
+import '../../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 import 'package:go_router/go_router.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,11 +48,10 @@ class _AptitudeQuizScreenState extends ConsumerState<AptitudeQuizScreen> {
     } else if (mounted) {
       // 실패 시 에러 메시지 표시
       final state = ref.read(aptitudeNotifierProvider);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(state.errorMessage ?? '결과 제출에 실패했습니다.'),
-          backgroundColor: Colors.red,
-        ),
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.error,
+        message: state.errorMessage ?? '결과 제출에 실패했습니다.',
       );
     }
   }

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_routes.dart';
 import '../../../../app/core/widgets/loading_widget.dart';
+import '../../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 import '../constants/note_templates.dart';
 import '../riverpod/note_notifier.dart';
 import '../widgets/note_card.dart';
@@ -201,18 +202,11 @@ class _NoteListScreenState extends ConsumerState<NoteListScreen> {
             onPressed: () {
               ref.read(noteNotifierProvider.notifier).deleteNote(note.id);
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    '노트가 삭제되었습니다',
-                    style: TextStyle(fontSize: 14.sp),
-                  ),
-                  backgroundColor: Theme.of(context).primaryColor,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                ),
+              // 🎨 커스텀 SnackBar로 노트 삭제 성공 메시지 표시
+              CustomSnackBar.show(
+                context: context,
+                type: SnackBarType.success,
+                message: '노트가 삭제되었습니다',
               );
             },
             child: Text(

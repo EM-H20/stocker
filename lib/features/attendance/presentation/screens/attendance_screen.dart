@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/widgets/action_button.dart';
+import '../../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
 import '../../../../app/core/widgets/loading_widget.dart';
 import '../riverpod/attendance_notifier.dart';
 import '../widgets/attendance_calendar.dart';
@@ -49,11 +50,11 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
         },
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(attendanceState.errorMessage ?? '퀴즈를 불러오는 데 실패했습니다.'),
-          backgroundColor: AppTheme.errorColor,
-        ),
+      // 🎨 퀴즈 로드 실패 에러 메시지 (커스텀 SnackBar)
+      CustomSnackBar.show(
+        context: context,
+        type: SnackBarType.error,
+        message: attendanceState.errorMessage ?? '퀴즈를 불러오는 데 실패했습니다.',
       );
     }
     notifier.setQuizLoading(false);
