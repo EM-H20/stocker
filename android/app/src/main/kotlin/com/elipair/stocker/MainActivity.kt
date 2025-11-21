@@ -1,4 +1,4 @@
-package com.example.stocker
+package com.elipair.stocker
 
 import io.flutter.embedding.android.FlutterActivity
 
