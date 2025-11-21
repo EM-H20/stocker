@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/chapter_info.dart';
 import '../../../../app/core/providers/riverpod/repository_providers.dart';
+import '../../../../app/core/utils/error_message_extractor.dart';
 import 'education_state.dart';
 
 part 'education_notifier.g.dart';
@@ -60,27 +61,8 @@ class EducationNotifier extends _$EducationNotifier {
     } catch (e) {
       debugPrint('❌ [EDU_NOTIFIER] 챕터 로드 실패: $e');
 
-      String errorMessage;
-
-      // 🔐 401 Unauthorized 에러 처리
-      if (e.toString().contains('401') ||
-          e.toString().contains('Unauthorized') ||
-          e.toString().contains('토큰이 제공되지 않았습니다')) {
-        errorMessage = '로그인이 필요한 서비스입니다. 로그인 후 다시 시도해주세요.';
-        debugPrint('🔐 [EDU_NOTIFIER] 401 Unauthorized - 로그인 필요');
-      }
-      // 🌐 네트워크 관련 에러
-      else if (e.toString().contains('No host specified') ||
-          e.toString().contains('Connection refused') ||
-          e.toString().contains('timeout')) {
-        errorMessage = '네트워크 연결에 문제가 있습니다. 연결 상태를 확인하고 다시 시도해주세요.';
-        debugPrint('🌐 [EDU_NOTIFIER] 네트워크 연결 문제 감지');
-      }
-      // 🚨 기타 에러
-      else {
-        errorMessage = '챕터 정보를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.';
-        debugPrint('🚨 [EDU_NOTIFIER] 예상치 못한 에러: $e');
-      }
+      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '챕터');
+      debugPrint('📩 [EDU_NOTIFIER] 에러 메시지: $errorMessage');
 
       state = state.copyWith(
         chapters: [],
@@ -148,9 +130,12 @@ class EducationNotifier extends _$EducationNotifier {
       return true;
     } catch (e) {
       debugPrint('❌ [EDU_NOTIFIER] 이론 진입 실패 - 챕터 ID: $chapterId, 에러: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '이론');
+
       state = state.copyWith(
         isLoadingTheory: false,
-        theoryError: e.toString(),
+        theoryError: errorMessage,
       );
       return false;
     }
@@ -229,9 +214,12 @@ class EducationNotifier extends _$EducationNotifier {
       return true;
     } catch (e) {
       debugPrint('❌ [EDU_NOTIFIER] 이론 완료 처리 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '이론 완료');
+
       state = state.copyWith(
         isCompletingTheory: false,
-        theoryError: e.toString(),
+        theoryError: errorMessage,
       );
       return false;
     }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/quiz_result.dart';
 import '../../../../app/core/providers/riverpod/repository_providers.dart';
+import '../../../../app/core/utils/error_message_extractor.dart';
 import 'quiz_state.dart';
 
 part 'quiz_notifier.g.dart';
@@ -105,9 +106,12 @@ class QuizNotifier extends _$QuizNotifier {
       return true;
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 퀴즈 시작 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '퀴즈');
+
       state = state.copyWith(
         isLoadingQuiz: false,
-        quizError: e.toString(),
+        quizError: errorMessage,
       );
       return false;
     }
@@ -140,9 +144,12 @@ class QuizNotifier extends _$QuizNotifier {
       return true;
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 단일 퀴즈 시작 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '퀴즈');
+
       state = state.copyWith(
         isLoadingQuiz: false,
-        quizError: e.toString(),
+        quizError: errorMessage,
       );
       return false;
     }
@@ -185,9 +192,12 @@ class QuizNotifier extends _$QuizNotifier {
       return true;
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 오답노트 복습 시작 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '오답노트');
+
       state = state.copyWith(
         isLoadingQuiz: false,
-        quizError: e.toString(),
+        quizError: errorMessage,
       );
       return false;
     }
@@ -245,9 +255,12 @@ class QuizNotifier extends _$QuizNotifier {
       return true;
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 답안 제출 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '답안 제출');
+
       state = state.copyWith(
         isSubmittingAnswer: false,
-        quizError: e.toString(),
+        quizError: errorMessage,
       );
       return false;
     }
@@ -353,9 +366,12 @@ class QuizNotifier extends _$QuizNotifier {
       return result;
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 퀴즈 완료 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '퀴즈 완료');
+
       state = state.copyWith(
         isSubmittingAnswer: false,
-        quizError: e.toString(),
+        quizError: errorMessage,
       );
       return null;
     }
@@ -403,9 +419,12 @@ class QuizNotifier extends _$QuizNotifier {
       debugPrint('✅ [QUIZ_NOTIFIER] 퀴즈 결과 로드 성공 - 총 ${results.length}개');
     } catch (e) {
       debugPrint('❌ [QUIZ_NOTIFIER] 퀴즈 결과 로드 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '퀴즈 결과');
+
       state = state.copyWith(
         isLoadingResults: false,
-        resultsError: e.toString(),
+        resultsError: errorMessage,
       );
     }
   }

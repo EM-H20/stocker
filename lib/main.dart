@@ -40,41 +40,37 @@ void main() async {
   );
 }
 
-class StockerApp extends StatelessWidget {
+class StockerApp extends ConsumerWidget {
   const StockerApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ScreenUtilInit(
       designSize: const Size(393, 852),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return Consumer(
-          builder: (context, ref, child) {
-            final currentThemeMode = ref.watch(themeModeProvider);
+        final currentThemeMode = ref.watch(themeModeProvider);
 
-            return MaterialApp.router(
-              title: 'Stocker',
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: currentThemeMode,
-              locale: const Locale('ko'),
-              localizationsDelegates: const [
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-                quill.FlutterQuillLocalizations.delegate,
-              ],
-              supportedLocales: [
-                const Locale('en'),
-                const Locale('ko'),
-                ...quill.FlutterQuillLocalizations.supportedLocales,
-              ],
-              routerConfig: AppRouter.router,
-            );
-          },
+        return MaterialApp.router(
+          title: 'Stocker',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: currentThemeMode,
+          locale: const Locale('ko'),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            quill.FlutterQuillLocalizations.delegate,
+          ],
+          supportedLocales: [
+            const Locale('en'),
+            const Locale('ko'),
+            ...quill.FlutterQuillLocalizations.supportedLocales,
+          ],
+          routerConfig: AppRouter.createRouter(ref),
         );
       },
     );

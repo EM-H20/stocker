@@ -7,6 +7,7 @@ import '../../data/dto/login_request.dart';
 import '../../data/dto/signup_request.dart';
 import '../../../../app/core/services/token_storage.dart';
 import '../../../../app/core/providers/riverpod/repository_providers.dart';
+import '../../../../app/core/utils/error_message_extractor.dart';
 import 'auth_state.dart';
 
 part 'auth_notifier.g.dart';
@@ -94,10 +95,12 @@ class AuthNotifier extends _$AuthNotifier {
     } catch (e) {
       debugPrint('❌ [AUTH_NOTIFIER] Login failed: $e');
 
+      final errorMessage = ErrorMessageExtractor.extractAuthError(e);
+
       state = AsyncValue.data(
         state.value!.copyWith(
           isLoading: false,
-          errorMessage: '로그인 실패: ${e.toString()}',
+          errorMessage: errorMessage,
         ),
       );
       return false;
@@ -157,10 +160,12 @@ class AuthNotifier extends _$AuthNotifier {
     } catch (e) {
       debugPrint('❌ [AUTH_NOTIFIER] 회원가입 실패: $e');
 
+      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '회원가입');
+
       state = AsyncValue.data(
         state.value!.copyWith(
           isLoading: false,
-          errorMessage: '회원가입 실패: ${e.toString()}',
+          errorMessage: errorMessage,
         ),
       );
       return false;
@@ -217,10 +222,12 @@ class AuthNotifier extends _$AuthNotifier {
     } catch (e) {
       debugPrint('❌ [AUTH_NOTIFIER] 프로필 수정 실패: $e');
 
+      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '프로필 수정');
+
       state = AsyncValue.data(
         state.value!.copyWith(
           isUpdatingProfile: false,
-          errorMessage: '프로필 수정 실패: ${e.toString()}',
+          errorMessage: errorMessage,
         ),
       );
       return false;

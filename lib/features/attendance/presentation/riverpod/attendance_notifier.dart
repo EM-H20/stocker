@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/repository/attendance_repository.dart';
 import '../../data/dto/quiz_submission_dto.dart';
 import '../../../../app/core/providers/riverpod/repository_providers.dart';
+import '../../../../app/core/utils/error_message_extractor.dart';
 import 'attendance_state.dart';
 
 part 'attendance_notifier.g.dart';
@@ -56,9 +57,12 @@ class AttendanceNotifier extends _$AttendanceNotifier {
       debugPrint('✅ [ATTENDANCE] 출석 현황 로드 완료: ${attendanceMap.length}일');
     } catch (e) {
       debugPrint('❌ [ATTENDANCE] 출석 현황 로딩 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '출석 현황');
+
       state = state.copyWith(
         isLoading: false,
-        errorMessage: '출석 현황 로딩 실패: ${e.toString()}',
+        errorMessage: errorMessage,
       );
     }
   }
@@ -77,9 +81,12 @@ class AttendanceNotifier extends _$AttendanceNotifier {
       return true;
     } catch (e) {
       debugPrint('❌ [ATTENDANCE] 퀴즈 로딩 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractDataLoadError(e, '퀴즈');
+
       state = state.copyWith(
         quizzes: [],
-        errorMessage: '퀴즈 로딩 실패: ${e.toString()}',
+        errorMessage: errorMessage,
       );
       return false;
     }
@@ -103,9 +110,12 @@ class AttendanceNotifier extends _$AttendanceNotifier {
       return true;
     } catch (e) {
       debugPrint('❌ [ATTENDANCE] 출석 처리 실패: $e');
+
+      final errorMessage = ErrorMessageExtractor.extractSubmissionError(e, '출석 처리');
+
       state = state.copyWith(
         isSubmitting: false,
-        errorMessage: '출석 처리 실패: ${e.toString()}',
+        errorMessage: errorMessage,
       );
       return false;
     }

@@ -32,13 +32,20 @@ class LoginScreen extends ConsumerWidget {
       // 비동기 작업 후에도 위젯이 유효한지 다시 확인합니다.
       if (context.mounted) {
         if (isSuccess) {
-          debugPrint('✅ [LOGIN] 로그인 성공 - 홈으로 이동');
+          debugPrint('✅ [LOGIN] 로그인 성공');
 
           // 🔥 Riverpod: 최신 상태를 다시 읽어옴
           final currentState = ref.read(authNotifierProvider).value;
 
-          // 로그인 성공 시 홈으로 이동 (교육 페이지 대신 홈으로)
-          context.go(AppRoutes.home);
+          // ✅ 쿼리 파라미터에서 원래 경로 가져오기
+          final uri = GoRouterState.of(context).uri;
+          final redirectPath = uri.queryParameters['redirect'];
+
+          // ✅ 원래 가려던 페이지로 이동 (없으면 기본 홈)
+          final destination = redirectPath ?? AppRoutes.education;
+
+          debugPrint('📍 [LOGIN] Redirecting to: $destination');
+          context.go(destination);
 
           // 성공 메시지 표시
           ScaffoldMessenger.of(context).showSnackBar(

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'app_routes.dart';
+import 'auth_guard.dart';
 import '../core/widgets/error_page.dart';
 import '../../features/home/presentation/home_shell.dart';
 import '../../features/education/presentation/education_screen.dart';
@@ -21,10 +23,17 @@ import '../../features/note/presentation/screens/note_editor_screen.dart';
 
 /// 앱 전체의 라우팅을 관리하는 GoRouter 설정
 class AppRouter {
-  static final GoRouter _router = GoRouter(
-    initialLocation: AppRoutes.education, // 🎓 교육 탭을 초기 화면으로
-    debugLogDiagnostics: true, // ✅ GoRouter 내부 디버깅 로그 활성화
-    routes: [
+  /// WidgetRef를 받아서 GoRouter 생성
+  /// 인증 상태에 따른 자동 리다이렉트 기능 포함
+  static GoRouter createRouter(WidgetRef ref) {
+    return GoRouter(
+      initialLocation: AppRoutes.education, // 🎓 교육 탭을 초기 화면으로
+      debugLogDiagnostics: true, // ✅ GoRouter 내부 디버깅 로그 활성화
+
+      // ✅ 인증 가드 리다이렉트 추가
+      redirect: (context, state) => AuthGuard.redirect(context, state, ref),
+
+      routes: [
       // 로그인 화면 (완전한 애니메이션 제거)
       GoRoute(
         path: AppRoutes.login,
@@ -284,12 +293,11 @@ class AppRouter {
           );
         },
       ),
-    ],
+      ],
 
-    // 에러 페이지 처리
-    errorBuilder: (context, state) =>
-        ErrorPage(errorPath: state.matchedLocation),
-  );
-
-  static GoRouter get router => _router;
+      // 에러 페이지 처리
+      errorBuilder: (context, state) =>
+          ErrorPage(errorPath: state.matchedLocation),
+    );
+  }
 }
