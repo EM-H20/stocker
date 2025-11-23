@@ -97,11 +97,18 @@ class InvestmentMasterDto {
       return MapEntry(key, (value as num).toDouble());
     });
 
+    // 디버깅: 포트폴리오가 비어있으면 로그 출력
+    if (portfolio.isEmpty) {
+      print('⚠️ [DTO] ${json['name']} 포트폴리오가 비어있습니다! JSON: ${json['portfolio']}');
+    }
+
     return InvestmentMasterDto(
       name: json['name'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      portfolio: portfolio,
+      portfolio: portfolio.isNotEmpty
+          ? portfolio
+          : {'주식': 40.0, '채권': 30.0, '현금': 20.0, '기타': 10.0}, // 기본 포트폴리오
     );
   }
 

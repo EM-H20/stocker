@@ -10,6 +10,32 @@ class MasterPortfolioChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 포트폴리오 데이터가 비어있을 경우 안내 메시지 표시
+    if (portfolio.isEmpty) {
+      return Container(
+        height: 200.h,
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.pie_chart_outline,
+              size: 48.r,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              '포트폴리오 데이터가 없습니다',
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     // 차트에 사용할 색상 목록
     final List<Color> colorList = [
       Colors.blue.shade400,
@@ -33,6 +59,13 @@ class MasterPortfolioChart extends StatelessWidget {
           fontSize: 12.sp,
           fontWeight: FontWeight.bold,
           color: Colors.white,
+          shadows: [
+            Shadow(
+              color: Colors.black.withValues(alpha: 0.7),
+              offset: const Offset(1, 1),
+              blurRadius: 2,
+            ),
+          ],
         ),
       );
     }).toList();

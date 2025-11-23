@@ -50,9 +50,9 @@ class AptitudeQuestionDto {
       String text;
 
       if (value == 1) {
-        text = '$leftLabel (매우 그렇다)';
+        text = '$leftLabel (매우 아니다)';
       } else if (value == 2) {
-        text = '$leftLabel (그렇다)';
+        text = '$leftLabel (아니다)';
       } else if (value == 3) {
         text = '보통';
       } else if (value == 4) {
