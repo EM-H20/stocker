@@ -40,16 +40,22 @@ class AuthGuard {
     final isLoggedIn = authState.value?.user != null;
     final currentPath = state.matchedLocation;
 
-    debugPrint('🔐 [AUTH_GUARD] Checking route: $currentPath');
-    debugPrint('🔐 [AUTH_GUARD] Logged in: $isLoggedIn');
+    // ✅ 강화된 디버그 로그: 상태 세부 정보 출력
+    debugPrint('🔐 [AUTH_GUARD] ═══════════════════════════');
+    debugPrint('🔐 [AUTH_GUARD] Route check: $currentPath');
+    debugPrint('🔐 [AUTH_GUARD] Is logged in: $isLoggedIn');
+    debugPrint('🔐 [AUTH_GUARD] User email: ${authState.value?.user?.email ?? "null"}');
+    debugPrint('🔐 [AUTH_GUARD] Auth loading: ${authState.isLoading}');
+    debugPrint('🔐 [AUTH_GUARD] Auth initializing: ${authState.value?.isInitializing ?? "null"}');
 
     // 2. 공개 페이지인지 확인
     final isPublicRoute = publicRoutes.contains(currentPath);
+    debugPrint('🔐 [AUTH_GUARD] Is public route: $isPublicRoute');
 
     // 3. 로그인하지 않았고, 공개 페이지가 아니면 → 로그인으로 리다이렉트
     if (!isLoggedIn && !isPublicRoute) {
-      debugPrint('⚠️ [AUTH_GUARD] Not logged in, redirecting to login');
-      debugPrint('📍 [AUTH_GUARD] Original destination: $currentPath');
+      debugPrint('⚠️ [AUTH_GUARD] ❌ Access denied - not logged in');
+      debugPrint('📍 [AUTH_GUARD] Redirecting to login with return path: $currentPath');
 
       // 원래 가려던 경로를 쿼리 파라미터로 저장
       final encodedPath = Uri.encodeComponent(currentPath);
@@ -63,7 +69,8 @@ class AuthGuard {
     }
 
     // 5. 그 외의 경우 → 현재 경로 유지
-    debugPrint('✅ [AUTH_GUARD] Access granted to: $currentPath');
+    debugPrint('✅ [AUTH_GUARD] ✅ Access granted to: $currentPath');
+    debugPrint('🔐 [AUTH_GUARD] ═══════════════════════════');
     return null;
   }
 }

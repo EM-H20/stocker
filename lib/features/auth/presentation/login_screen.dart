@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // 🔥 Riverpod 추가
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/config/app_routes.dart';
-import '../../../app/core/widgets/action_button.dart';
-import '../../../app/core/widgets/custom_snackbar.dart'; // 🎨 커스텀 SnackBar
-// import '../../auth/presentation/auth_provider.dart'; // 🔥 Riverpod으로 교체됨
-import '../../auth/presentation/riverpod/auth_notifier.dart'; // 🔥 Riverpod AuthNotifier
+import '../../../app/core/widgets/custom_snackbar.dart';
+import 'riverpod/auth_notifier.dart';
+import 'widgets/modern_text_field.dart';
+import 'widgets/gradient_button.dart';
 
 class LoginScreen extends ConsumerWidget {
   const LoginScreen({super.key});
@@ -23,6 +23,8 @@ class LoginScreen extends ConsumerWidget {
       // 위젯이 여전히 유효한지 먼저 확인합니다.
       if (!context.mounted) return;
 
+      debugPrint('🔐 [LOGIN] Login attempt started');
+
       // 🔥 Riverpod: ref.read()로 AuthNotifier의 login 메서드 호출
       final authNotifier = ref.read(authNotifierProvider.notifier);
       final isSuccess = await authNotifier.login(
@@ -37,6 +39,19 @@ class LoginScreen extends ConsumerWidget {
 
           // 🔥 Riverpod: 최신 상태를 다시 읽어옴
           final currentState = ref.read(authNotifierProvider).value;
+          debugPrint('🔍 [LOGIN] Current auth state - user: ${currentState?.user?.email}');
+
+          // ✅ Android 대응: Riverpod 상태 전파 대기
+          // AuthGuard가 정확한 상태로 평가될 수 있도록 추가 대기
+          debugPrint('⏳ [LOGIN] Waiting for state propagation...');
+          await Future.delayed(const Duration(milliseconds: 200));
+
+          // 상태 전파 후 재확인
+          final finalState = ref.read(authNotifierProvider).value;
+          debugPrint('✅ [LOGIN] State propagation complete - user: ${finalState?.user?.email}');
+
+          // ✅ async gap 이후 mounted 체크
+          if (!context.mounted) return;
 
           // ✅ 쿼리 파라미터에서 원래 경로 가져오기
           final uri = GoRouterState.of(context).uri;
@@ -119,59 +134,61 @@ class LoginScreen extends ConsumerWidget {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 48),
-                TextField(
+                // ✨ ModernTextField - 이메일
+                ModernTextField(
+                  label: '이메일',
+                  hint: 'example@email.com',
+                  prefixIcon: Icons.email_outlined,
                   controller: emailController,
-                  decoration: const InputDecoration(
-                    labelText: '✉️ 이메일',
-                    border: OutlineInputBorder(),
-                  ),
+                  keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                // ✨ ModernTextField - 비밀번호 (가시성 토글 포함)
+                ModernTextField(
+                  label: '비밀번호',
+                  prefixIcon: Icons.lock_outline,
                   controller: passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: '🔒 비밀번호',
-                    border: OutlineInputBorder(),
-                  ),
+                  isPassword: true,
                 ),
                 const SizedBox(height: 32),
-                ActionButton(
+                // ✨ GradientButton - 로그인
+                GradientButton(
                   text: '로그인',
                   icon: Icons.login,
-                  color: Colors.blue,
-                  // 🔥 Riverpod: authState.value?.isLoading으로 로딩 상태 확인
                   onPressed: (authState.value?.isLoading ?? false)
                       ? null
                       : handleLogin,
+                  isLoading: authState.value?.isLoading ?? false,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
+                // ✨ 개선된 회원가입 CTA
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    Text(
+                      '계정이 없으신가요? ',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
                     TextButton(
                       onPressed: () {
                         debugPrint('📝 [LOGIN] 회원가입 버튼 클릭');
                         context.push(AppRoutes.register);
                       },
-                      child: const Text('회원가입'),
-                    ),
-                    Text(
-                      '|',
-                      style: TextStyle(
-                        color: Colors.grey.withValues(alpha: 0.5),
-                        fontSize: 16,
-                      ),
-                    ),
-                    TextButton.icon(
-                      onPressed: () {
-                        debugPrint('🏠 [LOGIN] 메인으로 돌아가기 버튼 클릭');
-                        context.go(AppRoutes.home);
-                      },
-                      icon: const Icon(Icons.home_outlined, size: 18),
-                      label: const Text('메인으로'),
                       style: TextButton.styleFrom(
-                        foregroundColor: Colors.grey[600],
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                      ),
+                      child: const Text(
+                        '회원가입',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ],

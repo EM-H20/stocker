@@ -84,6 +84,14 @@ class AuthNotifier extends _$AuthNotifier {
       final repository = ref.read(authRepositoryProvider);
       final user = await repository.login(request);
 
+      debugPrint('🔄 [AUTH_NOTIFIER] Login API success, waiting for storage sync...');
+
+      // ✅ Android 대응: flutter_secure_storage 저장 완료 대기
+      // Android의 KeyStore 암호화 작업 완료를 위한 짧은 대기 (100-200ms)
+      await Future.delayed(const Duration(milliseconds: 150));
+
+      debugPrint('✅ [AUTH_NOTIFIER] Storage sync complete');
+
       // 로그인 성공
       state = AsyncValue.data(
         AuthState(user: user, isLoading: false, isInitializing: false),
