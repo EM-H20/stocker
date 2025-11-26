@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import '../../domain/model/user.dart';
 import '../../data/dto/login_request.dart';
 import '../../data/dto/signup_request.dart';
+import '../../../../app/core/services/aptitude_prompt_service.dart';
 import '../../../../app/core/services/token_storage.dart';
 import '../../../../app/core/providers/riverpod/repository_providers.dart';
 import '../../../../app/core/utils/error_message_extractor.dart';
@@ -266,10 +267,12 @@ class AuthNotifier extends _$AuthNotifier {
       _logger.e('Logout API failed: $e');
     } finally {
       await TokenStorage.clear();
+      // 🔥 성향분석 유도 다이얼로그 캐시도 삭제 (다음 로그인 시 다시 표시)
+      await AptitudePromptService.clearDismissed();
       state = AsyncValue.data(
         const AuthState(isInitializing: false),
       );
-      debugPrint('✅ [AUTH_NOTIFIER] 로그아웃 완료');
+      debugPrint('✅ [AUTH_NOTIFIER] 로그아웃 완료 (캐시 삭제 포함)');
     }
   }
 

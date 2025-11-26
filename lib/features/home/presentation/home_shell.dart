@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'tap_item.dart';
 import '../../../app/config/app_routes.dart';
+import '../../../app/core/services/aptitude_prompt_service.dart';
 import '../../auth/presentation/riverpod/auth_notifier.dart';
 import '../../attendance/presentation/riverpod/attendance_notifier.dart';
 import '../../attendance/presentation/widgets/attendance_quiz_dialog.dart';
+import '../../aptitude/presentation/widgets/aptitude_prompt_dialog.dart';
 import '../../../app/core/utils/theme_utils.dart';
 
 /// BottomNavigationBar와 탭별 화면 전환을 담당하는 메인 Shell (StatelessWidget 유지)
@@ -111,6 +113,51 @@ class _HomeShellListener extends ConsumerStatefulWidget {
 
 class __HomeShellListenerState extends ConsumerState<_HomeShellListener> {
   // 🔥 Riverpod 변환 완료 - Provider 참조 불필요
+  bool _hasCheckedInitialDialogs = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 🎯 첫 빌드 후 다이얼로그 체크 (로그인 직후 화면 진입 시)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkInitialDialogsIfNeeded();
+    });
+  }
+
+  /// 🔍 앱 시작/로그인 직후 다이얼로그 체크
+  Future<void> _checkInitialDialogsIfNeeded() async {
+    if (_hasCheckedInitialDialogs) return;
+    _hasCheckedInitialDialogs = true;
+
+    // 로그인 상태인지 확인
+    final authState = ref.read(authNotifierProvider).value;
+    if (authState?.user != null) {
+      debugPrint('🚀 [HOME_SHELL] 앱 시작 - 로그인 상태 감지, 다이얼로그 체크');
+      await _handleLoginSuccessDialogs();
+    }
+  }
+
+  // 🎯 투자 성향 분석 유도 다이얼로그 (SharedPreferences 기반)
+  Future<void> _showAptitudePromptIfNeeded() async {
+    if (!mounted) return;
+
+    // 🔥 SharedPreferences: 로컬에 저장된 "다음에" 클릭 여부 확인
+    final isDismissed = await AptitudePromptService.isDismissed();
+
+    if (!mounted) return;
+
+    // "다음에"를 클릭한 적이 없으면 다이얼로그 표시
+    if (!isDismissed) {
+      debugPrint('📊 [HOME_SHELL] 성향분석 유도 다이얼로그 표시');
+      showDialog(
+        context: context,
+        barrierDismissible: true, // 다이얼로그 밖 터치로 닫기 가능
+        builder: (_) => const AptitudePromptDialog(),
+      );
+    } else {
+      debugPrint('✅ [HOME_SHELL] 이미 "다음에" 선택됨 - 다이얼로그 스킵');
+    }
+  }
 
   // 로그인 성공 시, 출석 퀴즈 팝업을 띄우는 핵심 로직
   Future<void> _showAttendanceQuizIfNeeded() async {
@@ -154,12 +201,30 @@ class __HomeShellListenerState extends ConsumerState<_HomeShellListener> {
     // 🔥 Riverpod ref.listen으로 로그인 성공 이벤트 감지
     ref.listen(loginSuccessNotifierProvider, (prev, next) {
       if (next == true) {
-        debugPrint('🎉 [HOME_SHELL] 로그인 성공 이벤트 감지 - 출석 퀴즈 확인 중...');
-        _showAttendanceQuizIfNeeded();
+        debugPrint('🎉 [HOME_SHELL] 로그인 성공 이벤트 감지 - 다이얼로그 시퀀스 시작');
+        _handleLoginSuccessDialogs();
       }
     });
 
     // 이 위젯은 UI를 직접 그리지 않고, 자식 위젯(Scaffold)을 그대로 반환합니다.
     return widget.child;
+  }
+
+  /// 🎬 로그인 성공 후 다이얼로그 시퀀스 처리
+  /// 1. 출석 퀴즈 다이얼로그 (필요시)
+  /// 2. 성향분석 유도 다이얼로그 (필요시)
+  Future<void> _handleLoginSuccessDialogs() async {
+    // 1️⃣ 먼저 출석 퀴즈 확인
+    debugPrint('📝 [HOME_SHELL] Step 1: 출석 퀴즈 확인 중...');
+    await _showAttendanceQuizIfNeeded();
+
+    // 2️⃣ 출석 퀴즈 완료 후 잠시 대기 (UX 개선)
+    if (!mounted) return;
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // 3️⃣ 성향분석 유도 다이얼로그
+    if (!mounted) return;
+    debugPrint('📊 [HOME_SHELL] Step 2: 성향분석 확인 중...');
+    await _showAptitudePromptIfNeeded();
   }
 }

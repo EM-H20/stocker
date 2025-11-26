@@ -61,7 +61,7 @@ class CustomSnackBar {
           icon: Icons.check_circle,
           backgroundColor: isDarkMode
               ? AppTheme.successColor.withValues(alpha: 0.2)
-              : AppTheme.successColor.withValues(alpha: 0.1),
+              : AppTheme.successColor.withValues(alpha: 0.25),
           borderColor: AppTheme.successColor,
           iconColor: AppTheme.successColor,
           textColor: isDarkMode ? Colors.white : AppTheme.grey900,
@@ -72,7 +72,7 @@ class CustomSnackBar {
           icon: Icons.error,
           backgroundColor: isDarkMode
               ? AppTheme.errorColor.withValues(alpha: 0.2)
-              : AppTheme.errorColor.withValues(alpha: 0.1),
+              : AppTheme.errorColor.withValues(alpha: 0.25),
           borderColor: AppTheme.errorColor,
           iconColor: AppTheme.errorColor,
           textColor: isDarkMode ? Colors.white : AppTheme.grey900,
@@ -83,7 +83,7 @@ class CustomSnackBar {
           icon: Icons.warning_amber_rounded,
           backgroundColor: isDarkMode
               ? AppTheme.warningColor.withValues(alpha: 0.2)
-              : AppTheme.warningColor.withValues(alpha: 0.1),
+              : AppTheme.warningColor.withValues(alpha: 0.25),
           borderColor: AppTheme.warningColor,
           iconColor: AppTheme.warningColor,
           textColor: isDarkMode ? Colors.white : AppTheme.grey900,
@@ -94,7 +94,7 @@ class CustomSnackBar {
           icon: Icons.info,
           backgroundColor: isDarkMode
               ? AppTheme.primaryColor.withValues(alpha: 0.2)
-              : AppTheme.primaryColor.withValues(alpha: 0.1),
+              : AppTheme.primaryColor.withValues(alpha: 0.25),
           borderColor: AppTheme.primaryColor,
           iconColor: AppTheme.primaryColor,
           textColor: isDarkMode ? Colors.white : AppTheme.grey900,
