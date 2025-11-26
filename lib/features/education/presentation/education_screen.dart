@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,20 +22,55 @@ class EducationScreen extends ConsumerStatefulWidget {
 }
 
 class _EducationScreenState extends ConsumerState<EducationScreen> {
+  /// 검색 입력 컨트롤러
+  final TextEditingController _searchController = TextEditingController();
+
+  /// 디바운스 타이머 (300ms 지연)
+  Timer? _debounceTimer;
+
+  /// 디바운스 시간 (밀리초)
+  static const int _debounceDuration = 300;
+
   @override
   void initState() {
     super.initState();
 
-    // 화면 로드 시 챕터 목록을 가져옴
+    // 화면 로드 시 챕터 목록을 가져옴 (캐시 활용)
     Future.microtask(() {
+      final educationState = ref.read(educationNotifierProvider);
       final educationNotifier = ref.read(educationNotifierProvider.notifier);
-      // 🧹 캐시 삭제 및 강제 새로고침으로 mock 데이터 제거
-      debugPrint('🧹 [EDUCATION_SCREEN] 캐시 삭제 및 강제 새로고침 시작');
-      educationNotifier.clearCache().then((_) {
-        debugPrint('🔄 [EDUCATION_SCREEN] 캐시 삭제 완료, 강제 새로고침 실행');
-        educationNotifier.loadChapters(forceRefresh: true);
-      });
+
+      // ✅ 데이터가 없을 때만 로드 (캐시 활용으로 불필요한 API 호출 방지)
+      if (educationState.chapters.isEmpty && !educationState.isLoadingChapters) {
+        debugPrint('📚 [EDUCATION_SCREEN] 챕터 데이터 없음 - API 호출');
+        educationNotifier.loadChapters();
+      } else {
+        debugPrint('✅ [EDUCATION_SCREEN] 캐시된 챕터 데이터 사용 (${educationState.chapters.length}개)');
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    // 메모리 누수 방지: 타이머와 컨트롤러 정리
+    _debounceTimer?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  /// 검색어 변경 핸들러 (디바운싱 적용)
+  void _onSearchChanged(String query) {
+    // 기존 타이머 취소
+    _debounceTimer?.cancel();
+
+    // 새 타이머 설정 (300ms 후 검색 실행)
+    _debounceTimer = Timer(
+      const Duration(milliseconds: _debounceDuration),
+      () {
+        debugPrint('🔍 [EDUCATION_SCREEN] 검색 실행: "$query"');
+        ref.read(educationNotifierProvider.notifier).setSearchQuery(query);
+      },
+    );
   }
 
   @override
@@ -52,8 +89,17 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 검색바 (상단으로 이동)
-              const SearchBarWidget(hintText: '챕터나 주제를 검색하세요'),
+              // 검색바 (상단으로 이동) - 디바운싱 적용된 실시간 검색
+              SearchBarWidget(
+                hintText: '챕터나 주제를 검색하세요',
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                onClear: () {
+                  // 클리어 버튼 클릭 시 검색어 초기화
+                  debugPrint('🧹 [EDUCATION_SCREEN] 검색어 클리어');
+                  ref.read(educationNotifierProvider.notifier).clearSearch();
+                },
+              ),
               SizedBox(height: 16.h),
 
               // 전체 진행률 바 (재사용 가능한 컴포넌트)
@@ -123,20 +169,40 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
               ),
               SizedBox(height: 28.h),
 
-              // 추천 학습 챕터 제목
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5.w),
-                child: Text(
-                  '추천 학습 챕터',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              // 추천 학습 챕터 제목 - 검색 중이면 "검색 결과" 표시
+              Consumer(
+                builder: (context, ref, child) {
+                  final educationState = ref.watch(educationNotifierProvider);
+                  final isSearching = educationState.isSearching;
+
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.w),
+                    child: Row(
+                      children: [
+                        Text(
+                          isSearching ? '검색 결과' : '추천 학습 챕터',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (isSearching) ...[
+                          SizedBox(width: 8.w),
+                          Text(
+                            '(${educationState.filteredChapters.length}건)',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
               ),
               SizedBox(height: 16.h),
 
-              // 추천 학습 챕터 리스트 - Riverpod 데이터 사용
+              // 추천 학습 챕터 리스트 - Riverpod 데이터 사용 (검색 필터링 적용)
               Consumer(
                 builder: (context, ref, child) {
                   final educationState = ref.watch(educationNotifierProvider);
@@ -185,8 +251,34 @@ class _EducationScreenState extends ConsumerState<EducationScreen> {
                     );
                   }
 
+                  // 🔍 검색 결과가 없는 경우
+                  final chaptersToDisplay = educationState.filteredChapters;
+                  if (chaptersToDisplay.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40.h),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.search_off,
+                              size: 48.sp,
+                              color: colorScheme.onSurface.withValues(alpha: 0.4),
+                            ),
+                            SizedBox(height: 12.h),
+                            Text(
+                              '"${educationState.searchQuery}" 검색 결과가 없습니다',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurface.withValues(alpha: 0.6),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
                   return Column(
-                    children: educationState.chapters.map((chapter) {
+                    children: chaptersToDisplay.map((chapter) {
                       // 챕터 상태에 따른 설명과 아이콘 결정
                       String description;
                       IconData icon;

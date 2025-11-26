@@ -55,6 +55,7 @@ class InvestmentMaster {
   final String style;
   final String typeCode;
   final int? score;
+  final Map<String, double> portfolio; // 포트폴리오 비중 (예: {"주식": 80, "현금": 20})
 
   InvestmentMaster({
     required this.masterId,
@@ -65,9 +66,17 @@ class InvestmentMaster {
     required this.style,
     required this.typeCode,
     this.score,
+    required this.portfolio,
   });
 
   factory InvestmentMaster.fromJson(Map<String, dynamic> json) {
+    // 포트폴리오 맵 변환: API 응답의 int/double을 double로 통일
+    final Map<String, dynamic> portfolioJson =
+        json['portfolio'] as Map<String, dynamic>? ?? {};
+    final Map<String, double> portfolio = portfolioJson.map((key, value) {
+      return MapEntry(key, (value as num).toDouble());
+    });
+
     return InvestmentMaster(
       masterId: json['master_id'] ?? 0,
       name: json['name'] ?? '',
@@ -77,6 +86,7 @@ class InvestmentMaster {
       style: json['style'] ?? '',
       typeCode: json['type_code'] ?? '',
       score: json['score'],
+      portfolio: portfolio,
     );
   }
 
@@ -90,12 +100,13 @@ class InvestmentMaster {
       'style': style,
       'type_code': typeCode,
       if (score != null) 'score': score,
+      'portfolio': portfolio,
     };
   }
 
   @override
   String toString() {
-    return 'InvestmentMaster(masterId: $masterId, name: $name, style: $style)';
+    return 'InvestmentMaster(masterId: $masterId, name: $name, style: $style, portfolio: $portfolio)';
   }
 }
 

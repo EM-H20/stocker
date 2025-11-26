@@ -10,6 +10,7 @@ class AptitudeTypeSummaryDto {
   final String imageUrl;
   final String style;
   final String typeCode;
+  final Map<String, double> portfolio; // 포트폴리오 비중 (예: {"주식": 80, "현금": 20})
 
   AptitudeTypeSummaryDto({
     required this.masterId,
@@ -19,9 +20,17 @@ class AptitudeTypeSummaryDto {
     required this.imageUrl,
     required this.style,
     required this.typeCode,
+    required this.portfolio,
   });
 
   factory AptitudeTypeSummaryDto.fromJson(Map<String, dynamic> json) {
+    // 포트폴리오 맵 변환: API 응답의 int/double을 double로 통일
+    final Map<String, dynamic> portfolioJson =
+        json['portfolio'] as Map<String, dynamic>? ?? {};
+    final Map<String, double> portfolio = portfolioJson.map((key, value) {
+      return MapEntry(key, (value as num).toDouble());
+    });
+
     // 백엔드 실제 응답: InvestmentMaster 테이블 구조
     return AptitudeTypeSummaryDto(
       masterId: json['master_id'] as int? ?? 0,
@@ -31,6 +40,7 @@ class AptitudeTypeSummaryDto {
       imageUrl: json['image_url'] as String? ?? '',
       style: json['style'] as String? ?? '',
       typeCode: json['type_code'] as String? ?? '',
+      portfolio: portfolio,
     );
   }
 
@@ -40,6 +50,11 @@ class AptitudeTypeSummaryDto {
       typeCode: typeCode,
       typeName: _getTypeNameFromCode(typeCode), // 타입 코드를 이름으로 변환
       description: bio.isNotEmpty ? bio : style, // bio가 있으면 bio, 없으면 style 사용
+      masterName: name,
+      imageUrl: imageUrl,
+      portfolioSummary: portfolioSummary,
+      style: style,
+      portfolio: portfolio,
     );
   }
 

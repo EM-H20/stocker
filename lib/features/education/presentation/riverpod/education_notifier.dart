@@ -32,6 +32,20 @@ class EducationNotifier extends _$EducationNotifier {
     _onChapterCompletedCallbacks.remove(callback);
   }
 
+  // === 검색 관련 메서드 ===
+
+  /// 검색어 설정 (디바운싱은 UI 레이어에서 처리)
+  void setSearchQuery(String query) {
+    debugPrint('🔍 [EDU_NOTIFIER] 검색어 설정: "$query"');
+    state = state.copyWith(searchQuery: query);
+  }
+
+  /// 검색어 초기화
+  void clearSearch() {
+    debugPrint('🧹 [EDU_NOTIFIER] 검색어 초기화');
+    state = state.copyWith(searchQuery: '');
+  }
+
   // === 챕터 관련 메서드 ===
 
   /// 챕터 목록 로드

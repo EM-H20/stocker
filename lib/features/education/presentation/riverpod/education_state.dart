@@ -18,6 +18,9 @@ class EducationState with _$EducationState {
     /// 선택된 챕터 ID
     int? selectedChapterId,
 
+    /// 검색어 (실시간 검색용)
+    @Default('') String searchQuery,
+
     /// 챕터 로딩 중
     @Default(false) bool isLoadingChapters,
 
@@ -138,4 +141,27 @@ class EducationState with _$EducationState {
     final totalChapters = chapters.length;
     return '이론: $completedTheories/$totalChapters, 퀴즈: $completedQuizzes/$totalChapters';
   }
+
+  /// 검색어로 필터링된 챕터 목록
+  /// searchQuery가 비어있으면 전체 챕터 반환
+  /// title, description, keyword 중 하나라도 검색어가 포함된 챕터 반환
+  List<ChapterInfo> get filteredChapters {
+    if (searchQuery.isEmpty) return chapters;
+
+    final query = searchQuery.toLowerCase();
+    return chapters.where((chapter) {
+      final titleMatch = chapter.title.toLowerCase().contains(query);
+      final descMatch =
+          chapter.description?.toLowerCase().contains(query) ?? false;
+      final keywordMatch =
+          chapter.keyword?.toLowerCase().contains(query) ?? false;
+      return titleMatch || descMatch || keywordMatch;
+    }).toList();
+  }
+
+  /// 검색 결과가 있는지 확인
+  bool get hasSearchResults => filteredChapters.isNotEmpty;
+
+  /// 검색 중인지 확인
+  bool get isSearching => searchQuery.isNotEmpty;
 }

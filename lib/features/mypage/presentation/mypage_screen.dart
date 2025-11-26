@@ -27,7 +27,14 @@ class _MypageScreenState extends ConsumerState<MypageScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(noteNotifierProvider.notifier).fetchAllNotes();
+      final noteState = ref.read(noteNotifierProvider);
+      // ✅ 노트가 없고 로딩 중이 아닐 때만 API 호출 (캐시 활용)
+      if (noteState.notes.isEmpty && !noteState.isLoading) {
+        debugPrint('📝 [MYPAGE_SCREEN] 노트 데이터 없음 - API 호출');
+        ref.read(noteNotifierProvider.notifier).fetchAllNotes();
+      } else {
+        debugPrint('✅ [MYPAGE_SCREEN] 캐시된 노트 데이터 사용 (${noteState.notes.length}개)');
+      }
     });
   }
 

@@ -6,7 +6,7 @@ part of 'education_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$educationNotifierHash() => r'76f291bfc38ede50c1f9d87fcf6a5d0d520fc7c2';
+String _$educationNotifierHash() => r'389da42c57063b43dd82b197b999bee41e46fbf7';
 
 /// 🔥 Riverpod 기반 교육 상태 관리 Notifier
 ///

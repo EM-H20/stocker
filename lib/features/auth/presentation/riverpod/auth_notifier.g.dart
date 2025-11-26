@@ -6,7 +6,7 @@ part of 'auth_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authNotifierHash() => r'cde9f30e9aa1c1edcebaf3beb326128e2ed3b88a';
+String _$authNotifierHash() => r'239f5df7f1a882d760545ee66439420577c634b2';
 
 /// 🔥 Riverpod 기반 인증 상태 관리 Notifier
 /// AsyncNotifier를 사용하여 비동기 초기화 지원

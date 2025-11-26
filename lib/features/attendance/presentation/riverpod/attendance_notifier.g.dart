@@ -7,7 +7,7 @@ part of 'attendance_notifier.dart';
 // **************************************************************************
 
 String _$attendanceNotifierHash() =>
-    r'ef593719518f6cad53fe190f4091090813479ab0';
+    r'b535dd0e1e789ccb05bb94014ed10088dfc4408a';
 
 /// 🔥 Riverpod 기반 출석 상태 관리 Notifier
 ///

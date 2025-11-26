@@ -215,7 +215,7 @@ class AptitudeNotifier extends _$AptitudeNotifier {
       default:
         return InvestmentMaster(
           name: '투자 전문가',
-          imageUrl: 'https://placehold.co/100x100/999999/FFFFFF?text=??',
+          imageUrl: 'https://placehold.co/100x100/999999/FFFFFF?text=EX',
           description: '당신의 투자 성향에 맞는 전문가',
           portfolio: {'주식': 50.0, '채권': 30.0, '현금': 20.0},
         );

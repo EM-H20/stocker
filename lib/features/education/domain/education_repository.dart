@@ -296,6 +296,7 @@ class EducationRepository {
     return ChapterInfo(
       id: response.chapterId,
       title: response.title,
+      keyword: response.keyword,
       isTheoryCompleted: response.isTheoryCompleted,
       isQuizCompleted: response.isQuizCompleted,
       isChapterCompleted: response.isChapterCompleted,

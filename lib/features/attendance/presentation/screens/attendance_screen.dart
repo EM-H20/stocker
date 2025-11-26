@@ -22,9 +22,16 @@ class _AttendanceScreenState extends ConsumerState<AttendanceScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref
-        .read(attendanceNotifierProvider.notifier)
-        .fetchAttendanceStatus(DateTime.now()));
+    Future.microtask(() {
+      final attendanceState = ref.read(attendanceNotifierProvider);
+      // ✅ 출석 데이터가 없고 로딩 중이 아닐 때만 API 호출 (캐시 활용)
+      if (attendanceState.attendanceStatus.isEmpty && !attendanceState.isLoading) {
+        debugPrint('📅 [ATTENDANCE_SCREEN] 출석 데이터 없음 - API 호출');
+        ref.read(attendanceNotifierProvider.notifier).fetchAttendanceStatus(DateTime.now());
+      } else {
+        debugPrint('✅ [ATTENDANCE_SCREEN] 캐시된 출석 데이터 사용 (${attendanceState.attendanceStatus.length}일)');
+      }
+    });
   }
 
   Future<void> _onStartQuizPressed() async {

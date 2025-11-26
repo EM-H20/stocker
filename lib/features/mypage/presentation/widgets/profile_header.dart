@@ -21,7 +21,7 @@ class ProfileHeader extends StatelessWidget {
           // 제목
           Center(
             child: Text(
-              '마이 페이지',
+              '마이페이지',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

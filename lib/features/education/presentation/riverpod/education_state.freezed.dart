@@ -25,6 +25,9 @@ mixin _$EducationState {
   /// 선택된 챕터 ID
   int? get selectedChapterId => throw _privateConstructorUsedError;
 
+  /// 검색어 (실시간 검색용)
+  String get searchQuery => throw _privateConstructorUsedError;
+
   /// 챕터 로딩 중
   bool get isLoadingChapters => throw _privateConstructorUsedError;
 
@@ -60,6 +63,7 @@ abstract class $EducationStateCopyWith<$Res> {
       {List<ChapterInfo> chapters,
       TheorySession? currentTheorySession,
       int? selectedChapterId,
+      String searchQuery,
       bool isLoadingChapters,
       bool isLoadingTheory,
       bool isUpdatingProgress,
@@ -86,6 +90,7 @@ class _$EducationStateCopyWithImpl<$Res, $Val extends EducationState>
     Object? chapters = null,
     Object? currentTheorySession = freezed,
     Object? selectedChapterId = freezed,
+    Object? searchQuery = null,
     Object? isLoadingChapters = null,
     Object? isLoadingTheory = null,
     Object? isUpdatingProgress = null,
@@ -106,6 +111,10 @@ class _$EducationStateCopyWithImpl<$Res, $Val extends EducationState>
           ? _value.selectedChapterId
           : selectedChapterId // ignore: cast_nullable_to_non_nullable
               as int?,
+      searchQuery: null == searchQuery
+          ? _value.searchQuery
+          : searchQuery // ignore: cast_nullable_to_non_nullable
+              as String,
       isLoadingChapters: null == isLoadingChapters
           ? _value.isLoadingChapters
           : isLoadingChapters // ignore: cast_nullable_to_non_nullable
@@ -146,6 +155,7 @@ abstract class _$$EducationStateImplCopyWith<$Res>
       {List<ChapterInfo> chapters,
       TheorySession? currentTheorySession,
       int? selectedChapterId,
+      String searchQuery,
       bool isLoadingChapters,
       bool isLoadingTheory,
       bool isUpdatingProgress,
@@ -170,6 +180,7 @@ class __$$EducationStateImplCopyWithImpl<$Res>
     Object? chapters = null,
     Object? currentTheorySession = freezed,
     Object? selectedChapterId = freezed,
+    Object? searchQuery = null,
     Object? isLoadingChapters = null,
     Object? isLoadingTheory = null,
     Object? isUpdatingProgress = null,
@@ -190,6 +201,10 @@ class __$$EducationStateImplCopyWithImpl<$Res>
           ? _value.selectedChapterId
           : selectedChapterId // ignore: cast_nullable_to_non_nullable
               as int?,
+      searchQuery: null == searchQuery
+          ? _value.searchQuery
+          : searchQuery // ignore: cast_nullable_to_non_nullable
+              as String,
       isLoadingChapters: null == isLoadingChapters
           ? _value.isLoadingChapters
           : isLoadingChapters // ignore: cast_nullable_to_non_nullable
@@ -225,6 +240,7 @@ class _$EducationStateImpl extends _EducationState {
       {final List<ChapterInfo> chapters = const [],
       this.currentTheorySession,
       this.selectedChapterId,
+      this.searchQuery = '',
       this.isLoadingChapters = false,
       this.isLoadingTheory = false,
       this.isUpdatingProgress = false,
@@ -253,6 +269,11 @@ class _$EducationStateImpl extends _EducationState {
   /// 선택된 챕터 ID
   @override
   final int? selectedChapterId;
+
+  /// 검색어 (실시간 검색용)
+  @override
+  @JsonKey()
+  final String searchQuery;
 
   /// 챕터 로딩 중
   @override
@@ -284,7 +305,7 @@ class _$EducationStateImpl extends _EducationState {
 
   @override
   String toString() {
-    return 'EducationState(chapters: $chapters, currentTheorySession: $currentTheorySession, selectedChapterId: $selectedChapterId, isLoadingChapters: $isLoadingChapters, isLoadingTheory: $isLoadingTheory, isUpdatingProgress: $isUpdatingProgress, isCompletingTheory: $isCompletingTheory, chaptersError: $chaptersError, theoryError: $theoryError)';
+    return 'EducationState(chapters: $chapters, currentTheorySession: $currentTheorySession, selectedChapterId: $selectedChapterId, searchQuery: $searchQuery, isLoadingChapters: $isLoadingChapters, isLoadingTheory: $isLoadingTheory, isUpdatingProgress: $isUpdatingProgress, isCompletingTheory: $isCompletingTheory, chaptersError: $chaptersError, theoryError: $theoryError)';
   }
 
   @override
@@ -297,6 +318,8 @@ class _$EducationStateImpl extends _EducationState {
                 other.currentTheorySession == currentTheorySession) &&
             (identical(other.selectedChapterId, selectedChapterId) ||
                 other.selectedChapterId == selectedChapterId) &&
+            (identical(other.searchQuery, searchQuery) ||
+                other.searchQuery == searchQuery) &&
             (identical(other.isLoadingChapters, isLoadingChapters) ||
                 other.isLoadingChapters == isLoadingChapters) &&
             (identical(other.isLoadingTheory, isLoadingTheory) ||
@@ -317,6 +340,7 @@ class _$EducationStateImpl extends _EducationState {
       const DeepCollectionEquality().hash(_chapters),
       currentTheorySession,
       selectedChapterId,
+      searchQuery,
       isLoadingChapters,
       isLoadingTheory,
       isUpdatingProgress,
@@ -339,6 +363,7 @@ abstract class _EducationState extends EducationState {
       {final List<ChapterInfo> chapters,
       final TheorySession? currentTheorySession,
       final int? selectedChapterId,
+      final String searchQuery,
       final bool isLoadingChapters,
       final bool isLoadingTheory,
       final bool isUpdatingProgress,
@@ -358,6 +383,10 @@ abstract class _EducationState extends EducationState {
   /// 선택된 챕터 ID
   @override
   int? get selectedChapterId;
+
+  /// 검색어 (실시간 검색용)
+  @override
+  String get searchQuery;
 
   /// 챕터 로딩 중
   @override

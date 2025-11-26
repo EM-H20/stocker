@@ -4,6 +4,7 @@ class ChapterInfo {
   final int id;
   final String title;
   final String? description; // 백엔드 데이터와 매칭
+  final String? keyword; // 쉼표로 구분된 키워드 (검색용)
   final bool isTheoryCompleted;
   final bool isQuizCompleted;
   final bool isChapterCompleted; // 챕터 전체 완료 상태
@@ -12,6 +13,7 @@ class ChapterInfo {
     required this.id,
     required this.title,
     this.description,
+    this.keyword,
     required this.isTheoryCompleted,
     required this.isQuizCompleted,
     required this.isChapterCompleted,
@@ -24,6 +26,7 @@ class ChapterInfo {
       id: json['id'] as int,
       title: json['title'] as String,
       description: json['description'] as String?,
+      keyword: json['keyword'] as String?,
       isTheoryCompleted: false, // 별도 API로 조회 필요
       isQuizCompleted: false, // 별도 API로 조회 필요
       isChapterCompleted: false, // 별도 API로 조회 필요
@@ -36,6 +39,7 @@ class ChapterInfo {
       'id': id,
       'title': title,
       'description': description,
+      'keyword': keyword,
     };
   }
 
@@ -45,6 +49,7 @@ class ChapterInfo {
     int? id,
     String? title,
     String? description,
+    String? keyword,
     bool? isTheoryCompleted,
     bool? isQuizCompleted,
     bool? isChapterCompleted,
@@ -53,6 +58,7 @@ class ChapterInfo {
       id: id ?? this.id,
       title: title ?? this.title,
       description: description ?? this.description,
+      keyword: keyword ?? this.keyword,
       isTheoryCompleted: isTheoryCompleted ?? this.isTheoryCompleted,
       isQuizCompleted: isQuizCompleted ?? this.isQuizCompleted,
       isChapterCompleted: isChapterCompleted ?? this.isChapterCompleted,
@@ -62,11 +68,11 @@ class ChapterInfo {
   @override
   String toString() {
     return 'ChapterInfo(id: $id, title: $title, description: $description, '
-        'isTheoryCompleted: $isTheoryCompleted, isQuizCompleted: $isQuizCompleted, '
-        'isChapterCompleted: $isChapterCompleted)';
+        'keyword: $keyword, isTheoryCompleted: $isTheoryCompleted, '
+        'isQuizCompleted: $isQuizCompleted, isChapterCompleted: $isChapterCompleted)';
   }
 
-  // chapterInfo가 같은지 비교(id, title, description, isTheoryCompleted, isQuizCompleted, isChapterCompleted)
+  // chapterInfo가 같은지 비교
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -74,6 +80,7 @@ class ChapterInfo {
         other.id == id &&
         other.title == title &&
         other.description == description &&
+        other.keyword == keyword &&
         other.isTheoryCompleted == isTheoryCompleted &&
         other.isQuizCompleted == isQuizCompleted &&
         other.isChapterCompleted == isChapterCompleted;
@@ -82,7 +89,7 @@ class ChapterInfo {
   // chapterInfo의 해시코드
   @override
   int get hashCode {
-    return Object.hash(id, title, description, isTheoryCompleted,
+    return Object.hash(id, title, description, keyword, isTheoryCompleted,
         isQuizCompleted, isChapterCompleted);
   }
 }

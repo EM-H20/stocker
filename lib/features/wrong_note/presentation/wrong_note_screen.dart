@@ -31,13 +31,19 @@ class _WrongNoteScreenState extends ConsumerState<WrongNoteScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // 화면 로드 시 오답노트 데이터 한 번만 로드 (중복 방지)
-    debugPrint('📝 [WrongNote] Screen 초기화 - 오답노트 로드 시작');
+    // 화면 로드 시 오답노트 데이터 조건부 로드 (캐시 활용)
+    debugPrint('📝 [WrongNote] Screen 초기화');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        _loadWrongNotesWithCheck();
+        final wrongNoteState = ref.read(wrongNoteNotifierProvider);
+        // ✅ 데이터가 없고 로딩 중이 아닐 때만 API 호출 (캐시 활용)
+        if (wrongNoteState.wrongNotes.isEmpty && !wrongNoteState.isLoading) {
+          debugPrint('📝 [WrongNote] 오답노트 데이터 없음 - API 호출');
+          _loadWrongNotesWithCheck();
+        } else {
+          debugPrint('✅ [WrongNote] 캐시된 오답노트 데이터 사용 (${wrongNoteState.wrongNotes.length}개)');
+        }
         _hasLoadedOnce = true;
-        debugPrint('📝 [WrongNote] initState에서 오답노트 로드 완료');
       }
     });
   }

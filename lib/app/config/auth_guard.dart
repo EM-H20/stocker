@@ -29,7 +29,8 @@ class AuthGuard {
     WidgetRef ref,
   ) {
     // 1. 현재 인증 상태 확인
-    final authState = ref.watch(authNotifierProvider); // watch로 변경하여 상태 변화 감지
+    // ⚠️ redirect 콜백에서는 ref.read() 사용! (ref.watch() 사용 시 앱 전체 rebuild 발생)
+    final authState = ref.read(authNotifierProvider);
 
     // 초기화 중이면 아무것도 하지 않음 (깜빡임 방지)
     if (authState.isLoading || authState.value?.isInitializing == true) {

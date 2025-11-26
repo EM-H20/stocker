@@ -93,14 +93,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         // 🔥 Riverpod: 최신 상태를 다시 읽어옴
         final currentState = ref.read(authNotifierProvider).value;
+        final errorMsg = currentState?.errorMessage ?? '로그인에 실패했습니다.';
+
+        debugPrint('🔔 [LOGIN] 에러 메시지 표시 예정: $errorMsg');
 
         // 🎨 실패 메시지 표시 (커스텀 SnackBar) - 서버 에러 메시지 자동 표시
         CustomSnackBar.show(
           context: context,
           type: SnackBarType.error,
-          message: currentState?.errorMessage ?? '로그인에 실패했습니다.',
+          message: errorMsg,
           duration: const Duration(seconds: 3),
         );
+
+        debugPrint('✅ [LOGIN] CustomSnackBar.show() 호출 완료');
       }
     }
   }
