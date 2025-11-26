@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/config/app_routes.dart';
 import '../../../app/core/widgets/custom_snackbar.dart';
@@ -87,113 +88,108 @@ class LoginScreen extends ConsumerWidget {
       }
     }
 
-    return GestureDetector(
-      onTap: () {
-        // 화면을 탭하면 키보드 숨김
-        FocusScope.of(context).unfocus();
+    return PopScope(
+      // ✅ Android 뒤로가기 버튼 제어: 로그인 화면에서는 뒤로가기 허용 (홈으로 이동)
+      canPop: false, // 기본 뒤로가기 막기
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
+        if (!didPop) {
+          debugPrint('🔙 [LOGIN] Android 뒤로가기 감지');
+          // 홈으로 이동 허용
+          context.go(AppRoutes.home);
+        }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('로그인'),
-          centerTitle: true,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              debugPrint('🔙 [LOGIN] 뒤로가기 버튼 클릭');
-              // 이전 페이지가 있으면 뒤로가기, 없으면 홈으로
-              if (Navigator.canPop(context)) {
-                context.pop();
-                debugPrint('📱 [LOGIN] 이전 페이지로 이동');
-              } else {
-                context.go(AppRoutes.home);
-                debugPrint('🏠 [LOGIN] 홈 페이지로 이동');
-              }
-            },
-          ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 48),
-                Center(
-                  child: Image.asset(
-                    'assets/images/stocker_logo.png',
-                    width: 120,
-                    height: 120,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  '로그인',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 48),
-                // ✨ ModernTextField - 이메일
-                ModernTextField(
-                  label: '이메일',
-                  hint: 'example@email.com',
-                  prefixIcon: Icons.email_outlined,
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 16),
-                // ✨ ModernTextField - 비밀번호 (가시성 토글 포함)
-                ModernTextField(
-                  label: '비밀번호',
-                  prefixIcon: Icons.lock_outline,
-                  controller: passwordController,
-                  isPassword: true,
-                ),
-                const SizedBox(height: 32),
-                // ✨ GradientButton - 로그인
-                GradientButton(
-                  text: '로그인',
-                  icon: Icons.login,
-                  onPressed: (authState.value?.isLoading ?? false)
-                      ? null
-                      : handleLogin,
-                  isLoading: authState.value?.isLoading ?? false,
-                ),
-                const SizedBox(height: 24),
-                // ✨ 개선된 회원가입 CTA
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      child: GestureDetector(
+        onTap: () {
+          // 화면을 탭하면 키보드 숨김
+          FocusScope.of(context).unfocus();
+        },
+        child: Scaffold(
+          // ✅ 키보드가 올라올 때 Scaffold가 자동으로 resize되도록 설정
+          resizeToAvoidBottomInset: true,
+          // ✅ AppBar 제거 - 회원가입 화면과 일관성 유지
+          body: SafeArea(
+            child: SingleChildScrollView(
+              // ✅ 키보드 올라올 때 스크롤 가능하도록 추가
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      '계정이 없으신가요? ',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
+                    SizedBox(height: 60.h), // ✅ AppBar 없어서 상단 여백 증가
+                    Center(
+                      child: Image.asset(
+                        'assets/images/stocker_logo.png',
+                        width: 140.w, // ✅ 로고 크기 증가 + 반응형
+                        height: 140.h,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        debugPrint('📝 [LOGIN] 회원가입 버튼 클릭');
-                        context.push(AppRoutes.register);
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                    SizedBox(height: 32.h), // ✅ 반응형 적용
+                    Text(
+                      '로그인',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineMedium, // ✅ Theme 활용
+                    ),
+                    SizedBox(height: 48.h), // ✅ 반응형 적용
+                    // ✨ ModernTextField - 이메일
+                    ModernTextField(
+                      label: '이메일',
+                      hint: 'example@email.com',
+                      prefixIcon: Icons.email_outlined,
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    SizedBox(height: 16.h), // ✅ 반응형 적용
+                    // ✨ ModernTextField - 비밀번호 (가시성 토글 포함)
+                    ModernTextField(
+                      label: '비밀번호',
+                      prefixIcon: Icons.lock_outline,
+                      controller: passwordController,
+                      isPassword: true,
+                    ),
+                    SizedBox(height: 32.h), // ✅ 반응형 적용
+                    // ✨ GradientButton - 로그인
+                    GradientButton(
+                      text: '로그인',
+                      icon: Icons.login,
+                      onPressed: (authState.value?.isLoading ?? false)
+                          ? null
+                          : handleLogin,
+                      isLoading: authState.value?.isLoading ?? false,
+                    ),
+                    SizedBox(height: 24.h), // ✅ 반응형 적용
+                    // ✨ 개선된 회원가입 CTA
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '계정이 없으신가요? ',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ), // ✅ Theme 활용
                         ),
-                      ),
-                      child: const Text(
-                        '회원가입',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
+                        TextButton(
+                          onPressed: () {
+                            debugPrint('📝 [LOGIN] 회원가입 버튼 클릭');
+                            context.push(AppRoutes.register);
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 4.h,
+                            ), // ✅ 반응형 적용
+                          ),
+                          child: Text(
+                            '회원가입',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ), // ✅ Theme 활용
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

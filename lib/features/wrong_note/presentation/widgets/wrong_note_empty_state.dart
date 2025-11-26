@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../app/core/widgets/action_button.dart';
 import '../../../../app/config/app_theme.dart';
 import '../../../../app/core/utils/theme_utils.dart';
 
@@ -49,13 +48,6 @@ class WrongNoteEmptyState extends StatelessWidget {
                   : AppTheme.grey600,
               fontSize: 14.sp,
             ),
-          ),
-          SizedBox(height: 24.h),
-          ActionButton(
-            text: '퀴즈 풀러가기',
-            icon: Icons.quiz,
-            color: AppTheme.successColor,
-            onPressed: onGoToQuiz,
           ),
         ],
       ),

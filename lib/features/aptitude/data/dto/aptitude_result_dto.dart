@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../../../features/aptitude/domain/model/aptitude_result.dart';
 
 // features/aptitude/data/dto/aptitude_result_dto.dart
@@ -99,7 +101,8 @@ class InvestmentMasterDto {
 
     // 디버깅: 포트폴리오가 비어있으면 로그 출력
     if (portfolio.isEmpty) {
-      print('⚠️ [DTO] ${json['name']} 포트폴리오가 비어있습니다! JSON: ${json['portfolio']}');
+      debugPrint(
+          '⚠️ [DTO] ${json['name']} 포트폴리오가 비어있습니다! JSON: ${json['portfolio']}');
     }
 
     return InvestmentMasterDto(
