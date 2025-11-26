@@ -66,9 +66,11 @@ dev_dependencies:
   json_serializable: ^6.8.0        # JSON 직렬화 (freezed 의존성)
 
 flutter_launcher_icons:
-   image_path: "assets/icon/app_icon.png"
-   android: true
-   ios: true
+  image_path: "assets/images/stocker_logo.png"
+  android: true
+  ios: true
+  min_sdk_android: 21
+  remove_alpha_ios: true
 
 flutter:
   uses-material-design: true
