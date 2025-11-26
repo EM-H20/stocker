@@ -8,85 +8,107 @@ import 'riverpod/auth_notifier.dart';
 import 'widgets/modern_text_field.dart';
 import 'widgets/gradient_button.dart';
 
-class LoginScreen extends ConsumerWidget {
+/// 🔥 ConsumerStatefulWidget으로 변환 - TextEditingController 생명주기 관리
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // 🔥 Riverpod: ref.watch()로 AuthState 구독
-    final authState = ref.watch(authNotifierProvider);
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
 
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  // ✅ State 클래스 멤버로 이동 - 빌드 때마다 초기화되지 않음!
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
 
-    // ✅ [Riverpod 변환] 로그인 로직을 별도의 비동기 함수로 분리합니다.
-    Future<void> handleLogin() async {
-      // 위젯이 여전히 유효한지 먼저 확인합니다.
-      if (!context.mounted) return;
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+  }
 
-      debugPrint('🔐 [LOGIN] Login attempt started');
+  @override
+  void dispose() {
+    // ✅ 메모리 누수 방지 - 컨트롤러 정리
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
-      // 🔥 Riverpod: ref.read()로 AuthNotifier의 login 메서드 호출
-      final authNotifier = ref.read(authNotifierProvider.notifier);
-      final isSuccess = await authNotifier.login(
-        emailController.text.trim(),
-        passwordController.text.trim(),
-      );
+  /// ✅ 로그인 처리 로직
+  Future<void> _handleLogin() async {
+    if (!mounted) return;
 
-      // 비동기 작업 후에도 위젯이 유효한지 다시 확인합니다.
-      if (context.mounted) {
-        if (isSuccess) {
-          debugPrint('✅ [LOGIN] 로그인 성공');
+    debugPrint('🔐 [LOGIN] Login attempt started');
 
-          // 🔥 Riverpod: 최신 상태를 다시 읽어옴
-          final currentState = ref.read(authNotifierProvider).value;
-          debugPrint('🔍 [LOGIN] Current auth state - user: ${currentState?.user?.email}');
+    // 🔥 Riverpod: ref.read()로 AuthNotifier의 login 메서드 호출
+    final authNotifier = ref.read(authNotifierProvider.notifier);
+    final isSuccess = await authNotifier.login(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
 
-          // ✅ Android 대응: Riverpod 상태 전파 대기
-          // AuthGuard가 정확한 상태로 평가될 수 있도록 추가 대기
-          debugPrint('⏳ [LOGIN] Waiting for state propagation...');
-          await Future.delayed(const Duration(milliseconds: 200));
+    // 비동기 작업 후에도 위젯이 유효한지 다시 확인합니다.
+    if (mounted) {
+      if (isSuccess) {
+        debugPrint('✅ [LOGIN] 로그인 성공');
 
-          // 상태 전파 후 재확인
-          final finalState = ref.read(authNotifierProvider).value;
-          debugPrint('✅ [LOGIN] State propagation complete - user: ${finalState?.user?.email}');
+        // 🔥 Riverpod: 최신 상태를 다시 읽어옴
+        final currentState = ref.read(authNotifierProvider).value;
+        debugPrint(
+            '🔍 [LOGIN] Current auth state - user: ${currentState?.user?.email}');
 
-          // ✅ async gap 이후 mounted 체크
-          if (!context.mounted) return;
+        // ✅ Android 대응: Riverpod 상태 전파 대기
+        debugPrint('⏳ [LOGIN] Waiting for state propagation...');
+        await Future.delayed(const Duration(milliseconds: 200));
 
-          // ✅ 쿼리 파라미터에서 원래 경로 가져오기
-          final uri = GoRouterState.of(context).uri;
-          final redirectPath = uri.queryParameters['redirect'];
+        // 상태 전파 후 재확인
+        final finalState = ref.read(authNotifierProvider).value;
+        debugPrint(
+            '✅ [LOGIN] State propagation complete - user: ${finalState?.user?.email}');
 
-          // ✅ 원래 가려던 페이지로 이동 (없으면 기본 홈)
-          final destination = redirectPath ?? AppRoutes.education;
+        // ✅ async gap 이후 mounted 체크
+        if (!mounted) return;
 
-          debugPrint('📍 [LOGIN] Redirecting to: $destination');
-          context.go(destination);
+        // ✅ 쿼리 파라미터에서 원래 경로 가져오기
+        final uri = GoRouterState.of(context).uri;
+        final redirectPath = uri.queryParameters['redirect'];
 
-          // 🎨 성공 메시지 표시 (커스텀 SnackBar)
-          CustomSnackBar.show(
-            context: context,
-            type: SnackBarType.success,
-            message: '${currentState?.user?.nickname ?? "사용자"}님 환영합니다! 🎉',
-            duration: const Duration(seconds: 2),
-          );
-        } else {
-          debugPrint('❌ [LOGIN] 로그인 실패');
+        // ✅ 원래 가려던 페이지로 이동 (없으면 기본 홈)
+        final destination = redirectPath ?? AppRoutes.education;
 
-          // 🔥 Riverpod: 최신 상태를 다시 읽어옴
-          final currentState = ref.read(authNotifierProvider).value;
+        debugPrint('📍 [LOGIN] Redirecting to: $destination');
+        context.go(destination);
 
-          // 🎨 실패 메시지 표시 (커스텀 SnackBar) - 서버 에러 메시지 자동 표시
-          CustomSnackBar.show(
-            context: context,
-            type: SnackBarType.error,
-            message: currentState?.errorMessage ?? '로그인에 실패했습니다.',
-            duration: const Duration(seconds: 3),
-          );
-        }
+        // 🎨 성공 메시지 표시 (커스텀 SnackBar)
+        CustomSnackBar.show(
+          context: context,
+          type: SnackBarType.success,
+          message: '${currentState?.user?.nickname ?? "사용자"}님 환영합니다! 🎉',
+          duration: const Duration(seconds: 2),
+        );
+      } else {
+        debugPrint('❌ [LOGIN] 로그인 실패');
+
+        // 🔥 Riverpod: 최신 상태를 다시 읽어옴
+        final currentState = ref.read(authNotifierProvider).value;
+
+        // 🎨 실패 메시지 표시 (커스텀 SnackBar) - 서버 에러 메시지 자동 표시
+        CustomSnackBar.show(
+          context: context,
+          type: SnackBarType.error,
+          message: currentState?.errorMessage ?? '로그인에 실패했습니다.',
+          duration: const Duration(seconds: 3),
+        );
       }
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 🔥 Riverpod: ref.watch()로 AuthState 구독
+    final authState = ref.watch(authNotifierProvider);
 
     return PopScope(
       // ✅ Android 뒤로가기 버튼 제어: 로그인 화면에서는 뒤로가기 허용 (홈으로 이동)
@@ -127,7 +149,8 @@ class LoginScreen extends ConsumerWidget {
                     Text(
                       '로그인',
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineMedium, // ✅ Theme 활용
+                      style:
+                          Theme.of(context).textTheme.headlineMedium, // ✅ Theme 활용
                     ),
                     SizedBox(height: 48.h), // ✅ 반응형 적용
                     // ✨ ModernTextField - 이메일
@@ -135,7 +158,7 @@ class LoginScreen extends ConsumerWidget {
                       label: '이메일',
                       hint: 'example@email.com',
                       prefixIcon: Icons.email_outlined,
-                      controller: emailController,
+                      controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                     ),
                     SizedBox(height: 16.h), // ✅ 반응형 적용
@@ -143,7 +166,7 @@ class LoginScreen extends ConsumerWidget {
                     ModernTextField(
                       label: '비밀번호',
                       prefixIcon: Icons.lock_outline,
-                      controller: passwordController,
+                      controller: _passwordController,
                       isPassword: true,
                     ),
                     SizedBox(height: 32.h), // ✅ 반응형 적용
@@ -153,7 +176,7 @@ class LoginScreen extends ConsumerWidget {
                       icon: Icons.login,
                       onPressed: (authState.value?.isLoading ?? false)
                           ? null
-                          : handleLogin,
+                          : _handleLogin,
                       isLoading: authState.value?.isLoading ?? false,
                     ),
                     SizedBox(height: 24.h), // ✅ 반응형 적용
@@ -163,9 +186,12 @@ class LoginScreen extends ConsumerWidget {
                       children: [
                         Text(
                           '계정이 없으신가요? ',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ), // ✅ Theme 활용
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ), // ✅ Theme 활용
                         ),
                         TextButton(
                           onPressed: () {
@@ -180,9 +206,10 @@ class LoginScreen extends ConsumerWidget {
                           ),
                           child: Text(
                             '회원가입',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ), // ✅ Theme 활용
+                            style:
+                                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ), // ✅ Theme 활용
                           ),
                         ),
                       ],
