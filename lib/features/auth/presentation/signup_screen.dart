@@ -341,10 +341,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             prefixIcon: Icons.lock_outline,
             controller: _confirmPasswordController,
             isPassword: true,
-            errorText: _confirmPasswordController.text.isNotEmpty &&
-                    !_isPasswordMatch
-                ? '비밀번호가 일치하지 않습니다'
-                : null,
+            errorText:
+                _confirmPasswordController.text.isNotEmpty && !_isPasswordMatch
+                    ? '비밀번호가 일치하지 않습니다'
+                    : null,
           ),
           SizedBox(height: 32.h),
 
@@ -477,10 +477,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               height: 24.h,
               child: Checkbox(
                 value: _agreedToTerms,
-                onChanged: (val) => setState(() => _agreedToTerms = val ?? false),
+                onChanged: (val) =>
+                    setState(() => _agreedToTerms = val ?? false),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4.r),
                 ),
+                // 🎨 다크모드 대응: 테두리 및 체크 색상 명시
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.outline,
+                  width: 1.5,
+                ),
+                activeColor: Theme.of(context).primaryColor,
+                checkColor: Colors.white,
               ),
             ),
             SizedBox(width: 12.w),
@@ -488,7 +496,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
               child: Text.rich(
                 TextSpan(
                   text: '이용약관 및 ',
-                  style: TextStyle(fontSize: 14.sp),
+                  // 🎨 다크모드 대응: 테마의 텍스트 색상 사용
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                   children: [
                     TextSpan(
                       text: '개인정보처리방침',
@@ -496,10 +508,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         fontSize: 14.sp,
                         decoration: TextDecoration.underline,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).primaryColor,
+                        color: Colors.blue.shade700,
                       ),
                     ),
-                    const TextSpan(text: '에 동의합니다'),
+                    TextSpan(
+                      text: '에 동의합니다',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -14,6 +14,7 @@ import '../../features/mypage/presentation/mypage_screen.dart';
 import '../../features/education/presentation/theory_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/signup_screen.dart';
+import '../../features/auth/presentation/splash_screen.dart';
 import '../../features/quiz/presentation/quiz_screen.dart';
 import '../../features/quiz/presentation/quiz_result_screen.dart';
 import '../../features/aptitude/presentation/screens/aptitude_quiz_screen.dart';
@@ -27,13 +28,22 @@ class AppRouter {
   /// 인증 상태에 따른 자동 리다이렉트 기능 포함
   static GoRouter createRouter(WidgetRef ref) {
     return GoRouter(
-      initialLocation: AppRoutes.education, // 🎓 교육 탭을 초기 화면으로
+      initialLocation: AppRoutes.splash, // 🚀 스플래시 화면에서 인증 확인 후 분기
       debugLogDiagnostics: true, // ✅ GoRouter 내부 디버깅 로그 활성화
 
       // ✅ 인증 가드 리다이렉트 추가
       redirect: (context, state) => AuthGuard.redirect(context, state, ref),
 
       routes: [
+        // 🚀 스플래시 화면 (앱 시작점)
+        GoRoute(
+          path: AppRoutes.splash,
+          pageBuilder: (context, state) {
+            debugPrint('🚀 [ROUTER] 스플래시 페이지 로드');
+            return const NoTransitionPage(child: SplashScreen());
+          },
+        ),
+
         // 로그인 화면 (완전한 애니메이션 제거)
         GoRoute(
           path: AppRoutes.login,

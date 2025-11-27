@@ -64,21 +64,53 @@ class AptitudeResultScreen extends ConsumerWidget {
                 padding: EdgeInsets.all(20.w),
                 child: Column(
                   children: [
-                    // 거장 프로필 이미지
-                    CircleAvatar(
-                      radius: 50.r,
-                      backgroundImage: result.master.imageUrl.isNotEmpty
-                          ? NetworkImage(result.master.imageUrl)
-                          : null,
-                      backgroundColor: Colors.grey[300],
-                      child: result.master.imageUrl.isEmpty ||
-                              result.master.imageUrl.contains('placehold')
-                          ? Icon(
-                              Icons.person,
-                              size: 50.r,
-                              color: Colors.grey[600],
-                            )
-                          : null,
+                    // 거장 프로필 이미지 (403 에러 핸들링 포함)
+                    ClipOval(
+                      child: Container(
+                        width: 100.r,
+                        height: 100.r,
+                        color: Colors.grey[300],
+                        child: result.master.imageUrl.isNotEmpty &&
+                                !result.master.imageUrl.contains('placehold')
+                            ? Image.network(
+                                result.master.imageUrl,
+                                fit: BoxFit.cover,
+                                width: 100.r,
+                                height: 100.r,
+                                errorBuilder: (context, error, stackTrace) {
+                                  // 403 에러 등 이미지 로드 실패 시 기본 아이콘 표시
+                                  debugPrint(
+                                      '🖼️ [IMAGE_ERROR] 이미지 로드 실패: $error');
+                                  return Icon(
+                                    Icons.person,
+                                    size: 50.r,
+                                    color: Colors.grey[600],
+                                  );
+                                },
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                    ),
+                                  );
+                                },
+                              )
+                            : Icon(
+                                Icons.person,
+                                size: 50.r,
+                                color: Colors.grey[600],
+                              ),
+                      ),
                     ),
                     SizedBox(height: 16.h),
 

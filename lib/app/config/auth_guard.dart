@@ -13,6 +13,7 @@ import 'app_routes.dart';
 class AuthGuard {
   /// 공개 페이지 목록 (로그인 없이 접근 가능)
   static const publicRoutes = [
+    AppRoutes.splash, // '/splash' - 인증 확인 후 분기
     AppRoutes.login, // '/login'
     AppRoutes.register, // '/register'
   ];
