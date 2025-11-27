@@ -107,8 +107,9 @@ class InvestmentMasterDto {
 
     return InvestmentMasterDto(
       name: json['name'] as String? ?? '',
-      imageUrl: json['imageUrl'] as String? ?? '',
-      description: json['description'] as String? ?? '',
+      // 🔧 백엔드 응답은 snake_case (image_url, bio) 사용
+      imageUrl: json['image_url'] as String? ?? json['imageUrl'] as String? ?? '',
+      description: json['bio'] as String? ?? json['description'] as String? ?? '',
       portfolio: portfolio.isNotEmpty
           ? portfolio
           : {'주식': 40.0, '채권': 30.0, '현금': 20.0, '기타': 10.0}, // 기본 포트폴리오

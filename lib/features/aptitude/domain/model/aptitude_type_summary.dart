@@ -1,4 +1,6 @@
 // features/aptitude/domain/model/aptitude_type_summary.dart
+import 'aptitude_result.dart';
+
 /// 성향 목록의 각 아이템을 나타내는 모델 (투자 거장 정보 포함)
 class AptitudeTypeSummary {
   final String typeCode; // 예: "CLPD", "ELAI" 등 API에서 사용하는 고유 코드
@@ -20,4 +22,17 @@ class AptitudeTypeSummary {
     this.style = '',
     this.portfolio = const {},
   });
+
+  /// 백엔드에서 받은 거장 정보를 InvestmentMaster로 변환
+  /// 하드코딩이 아닌 실제 API 데이터를 사용!
+  InvestmentMaster toInvestmentMaster() {
+    return InvestmentMaster(
+      name: masterName,
+      imageUrl: imageUrl,
+      description: portfolioSummary.isNotEmpty ? portfolioSummary : style,
+      portfolio: portfolio.isNotEmpty
+          ? portfolio
+          : {'주식': 50.0, '채권': 30.0, '현금': 20.0}, // 포트폴리오가 비어있을 때만 기본값
+    );
+  }
 }
