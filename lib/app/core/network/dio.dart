@@ -8,12 +8,12 @@ import '../services/dio_interceptor.dart';
 final Dio dio = Dio();
 
 Future<void> setupDio() async {
-  // 환경 변수에서 API URL 가져오기 (백엔드 8080 포트 기본값)
-  final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://168.107.22.83:8080';
+  // 환경 변수에서 API URL 가져오기 (Node.js 백엔드 3000 포트)
+  final baseUrl = dotenv.env['API_BASE_URL'] ?? 'http://158.180.84.121:3000';
   final connectTimeout =
-      (int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '15') ?? 15) * 1000;
+      int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '15') ?? 15;
   final receiveTimeout =
-      (int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '30') ?? 30) * 1000;
+      int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '15') ?? 15;
 
   // URL 검증
   if (!_isValidUrl(baseUrl)) {
@@ -24,7 +24,7 @@ Future<void> setupDio() async {
 
   debugPrint('🌐 [DIO] Setting up Dio with baseUrl: $baseUrl');
   debugPrint(
-      '⏰ [DIO] Timeouts - Connect: ${connectTimeout}s, Receive: ${receiveTimeout}s');
+      '⏰ [DIO] Timeouts - Connect: $connectTimeout초, Receive: $receiveTimeout초');
 
   dio.options = BaseOptions(
     baseUrl: baseUrl,

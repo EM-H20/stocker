@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 네트워크 통신을 위한 필수 권한 (Release 빌드 포함) -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="stocker"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
